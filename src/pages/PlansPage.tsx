@@ -1,5 +1,6 @@
-import { motion } from 'framer-motion';
-import { Check, Video, TrendingUp, Gift, Headphones, Zap } from 'lucide-react';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Check, Video, TrendingUp, Gift, Headphones, Zap, Crown, Star, Lock, Unlock, ExternalLink, Play, X } from 'lucide-react';
 
 const plans = [
   {
@@ -47,14 +48,101 @@ const plans = [
   },
 ];
 
+interface StreamingPlatform {
+  name: string;
+  type: 'paid' | 'free';
+  color: string;
+  description: string;
+}
+
+const streamingPlatforms: StreamingPlatform[] = [
+  { name: 'HBO Max', type: 'paid', color: 'hsl(var(--primary))', description: 'Filmes, séries e esportes ao vivo' },
+  { name: 'Amazon Prime', type: 'paid', color: 'hsl(var(--primary))', description: 'Premier League e mais' },
+  { name: 'Globoplay', type: 'paid', color: 'hsl(var(--primary))', description: 'Brasileirão e Copa do Brasil' },
+  { name: 'Netflix', type: 'paid', color: 'hsl(var(--primary))', description: 'Documentários esportivos' },
+  { name: 'CazéTV', type: 'free', color: 'hsl(var(--secondary))', description: 'Transmissões ao vivo gratuitas' },
+  { name: 'GoatTV', type: 'free', color: 'hsl(var(--secondary))', description: 'Futebol e esportes grátis' },
+  { name: 'YouTube', type: 'free', color: 'hsl(var(--secondary))', description: 'Canais esportivos gratuitos' },
+];
+
 const PlansPage = () => {
+  const [showTable, setShowTable] = useState(false);
+
   return (
     <div className="pb-20 px-4 pt-2 space-y-6">
       <div className="text-center space-y-2">
-        <h1 className="font-display text-2xl font-extrabold">Escolha seu Plano</h1>
+        <h1 className="font-display text-2xl font-extrabold">Planos & Assinatura</h1>
         <p className="text-sm font-body text-muted-foreground">Desbloqueie recursos exclusivos e turbine suas apostas</p>
       </div>
 
+      {/* Comparison table toggle */}
+      <motion.button
+        whileTap={{ scale: 0.97 }}
+        onClick={() => setShowTable(!showTable)}
+        className="w-full flex items-center justify-center gap-2 bg-surface-card rounded-xl py-3 text-sm font-display font-bold text-foreground min-h-[44px]"
+      >
+        {showTable ? <X size={16} /> : <Star size={16} className="text-primary" />}
+        {showTable ? 'Fechar Comparação' : 'Ver Tabela Comparativa'}
+      </motion.button>
+
+      {/* Comparison table */}
+      <AnimatePresence>
+        {showTable && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden"
+          >
+            <div className="bg-surface-card rounded-2xl overflow-hidden">
+              <table className="w-full text-xs font-body">
+                <thead>
+                  <tr className="border-b border-muted/20">
+                    <th className="text-left p-3 text-muted-foreground font-semibold">Recurso</th>
+                    <th className="p-3 text-muted-foreground font-semibold">Grátis</th>
+                    <th className="p-3 text-primary font-bold">Premium</th>
+                    <th className="p-3 text-muted-foreground font-semibold">VIP</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-b border-muted/10">
+                    <td className="p-3 flex items-center gap-1.5"><Video size={12} className="text-primary" /> Streaming</td>
+                    <td className="p-3 text-center text-muted-foreground">Limitado</td>
+                    <td className="p-3 text-center text-primary font-semibold">Ilimitado</td>
+                    <td className="p-3 text-center font-semibold">4K</td>
+                  </tr>
+                  <tr className="border-b border-muted/10">
+                    <td className="p-3 flex items-center gap-1.5"><TrendingUp size={12} className="text-primary" /> Boost Odds</td>
+                    <td className="p-3 text-center text-muted-foreground">—</td>
+                    <td className="p-3 text-center text-primary font-semibold">+5%</td>
+                    <td className="p-3 text-center font-semibold">+15%</td>
+                  </tr>
+                  <tr className="border-b border-muted/10">
+                    <td className="p-3 flex items-center gap-1.5"><Headphones size={12} className="text-primary" /> Suporte</td>
+                    <td className="p-3 text-center text-muted-foreground">Normal</td>
+                    <td className="p-3 text-center text-primary font-semibold">Prioritário</td>
+                    <td className="p-3 text-center font-semibold">24/7</td>
+                  </tr>
+                  <tr className="border-b border-muted/10">
+                    <td className="p-3 flex items-center gap-1.5"><Gift size={12} className="text-primary" /> Bônus</td>
+                    <td className="p-3 text-center text-muted-foreground">—</td>
+                    <td className="p-3 text-center text-primary font-semibold">Mensais</td>
+                    <td className="p-3 text-center font-semibold">Exclusivos</td>
+                  </tr>
+                  <tr>
+                    <td className="p-3 flex items-center gap-1.5"><Zap size={12} className="text-primary" /> Cash Out</td>
+                    <td className="p-3 text-center text-muted-foreground">—</td>
+                    <td className="p-3 text-center"><Check size={14} className="text-secondary mx-auto" /></td>
+                    <td className="p-3 text-center"><Check size={14} className="text-secondary mx-auto" /></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Plan cards */}
       <div className="space-y-4">
         {plans.map((plan) => (
           <motion.div
@@ -65,7 +153,8 @@ const PlansPage = () => {
             }`}
           >
             {plan.badge && (
-              <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-[0.65rem] font-display font-bold px-3 py-1 rounded-full">
+              <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-[0.65rem] font-display font-bold px-3 py-1 rounded-full flex items-center gap-1">
+                <Crown size={10} />
                 {plan.badge}
               </span>
             )}
@@ -109,6 +198,42 @@ const PlansPage = () => {
             </motion.button>
           </motion.div>
         ))}
+      </div>
+
+      {/* Streaming Platforms */}
+      <div className="space-y-3">
+        <h2 className="font-display text-lg font-bold">Plataformas de Streaming</h2>
+        <p className="text-xs font-body text-muted-foreground">Assista aos melhores jogos nas plataformas parceiras</p>
+
+        <div className="space-y-2">
+          {streamingPlatforms.map((platform) => (
+            <div key={platform.name} className="bg-surface-card rounded-xl p-4 flex items-center gap-3">
+              <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                platform.type === 'free' ? 'bg-secondary/15' : 'bg-primary/15'
+              }`}>
+                <Play size={18} className={platform.type === 'free' ? 'text-secondary' : 'text-primary'} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="font-display font-bold text-sm">{platform.name}</span>
+                  {platform.type === 'free' ? (
+                    <span className="flex items-center gap-0.5 text-[0.6rem] font-display font-bold text-secondary bg-secondary/15 px-1.5 py-0.5 rounded-full">
+                      <Unlock size={8} />
+                      GRÁTIS
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-0.5 text-[0.6rem] font-display font-bold text-primary bg-primary/15 px-1.5 py-0.5 rounded-full">
+                      <Lock size={8} />
+                      PAGO
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs font-body text-muted-foreground truncate">{platform.description}</p>
+              </div>
+              <ExternalLink size={16} className="text-muted-foreground shrink-0" />
+            </div>
+          ))}
+        </div>
       </div>
 
       <p className="text-[0.6rem] text-muted-foreground font-body text-center">

@@ -1,9 +1,51 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Video, Clock, ChevronDown, ChevronUp } from 'lucide-react';
+import { ArrowLeft, Video, Clock, ChevronDown, ChevronUp, Shield } from 'lucide-react';
 import OddsChip from '@/components/OddsChip';
 import LiveBadge from '@/components/LiveBadge';
+
+// Team flag mappings (ISO 3166-1 alpha-2 or custom for clubs)
+const teamFlags: Record<string, string> = {
+  'Flamengo': 'https://flagcdn.com/w80/br.png',
+  'Palmeiras': 'https://flagcdn.com/w80/br.png',
+  'Corinthians': 'https://flagcdn.com/w80/br.png',
+  'São Paulo': 'https://flagcdn.com/w80/br.png',
+  'Real Madrid': 'https://flagcdn.com/w80/es.png',
+  'Barcelona': 'https://flagcdn.com/w80/es.png',
+  'Juventus': 'https://flagcdn.com/w80/it.png',
+  'Inter Milan': 'https://flagcdn.com/w80/it.png',
+  'Liverpool': 'https://flagcdn.com/w80/gb-eng.png',
+  'Man City': 'https://flagcdn.com/w80/gb-eng.png',
+  'PSG': 'https://flagcdn.com/w80/fr.png',
+  'Bayern Munich': 'https://flagcdn.com/w80/de.png',
+  'Athletico-PR': 'https://flagcdn.com/w80/br.png',
+  'Coritiba': 'https://flagcdn.com/w80/br.png',
+  'Grêmio': 'https://flagcdn.com/w80/br.png',
+  'Internacional': 'https://flagcdn.com/w80/br.png',
+  'Atlético-MG': 'https://flagcdn.com/w80/br.png',
+  'Cruzeiro': 'https://flagcdn.com/w80/br.png',
+  'Fluminense': 'https://flagcdn.com/w80/br.png',
+  'Botafogo': 'https://flagcdn.com/w80/br.png',
+  'Santos': 'https://flagcdn.com/w80/br.png',
+  'Vasco': 'https://flagcdn.com/w80/br.png',
+  'Brasil': 'https://flagcdn.com/w80/br.png',
+  'Argentina': 'https://flagcdn.com/w80/ar.png',
+  'França': 'https://flagcdn.com/w80/fr.png',
+};
+
+const TeamBadge = ({ team }: { team: string }) => {
+  const flag = teamFlags[team];
+  return (
+    <div className="w-12 h-12 rounded-full bg-surface-interactive flex items-center justify-center overflow-hidden">
+      {flag ? (
+        <img src={flag} alt={team} className="w-8 h-8 object-cover rounded-sm" />
+      ) : (
+        <Shield size={24} className="text-muted-foreground" />
+      )}
+    </div>
+  );
+};
 
 const markets = [
   {
@@ -92,7 +134,7 @@ const EventDetailPage = () => {
 
         <div className="flex items-center justify-between px-4">
           <div className="text-center flex-1">
-            <div className="w-12 h-12 rounded-full bg-surface-interactive mx-auto flex items-center justify-center text-2xl">🔴</div>
+            <TeamBadge team="Flamengo" />
             <p className="font-body font-semibold text-sm mt-2">Flamengo</p>
           </div>
           <div className="text-center px-4">
@@ -109,12 +151,12 @@ const EventDetailPage = () => {
             </div>
           </div>
           <div className="text-center flex-1">
-            <div className="w-12 h-12 rounded-full bg-surface-interactive mx-auto flex items-center justify-center text-2xl">🟢</div>
+            <TeamBadge team="Palmeiras" />
             <p className="font-body font-semibold text-sm mt-2">Palmeiras</p>
           </div>
         </div>
 
-        {/* Streaming placeholder */}
+        {/* Streaming button */}
         <button className="w-full bg-surface-interactive rounded-xl py-3 flex items-center justify-center gap-2 text-sm font-body text-muted-foreground hover:text-foreground transition-colors min-h-[44px]">
           <Video size={18} className="text-primary" />
           Assistir Transmissão ao Vivo
