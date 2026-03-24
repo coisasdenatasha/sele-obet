@@ -7,10 +7,10 @@ import bannerLiga from '@/assets/banner-liga.jpg';
 import MatchCard from '@/components/MatchCard';
 import SportFilter from '@/components/SportFilter';
 import VisitorBanner from '@/components/VisitorBanner';
-import { liveMatches, boostedMatches, upcomingMatches, popularMultiples, playerProps, heroBanners } from '@/data/mockData';
+import { liveMatches, boostedMatches, upcomingMatches, popularMultiples, playerProps, heroBanners, competitions, specials, oddsByCategory } from '@/data/mockData';
 import { useBetSlipStore } from '@/store/betSlipStore';
 import { useAuthStore } from '@/store/authStore';
-import { Flame, ChevronRight, Trophy, Gift, Zap, User, Calendar } from 'lucide-react';
+import { Flame, ChevronRight, Trophy, Gift, Zap, User, Calendar, Target, Scale, CreditCard, CornerDownRight, Award, Star, LayoutGrid } from 'lucide-react';
 
 const SectionTitle = ({ children, icon, action }: { children: React.ReactNode; icon?: React.ReactNode; action?: string }) => (
   <div className="flex items-center justify-between mb-3">
@@ -276,6 +276,106 @@ const HomePage = () => {
               ))}
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* 7. Competições */}
+      <section className="px-4">
+        <SectionTitle icon={<Trophy size={20} className="text-secondary" />} action="Ver Todas">
+          Competições
+        </SectionTitle>
+        <div className="space-y-2">
+          {competitions.map((comp) => (
+            <div key={comp.id} className="bg-surface-card rounded-xl p-3.5 flex items-center gap-3">
+              <img src={comp.flag} alt={comp.country} className="w-8 h-6 object-cover rounded" />
+              <div className="flex-1 min-w-0">
+                <p className="font-display text-sm font-bold truncate">{comp.name}</p>
+                <p className="text-[0.65rem] font-body text-muted-foreground">{comp.country}</p>
+              </div>
+              <span className="text-xs font-display font-bold text-primary bg-primary/15 px-2 py-1 rounded-lg">
+                {comp.matchCount} jogos
+              </span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* 8. Especiais */}
+      <section className="px-4">
+        <SectionTitle icon={<Star size={20} className="text-primary" />} action="Ver Todos">
+          Especiais
+        </SectionTitle>
+        <div className="space-y-3">
+          {specials.map((spec) => (
+            <div key={spec.id} className="bg-surface-card rounded-xl p-4 space-y-2.5">
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex-1 min-w-0">
+                  <span className="text-[0.6rem] font-display font-bold text-secondary bg-secondary/15 px-2 py-0.5 rounded-full">
+                    {spec.market}
+                  </span>
+                  <h3 className="font-display text-sm font-bold mt-1.5">{spec.title}</h3>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[0.6rem] font-body text-muted-foreground">Favorito</p>
+                  <p className="font-display text-sm font-bold">{spec.topPick}</p>
+                </div>
+                <div className="text-right">
+                  <p className="font-display text-xl font-bold text-primary">{spec.topOdds.toFixed(2)}</p>
+                  <p className="text-[0.6rem] font-body text-muted-foreground">{spec.options} opções</p>
+                </div>
+              </div>
+              <motion.button
+                whileTap={{ scale: 0.97 }}
+                onClick={() =>
+                  addBet({
+                    id: spec.id,
+                    match: spec.title,
+                    market: spec.market,
+                    selection: spec.topPick,
+                    odds: spec.topOdds,
+                  })
+                }
+                className="w-full bg-surface-interactive text-foreground font-display font-bold text-sm py-2.5 rounded-xl min-h-[44px] hover:bg-muted transition-colors"
+              >
+                Apostar
+              </motion.button>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* 9. Odds por Categoria */}
+      <section className="px-4">
+        <SectionTitle icon={<LayoutGrid size={20} className="text-primary" />} action="Ver Todas">
+          Odds por Categoria
+        </SectionTitle>
+        <div className="grid grid-cols-2 gap-3">
+          {oddsByCategory.map((cat) => {
+            const iconMap: Record<string, React.ReactNode> = {
+              trophy: <Trophy size={20} className="text-primary" />,
+              target: <Target size={20} className="text-primary" />,
+              scale: <Scale size={20} className="text-primary" />,
+              card: <CreditCard size={20} className="text-primary" />,
+              corner: <CornerDownRight size={20} className="text-primary" />,
+              user: <User size={20} className="text-primary" />,
+            };
+            return (
+              <motion.div
+                key={cat.id}
+                whileTap={{ scale: 0.97 }}
+                className="bg-surface-card rounded-xl p-4 space-y-2 cursor-pointer"
+              >
+                <div className="w-10 h-10 rounded-lg bg-primary/15 flex items-center justify-center">
+                  {iconMap[cat.icon]}
+                </div>
+                <h3 className="font-display text-sm font-bold">{cat.category}</h3>
+                <p className="text-[0.6rem] font-body text-muted-foreground">{cat.description}</p>
+                <span className="text-xs font-display font-bold text-secondary">{cat.matches} mercados</span>
+              </motion.div>
+            );
+          })}
         </div>
       </section>
     </div>
