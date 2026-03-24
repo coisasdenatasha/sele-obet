@@ -44,9 +44,6 @@ const Header = ({ onMenuToggle }: HeaderProps) => {
           </nav>
 
           <div className="flex items-center gap-1">
-            <button onClick={() => setSearchOpen(true)} className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-foreground/70 hover:text-foreground transition-colors lg:hidden">
-              <Search size={20} />
-            </button>
             {isLoggedIn ? (
               <>
                 <button className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-foreground/70 hover:text-foreground transition-colors relative">
