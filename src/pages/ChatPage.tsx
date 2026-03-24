@@ -402,7 +402,10 @@ const ChatPage = () => {
     const isSaved = savedPosts.has(post.id);
     const isCommentsOpen = openComments === post.id;
     const [newComment, setNewComment] = useState('');
+    const realBetId = post.id.startsWith('real-') ? post.id.replace('real-', '') : null;
+    const dbCommentsForPost = realBetId ? (dbComments.get(realBetId) || []) : [];
     const [localComments, setLocalComments] = useState(post.comments);
+    const allComments = realBetId ? [...dbCommentsForPost, ...localComments] : localComments;
     const commentInputRef = useRef<HTMLInputElement>(null);
 
     return (
