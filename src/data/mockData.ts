@@ -223,7 +223,7 @@ export const heroBanners = [
   {
     id: 'banner-5',
     title: 'Brasil vs Marrocos',
-    subtitle: 'Quinta-feira - Clássico mundial com odds especiais',
+    subtitle: 'Com base em informações de março de 2026, restam aproximadamente 80 a 83 dias para o início do torneio',
     cta: 'Apostar Agora',
     accent: 'Brasil',
   },
