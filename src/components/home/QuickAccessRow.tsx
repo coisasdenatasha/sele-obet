@@ -4,8 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { staggerContainer, staggerItem } from '@/components/animations';
 
 const quickItems = [
-  { id: 'bonus', label: 'Bônus', icon: Gift, route: '/planos', color: 'text-primary' },
-  { id: 'promo', label: 'Promoções', icon: Award, route: '/planos', color: 'text-secondary' },
+  { id: 'bonus', label: 'Bonus', icon: Gift, route: '/promocoes', color: 'text-primary' },
+  { id: 'promo', label: 'Promocoes', icon: Award, route: '/promocoes', color: 'text-secondary' },
   { id: 'crash', label: 'Crash', icon: Zap, route: '/crash', color: 'text-primary' },
   { id: 'cassino', label: 'Cassino', icon: Dices, route: '/cassino', color: 'text-secondary' },
   { id: 'bolao', label: 'Bolão', icon: Ticket, route: '/bolao', color: 'text-primary' },
