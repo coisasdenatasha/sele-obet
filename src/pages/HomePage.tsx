@@ -179,7 +179,7 @@ const HomePage = () => {
       </section>
       </SectionReveal>
 
-      {/* 4. Popular Multiples */}
+      <SectionReveal delay={0.15}>
       <section className="px-4">
         <SectionTitle icon={<Trophy size={20} className="text-primary" />} action="Ver Mais">
           Múltiplas Populares
