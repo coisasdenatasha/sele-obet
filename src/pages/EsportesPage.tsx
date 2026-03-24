@@ -325,7 +325,7 @@ const EsportesPage = () => {
                     <Flame size={20} className="text-destructive" />
                     <h3 className="font-display text-lg font-extrabold uppercase">Eventos Populares</h3>
                   </div>
-                  <span className="text-sm font-display font-bold text-destructive">Ver tudo</span>
+                  <span className="text-sm font-display font-bold text-destructive cursor-pointer">Ver tudo</span>
                 </div>
 
                 <div className="space-y-3">

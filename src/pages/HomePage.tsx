@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import bannerHexa from '@/assets/banner-hexa.jpg';
 import bannerOdds from '@/assets/banner-odds.jpg';
@@ -21,25 +22,31 @@ import LiveInPlaySection from '@/components/home/LiveInPlaySection';
 import NewsSection from '@/components/home/NewsSection';
 import SuperSocialCTA from '@/components/home/SuperSocialCTA';
 
-const SectionTitle = ({ children, icon, action }: { children: React.ReactNode; icon?: React.ReactNode; action?: string }) => (
-  <motion.div
-    className="flex items-center justify-between mb-3"
-    initial={{ opacity: 0, x: -12 }}
-    whileInView={{ opacity: 1, x: 0 }}
-    viewport={{ once: true }}
-    transition={{ duration: 0.4 }}
-  >
-    <h2 className="font-display text-lg font-bold flex items-center gap-2">
-      {icon}
-      {children}
-    </h2>
-    {action && (
-      <button className="text-xs text-primary font-body font-semibold flex items-center gap-0.5 min-h-[44px]">
-        {action} <ChevronRight size={14} />
-      </button>
-    )}
-  </motion.div>
-);
+const SectionTitle = ({ children, icon, action, actionRoute }: { children: React.ReactNode; icon?: React.ReactNode; action?: string; actionRoute?: string }) => {
+  const navigate = useNavigate();
+  return (
+    <motion.div
+      className="flex items-center justify-between mb-3"
+      initial={{ opacity: 0, x: -12 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.4 }}
+    >
+      <h2 className="font-display text-lg font-bold flex items-center gap-2">
+        {icon}
+        {children}
+      </h2>
+      {action && (
+        <button
+          onClick={() => actionRoute && navigate(actionRoute)}
+          className="text-xs text-primary font-body font-semibold flex items-center gap-0.5 min-h-[44px]"
+        >
+          {action} <ChevronRight size={14} />
+        </button>
+      )}
+    </motion.div>
+  );
+};
 
 /* ───────── Hero Carousel ───────── */
 const HeroCarousel = () => {
@@ -197,7 +204,7 @@ const HomePage = () => {
       {/* 2. Live Matches */}
       <SectionReveal>
       <section className="px-4">
-        <SectionTitle icon={<Zap size={20} className="text-secondary" />} action="Ver Todos">
+        <SectionTitle icon={<Zap size={20} className="text-secondary" />} action="Ver Todos" actionRoute="/ao-vivo">
           Ao Vivo Popular
         </SectionTitle>
         <motion.div className="space-y-3" variants={staggerContainer} initial="hidden" whileInView="show" viewport={{ once: true }}>
@@ -282,7 +289,7 @@ const HomePage = () => {
       <SectionReveal delay={0.1}>
       <section>
         <div className="px-4">
-          <SectionTitle icon={<User size={20} className="text-primary" />} action="Ver Todos">
+          <SectionTitle icon={<User size={20} className="text-primary" />} action="Ver Todos" actionRoute="/esportes">
             Player Props
           </SectionTitle>
         </div>
@@ -292,7 +299,7 @@ const HomePage = () => {
 
       <SectionReveal>
       <section className="px-4">
-        <SectionTitle icon={<Calendar size={20} className="text-primary" />} action="Ver Todos">
+        <SectionTitle icon={<Calendar size={20} className="text-primary" />} action="Ver Todos" actionRoute="/esportes">
           Próximos Jogos
         </SectionTitle>
         <motion.div className="bg-surface-card rounded-xl overflow-hidden" initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
@@ -377,7 +384,7 @@ const HomePage = () => {
 
       <SectionReveal>
       <section className="px-4">
-        <SectionTitle icon={<Star size={20} className="text-primary" />} action="Ver Todos">
+        <SectionTitle icon={<Star size={20} className="text-primary" />} action="Ver Todos" actionRoute="/esportes">
           Especiais
         </SectionTitle>
         <motion.div className="space-y-3" variants={staggerContainer} initial="hidden" whileInView="show" viewport={{ once: true }}>

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Wallet, ArrowDownLeft, ArrowUpRight, CreditCard, Smartphone, Bitcoin, Clock,
@@ -23,6 +24,7 @@ const PIX_KEY = '00020126580014br.gov.bcb.pix0136a1b2c3d4-e5f6-7890-abcd-ef12345
 type View = 'main' | 'deposit' | 'deposit-pix' | 'deposit-card' | 'deposit-boleto' | 'deposit-crypto' | 'withdraw' | 'withdraw-confirm';
 
 const WalletPage = () => {
+  const navigate = useNavigate();
   const [view, setView] = useState<View>('main');
   const [depositAmount, setDepositAmount] = useState('');
   const [withdrawAmount, setWithdrawAmount] = useState('');
@@ -126,7 +128,7 @@ const WalletPage = () => {
             <Clock size={16} className="text-muted-foreground" />
             Histórico de Transações
           </h3>
-          <button className="text-xs text-primary font-body font-semibold flex items-center gap-0.5 min-h-[44px]">
+          <button onClick={() => navigate('/historico')} className="text-xs text-primary font-body font-semibold flex items-center gap-0.5 min-h-[44px]">
             Ver tudo <ChevronRight size={14} />
           </button>
         </div>
