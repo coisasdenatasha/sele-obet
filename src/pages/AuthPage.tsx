@@ -847,7 +847,7 @@ const AuthPage = () => {
                 ))}
               </div>
 
-              <motion.button whileTap={{ scale: 0.97 }} onClick={() => { useAuthStore.getState().login({ name: 'João Silva', username: 'joaosilva', level: 'Ouro' }); navigate('/'); }}
+              <motion.button whileTap={{ scale: 0.97 }} onClick={() => navigate('/')}
                 className="w-full bg-primary text-primary-foreground font-display font-bold text-base py-3.5 rounded-xl min-h-[44px] hover:brightness-110 transition-all">
                 Confirmar
               </motion.button>
@@ -931,7 +931,7 @@ const AuthPage = () => {
             <p className="text-sm font-body text-muted-foreground mt-2 max-w-[280px]">
               Tudo pronto! Comece a explorar os melhores mercados e odds turbinadas.
             </p>
-            <motion.button whileTap={{ scale: 0.97 }} onClick={() => { useAuthStore.getState().login({ name: fullName || 'João Silva', username: username || 'joaosilva', level: 'Bronze' }); navigate('/'); }}
+            <motion.button whileTap={{ scale: 0.97 }} onClick={() => navigate('/')}
               className="mt-8 w-full bg-primary text-primary-foreground font-display font-bold text-base py-3.5 rounded-xl min-h-[44px] hover:brightness-110 transition-all">
               Começar a Apostar
             </motion.button>
