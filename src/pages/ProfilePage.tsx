@@ -476,6 +476,94 @@ const ProfilePage = () => {
           Sair da Conta
         </motion.button>
       </div>
+
+      {/* Crop Modal */}
+      <AnimatePresence>
+        {cropImage && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/80 z-50"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="fixed inset-0 z-50 flex flex-col"
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between px-4 py-3 bg-background/90 backdrop-blur-sm">
+                <button
+                  onClick={() => { setCropImage(null); setRotation(0); setZoom(1); }}
+                  className="min-w-[44px] min-h-[44px] flex items-center justify-center"
+                >
+                  <X size={22} className="text-foreground" />
+                </button>
+                <span className="font-display font-bold text-sm">Ajustar Foto</span>
+                <motion.button
+                  whileTap={{ scale: 0.9 }}
+                  onClick={handleCropConfirm}
+                  disabled={uploadingPhoto}
+                  className="min-w-[44px] min-h-[44px] flex items-center justify-center"
+                >
+                  {uploadingPhoto ? (
+                    <Loader2 size={20} className="text-primary animate-spin" />
+                  ) : (
+                    <Check size={22} className="text-primary" />
+                  )}
+                </motion.button>
+              </div>
+
+              {/* Cropper area */}
+              <div className="flex-1 relative">
+                <Cropper
+                  image={cropImage}
+                  crop={crop}
+                  zoom={zoom}
+                  rotation={rotation}
+                  aspect={1}
+                  cropShape="round"
+                  showGrid={false}
+                  onCropChange={setCrop}
+                  onZoomChange={setZoom}
+                  onRotationChange={setRotation}
+                  onCropComplete={onCropComplete}
+                />
+              </div>
+
+              {/* Controls */}
+              <div className="bg-background/90 backdrop-blur-sm px-6 py-4 space-y-3">
+                <div className="flex items-center gap-3">
+                  <ZoomIn size={16} className="text-muted-foreground" />
+                  <input
+                    type="range"
+                    min={1}
+                    max={3}
+                    step={0.1}
+                    value={zoom}
+                    onChange={(e) => setZoom(Number(e.target.value))}
+                    className="flex-1 accent-primary h-1"
+                  />
+                </div>
+                <div className="flex items-center gap-3">
+                  <RotateCw size={16} className="text-muted-foreground" />
+                  <input
+                    type="range"
+                    min={0}
+                    max={360}
+                    step={1}
+                    value={rotation}
+                    onChange={(e) => setRotation(Number(e.target.value))}
+                    className="flex-1 accent-primary h-1"
+                  />
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </PageTransition>
   );
 };
