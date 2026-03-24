@@ -1,15 +1,53 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   User, TrendingUp, History, Shield, Settings, LogOut, ChevronRight,
   Award, Trophy, CreditCard, Star, UserPlus, LogIn, Pencil, Check, X,
-  Mail, Phone, MapPin, Calendar, FileText, Camera, Image, Loader2
+  Mail, Phone, MapPin, Calendar, FileText, Camera, Image, Loader2, RotateCw, ZoomIn
 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PageTransition, staggerContainer, staggerItem } from '@/components/animations';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import Cropper from 'react-easy-crop';
+import type { Area } from 'react-easy-crop';
+
+const createCroppedImage = async (imageSrc: string, pixelCrop: Area, rotation: number): Promise<Blob> => {
+  const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+    const img = new window.Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = imageSrc;
+  });
+
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d')!;
+  const radians = (rotation * Math.PI) / 180;
+
+  const sin = Math.abs(Math.sin(radians));
+  const cos = Math.abs(Math.cos(radians));
+  const bBoxWidth = image.width * cos + image.height * sin;
+  const bBoxHeight = image.width * sin + image.height * cos;
+
+  canvas.width = bBoxWidth;
+  canvas.height = bBoxHeight;
+
+  ctx.translate(bBoxWidth / 2, bBoxHeight / 2);
+  ctx.rotate(radians);
+  ctx.translate(-image.width / 2, -image.height / 2);
+  ctx.drawImage(image, 0, 0);
+
+  const data = ctx.getImageData(pixelCrop.x, pixelCrop.y, pixelCrop.width, pixelCrop.height);
+  canvas.width = pixelCrop.width;
+  canvas.height = pixelCrop.height;
+  ctx.putImageData(data, 0, 0);
+
+  return new Promise((resolve) => {
+    canvas.toBlob((blob) => resolve(blob!), 'image/jpeg', 0.9);
+  });
+};
 
 const stats = [
   { label: 'Apostas', value: '142' },
@@ -35,6 +73,11 @@ const ProfilePage = () => {
   const [saving, setSaving] = useState(false);
   const [showPhotoMenu, setShowPhotoMenu] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [cropImage, setCropImage] = useState<string | null>(null);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [rotation, setRotation] = useState(0);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const [form, setForm] = useState({
@@ -50,20 +93,29 @@ const ProfilePage = () => {
   const [newEmail, setNewEmail] = useState('');
   const [emailEditing, setEmailEditing] = useState(false);
 
-  const handlePhotoUpload = async (file: File) => {
-    if (!user) return;
-    setUploadingPhoto(true);
-    setShowPhotoMenu(false);
-    try {
-      const ext = file.name.split('.').pop() || 'jpg';
-      const path = `${user.id}/avatar.${ext}`;
+  const onCropComplete = useCallback((_: Area, croppedPixels: Area) => {
+    setCroppedAreaPixels(croppedPixels);
+  }, []);
 
-      // Remove old avatar if exists
+  const handleFileSelected = (file: File) => {
+    setShowPhotoMenu(false);
+    const reader = new FileReader();
+    reader.onload = () => setCropImage(reader.result as string);
+    reader.readAsDataURL(file);
+  };
+
+  const handleCropConfirm = async () => {
+    if (!cropImage || !croppedAreaPixels || !user) return;
+    setUploadingPhoto(true);
+    try {
+      const croppedBlob = await createCroppedImage(cropImage, croppedAreaPixels, rotation);
+      const path = `${user.id}/avatar.jpg`;
+
       await supabase.storage.from('avatars').remove([path]);
 
       const { error: uploadError } = await supabase.storage
         .from('avatars')
-        .upload(path, file, { upsert: true, contentType: file.type });
+        .upload(path, croppedBlob, { upsert: true, contentType: 'image/jpeg' });
 
       if (uploadError) throw uploadError;
 
@@ -76,12 +128,20 @@ const ProfilePage = () => {
       await updateProfile({ avatar_url: avatarUrl } as any);
       if (user) await fetchProfile(user.id);
       toast.success('Foto atualizada!');
+      setCropImage(null);
+      setCrop({ x: 0, y: 0 });
+      setZoom(1);
+      setRotation(0);
     } catch (err: any) {
       console.error(err);
       toast.error('Erro ao enviar foto');
     } finally {
       setUploadingPhoto(false);
     }
+  };
+
+  const handlePhotoUpload = async (file: File) => {
+    handleFileSelected(file);
   };
 
   useEffect(() => {
@@ -416,6 +476,94 @@ const ProfilePage = () => {
           Sair da Conta
         </motion.button>
       </div>
+
+      {/* Crop Modal */}
+      <AnimatePresence>
+        {cropImage && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/80 z-50"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="fixed inset-0 z-50 flex flex-col"
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between px-4 py-3 bg-background/90 backdrop-blur-sm">
+                <button
+                  onClick={() => { setCropImage(null); setRotation(0); setZoom(1); }}
+                  className="min-w-[44px] min-h-[44px] flex items-center justify-center"
+                >
+                  <X size={22} className="text-foreground" />
+                </button>
+                <span className="font-display font-bold text-sm">Ajustar Foto</span>
+                <motion.button
+                  whileTap={{ scale: 0.9 }}
+                  onClick={handleCropConfirm}
+                  disabled={uploadingPhoto}
+                  className="min-w-[44px] min-h-[44px] flex items-center justify-center"
+                >
+                  {uploadingPhoto ? (
+                    <Loader2 size={20} className="text-primary animate-spin" />
+                  ) : (
+                    <Check size={22} className="text-primary" />
+                  )}
+                </motion.button>
+              </div>
+
+              {/* Cropper area */}
+              <div className="flex-1 relative">
+                <Cropper
+                  image={cropImage}
+                  crop={crop}
+                  zoom={zoom}
+                  rotation={rotation}
+                  aspect={1}
+                  cropShape="round"
+                  showGrid={false}
+                  onCropChange={setCrop}
+                  onZoomChange={setZoom}
+                  onRotationChange={setRotation}
+                  onCropComplete={onCropComplete}
+                />
+              </div>
+
+              {/* Controls */}
+              <div className="bg-background/90 backdrop-blur-sm px-6 py-4 space-y-3">
+                <div className="flex items-center gap-3">
+                  <ZoomIn size={16} className="text-muted-foreground" />
+                  <input
+                    type="range"
+                    min={1}
+                    max={3}
+                    step={0.1}
+                    value={zoom}
+                    onChange={(e) => setZoom(Number(e.target.value))}
+                    className="flex-1 accent-primary h-1"
+                  />
+                </div>
+                <div className="flex items-center gap-3">
+                  <RotateCw size={16} className="text-muted-foreground" />
+                  <input
+                    type="range"
+                    min={0}
+                    max={360}
+                    step={1}
+                    value={rotation}
+                    onChange={(e) => setRotation(Number(e.target.value))}
+                    className="flex-1 accent-primary h-1"
+                  />
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </PageTransition>
   );
 };
