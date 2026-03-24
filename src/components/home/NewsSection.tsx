@@ -36,28 +36,26 @@ const NewsSection = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Auto-scroll horizontally
+  // Auto-scroll card by card
   useEffect(() => {
     const el = scrollRef.current;
     if (!el || articles.length === 0) return;
 
-    let animId: number;
     let paused = false;
-    let speed = 0.3;
+    const cardWidth = 200 + 12; // w-[200px] + gap-3
 
-    const step = () => {
-      if (!paused && el) {
-        el.scrollLeft += speed;
-        // Reset to start when reaching the end
-        if (el.scrollLeft >= el.scrollWidth - el.clientWidth - 1) {
-          el.scrollLeft = 0;
-        }
+    const interval = setInterval(() => {
+      if (paused || !el) return;
+      const maxScroll = el.scrollWidth - el.clientWidth;
+      if (el.scrollLeft >= maxScroll - 2) {
+        el.scrollTo({ left: 0, behavior: 'smooth' });
+      } else {
+        el.scrollBy({ left: cardWidth, behavior: 'smooth' });
       }
-      animId = requestAnimationFrame(step);
-    };
+    }, 4000);
 
     const pause = () => { paused = true; };
-    const resume = () => { setTimeout(() => { paused = false; }, 2000); };
+    const resume = () => { setTimeout(() => { paused = false; }, 3000); };
 
     el.addEventListener('pointerdown', pause);
     el.addEventListener('pointerup', resume);
@@ -66,10 +64,8 @@ const NewsSection = () => {
     el.addEventListener('touchstart', pause, { passive: true });
     el.addEventListener('touchend', resume);
 
-    animId = requestAnimationFrame(step);
-
     return () => {
-      cancelAnimationFrame(animId);
+      clearInterval(interval);
       el.removeEventListener('pointerdown', pause);
       el.removeEventListener('pointerup', resume);
       el.removeEventListener('pointerenter', pause);
