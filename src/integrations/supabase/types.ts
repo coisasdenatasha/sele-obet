@@ -59,6 +59,48 @@ export type Database = {
         }
         Relationships: []
       }
+      bolao_predictions: {
+        Row: {
+          away_score: number
+          away_team: string
+          created_at: string
+          home_score: number
+          home_team: string
+          id: string
+          match_id: string
+          points_earned: number | null
+          round_number: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          away_score: number
+          away_team: string
+          created_at?: string
+          home_score: number
+          home_team: string
+          id?: string
+          match_id: string
+          points_earned?: number | null
+          round_number?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          away_score?: number
+          away_team?: string
+          created_at?: string
+          home_score?: number
+          home_team?: string
+          id?: string
+          match_id?: string
+          points_earned?: number | null
+          round_number?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
