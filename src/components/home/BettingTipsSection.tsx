@@ -1,3 +1,4 @@
+import { useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { TrendingUp, ChevronRight, Receipt } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -40,6 +41,45 @@ const tips = [
 const BettingTipsSection = () => {
   const navigate = useNavigate();
   const addBet = useBetSlipStore((s) => s.addBet);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    let paused = false;
+    const cardWidth = 280 + 12; // w-[280px] + gap-3
+
+    const interval = setInterval(() => {
+      if (paused || !el) return;
+      const maxScroll = el.scrollWidth - el.clientWidth;
+      if (el.scrollLeft >= maxScroll - 2) {
+        el.scrollTo({ left: 0, behavior: 'smooth' });
+      } else {
+        el.scrollBy({ left: cardWidth, behavior: 'smooth' });
+      }
+    }, 4000);
+
+    const pause = () => { paused = true; };
+    const resume = () => { setTimeout(() => { paused = false; }, 3000); };
+
+    el.addEventListener('pointerdown', pause);
+    el.addEventListener('pointerup', resume);
+    el.addEventListener('pointerenter', pause);
+    el.addEventListener('pointerleave', resume);
+    el.addEventListener('touchstart', pause, { passive: true });
+    el.addEventListener('touchend', resume);
+
+    return () => {
+      clearInterval(interval);
+      el.removeEventListener('pointerdown', pause);
+      el.removeEventListener('pointerup', resume);
+      el.removeEventListener('pointerenter', pause);
+      el.removeEventListener('pointerleave', resume);
+      el.removeEventListener('touchstart', pause);
+      el.removeEventListener('touchend', resume);
+    };
+  }, []);
 
   return (
     <SectionReveal>
@@ -59,7 +99,7 @@ const BettingTipsSection = () => {
           </button>
         </motion.div>
 
-        <div className="flex gap-3 overflow-x-auto no-scrollbar -mx-4 px-4 pb-1">
+        <div ref={scrollRef} className="flex gap-3 overflow-x-auto no-scrollbar -mx-4 px-4 pb-1">
           {tips.map((tip) => (
             <motion.div
               key={tip.id}
