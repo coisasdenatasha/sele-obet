@@ -12,6 +12,14 @@ import { useBetSlipStore } from '@/store/betSlipStore';
 import { useAuthStore } from '@/store/authStore';
 import { Flame, ChevronRight, Trophy, Gift, Zap, User, Calendar, Target, Scale, CreditCard, CornerDownRight, Award, Star, LayoutGrid } from 'lucide-react';
 import { PageTransition, SectionReveal, staggerContainer, staggerItem } from '@/components/animations';
+import QuickAccessRow from '@/components/home/QuickAccessRow';
+import BettingTipsSection from '@/components/home/BettingTipsSection';
+import PopularTournamentsSection from '@/components/home/PopularTournamentsSection';
+import GoalReplaysSection from '@/components/home/GoalReplaysSection';
+import MultiCreatorBanner from '@/components/home/MultiCreatorBanner';
+import LiveInPlaySection from '@/components/home/LiveInPlaySection';
+import NewsSection from '@/components/home/NewsSection';
+import SuperSocialCTA from '@/components/home/SuperSocialCTA';
 
 const SectionTitle = ({ children, icon, action }: { children: React.ReactNode; icon?: React.ReactNode; action?: string }) => (
   <motion.div
@@ -148,11 +156,14 @@ const HomePage = () => {
       {/* 1. Hero Carousel */}
       <HeroCarousel />
 
+      {/* Quick Access Row */}
+      <QuickAccessRow />
+
       {/* 2. Live Matches */}
       <SectionReveal>
       <section className="px-4">
         <SectionTitle icon={<Zap size={20} className="text-secondary" />} action="Ver Todos">
-          Ao Vivo
+          Ao Vivo Popular
         </SectionTitle>
         <motion.div className="space-y-3" variants={staggerContainer} initial="hidden" whileInView="show" viewport={{ once: true }}>
           {liveMatches.map((match) => (
@@ -290,6 +301,23 @@ const HomePage = () => {
       </section>
       </SectionReveal>
 
+      {/* Super Odds / Boosted section stays */}
+
+      {/* Dicas de Aposta Populares */}
+      <BettingTipsSection />
+
+      {/* Torneios Populares */}
+      <PopularTournamentsSection />
+
+      {/* Replays de Gols */}
+      <GoalReplaysSection />
+
+      {/* Multi Criar Aposta */}
+      <MultiCreatorBanner />
+
+      {/* Em Jogo - Ao Vivo */}
+      <LiveInPlaySection />
+
       <SectionReveal>
       <section className="px-4">
         <SectionTitle icon={<Trophy size={20} className="text-secondary" />} action="Ver Todas">
@@ -395,6 +423,12 @@ const HomePage = () => {
         </motion.div>
       </section>
       </SectionReveal>
+
+      {/* Notícias */}
+      <NewsSection />
+
+      {/* Social CTA */}
+      <SuperSocialCTA />
     </div>
     </PageTransition>
   );
