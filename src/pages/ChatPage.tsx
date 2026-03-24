@@ -196,7 +196,7 @@ const formatNumber = (n: number) => {
 };
 
 const ChatPage = () => {
-  const { isLoggedIn } = useAuthStore();
+  const { isLoggedIn, user } = useAuthStore();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<Tab>('popular');
   const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
@@ -206,6 +206,76 @@ const ChatPage = () => {
   const [sharePost, setSharePost] = useState<string | null>(null);
   const [realBets, setRealBets] = useState<FeedPost[]>([]);
   const [loadingReal, setLoadingReal] = useState(true);
+  const [dbComments, setDbComments] = useState<Map<string, Comment[]>>(new Map());
+
+  // Fetch comments from DB
+  const fetchComments = async (betIds: string[]) => {
+    if (betIds.length === 0) return;
+    try {
+      const { data, error } = await supabase
+        .from('social_comments')
+        .select('*')
+        .in('bet_id', betIds)
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+      if (!data || data.length === 0) return;
+
+      const userIds = [...new Set(data.map(c => c.user_id))];
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('user_id, username, full_name, avatar_url')
+        .in('user_id', userIds);
+
+      const profileMap = new Map(profiles?.map(p => [p.user_id, p]) || []);
+
+      const grouped = new Map<string, Comment[]>();
+      data.forEach(c => {
+        const profile = profileMap.get(c.user_id);
+        const timeDiff = Math.floor((Date.now() - new Date(c.created_at).getTime()) / 60000);
+        const timeAgo = timeDiff < 1 ? 'agora' : timeDiff < 60 ? `${timeDiff} min` : `${Math.floor(timeDiff / 60)}h`;
+        const comment: Comment = {
+          id: c.id,
+          user: profile?.full_name || profile?.username || 'Usuário',
+          avatar: profile?.avatar_url || `https://i.pravatar.cc/40?img=50`,
+          verified: false,
+          text: c.text,
+          timeAgo,
+          likes: 0,
+        };
+        const arr = grouped.get(c.bet_id) || [];
+        arr.push(comment);
+        grouped.set(c.bet_id, arr);
+      });
+      setDbComments(grouped);
+    } catch (err) {
+      console.error('Error fetching comments:', err);
+    }
+  };
+
+  const addComment = async (betId: string, text: string) => {
+    if (!user) return;
+    const realBetId = betId.startsWith('real-') ? betId.replace('real-', '') : null;
+    if (!realBetId) {
+      // For mock posts, just add locally
+      return null;
+    }
+    try {
+      const { data, error } = await supabase
+        .from('social_comments')
+        .insert({ bet_id: realBetId, user_id: user.id, text })
+        .select()
+        .single();
+      if (error) throw error;
+      // Refresh comments
+      await fetchComments([realBetId]);
+      return data;
+    } catch (err) {
+      console.error('Error adding comment:', err);
+      toast.error('Erro ao enviar comentário');
+      return null;
+    }
+  };
 
   // Fetch real shared bets from database
   useEffect(() => {
@@ -230,6 +300,9 @@ const ChatPage = () => {
             .in('user_id', userIds);
 
           const profileMap = new Map(profiles?.map(p => [p.user_id, p]) || []);
+
+          // Fetch comments for these bets
+          await fetchComments(bets.map(b => b.id));
 
           const realPosts: FeedPost[] = bets.map((bet, idx) => {
             const profile = profileMap.get(bet.user_id);
