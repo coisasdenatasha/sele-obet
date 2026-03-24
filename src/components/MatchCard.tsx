@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import OddsChip from './OddsChip';
 import LiveBadge from './LiveBadge';
 
