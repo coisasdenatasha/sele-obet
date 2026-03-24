@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Home, Radio, Trophy, Receipt, Dice5 } from 'lucide-react';
+import { Home, Radio, Trophy, Receipt, User } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useBetSlipStore } from '@/store/betSlipStore';
 import { cn } from '@/lib/utils';
