@@ -3,7 +3,8 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
+  :root,
+  [data-theme="dark"] {
     --background: 0 0% 7.1%;
     --foreground: 0 0% 95%;
 
@@ -53,6 +54,93 @@
 
     font-family: 'Manrope', sans-serif;
   }
+
+  [data-theme="light"] {
+    --background: 0 0% 97%;
+    --foreground: 0 0% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 10%;
+
+    --primary: 51 100% 42%;
+    --primary-foreground: 0 0% 7%;
+
+    --secondary: 145 100% 30%;
+    --secondary-foreground: 0 0% 100%;
+
+    --accent: 218 100% 23%;
+    --accent-foreground: 0 0% 100%;
+
+    --muted: 0 0% 92%;
+    --muted-foreground: 0 0% 40%;
+
+    --destructive: 0 84% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 85%;
+    --input: 0 0% 85%;
+    --ring: 51 100% 42%;
+
+    --surface-base: 0 0% 97%;
+    --surface-section: 0 0% 95%;
+    --surface-card: 0 0% 100%;
+    --surface-interactive: 0 0% 93%;
+
+    --glass-bg: 0 0% 100% / 0.85;
+    --glass-blur: 20px;
+  }
+
+  [data-theme="contrast"] {
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
+
+    --card: 0 0% 5%;
+    --card-foreground: 0 0% 100%;
+
+    --popover: 0 0% 5%;
+    --popover-foreground: 0 0% 100%;
+
+    --primary: 51 100% 55%;
+    --primary-foreground: 0 0% 0%;
+
+    --secondary: 145 100% 40%;
+    --secondary-foreground: 0 0% 0%;
+
+    --accent: 218 100% 40%;
+    --accent-foreground: 0 0% 100%;
+
+    --muted: 0 0% 12%;
+    --muted-foreground: 0 0% 65%;
+
+    --destructive: 0 100% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 30%;
+    --input: 0 0% 30%;
+    --ring: 51 100% 55%;
+
+    --surface-base: 0 0% 0%;
+    --surface-section: 0 0% 4%;
+    --surface-card: 0 0% 5%;
+    --surface-interactive: 0 0% 12%;
+
+    --glass-bg: 0 0% 5% / 0.9;
+    --glass-blur: 20px;
+  }
+
+  /* Font size scaling */
+  [data-fontsize="P"] { font-size: 14px; }
+  [data-fontsize="M"] { font-size: 16px; }
+  [data-fontsize="G"] { font-size: 18px; }
+  [data-fontsize="GG"] { font-size: 20px; }
+
+  /* Daltonism filters */
+  [data-daltonism="deuteranopia"] { filter: url('#deuteranopia'); }
+  [data-daltonism="protanopia"] { filter: url('#protanopia'); }
+  [data-daltonism="tritanopia"] { filter: url('#tritanopia'); }
 }
 
 @layer base {
