@@ -387,6 +387,7 @@ const HomePage = () => {
         </div>
       </section>
     </div>
+    </PageTransition>
   );
 };
 
