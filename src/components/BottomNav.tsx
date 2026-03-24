@@ -1,4 +1,4 @@
-import { Home, Zap, Search, Receipt, User } from 'lucide-react';
+import { Home, Zap, MessageCircle, Receipt, User } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useBetSlipStore } from '@/store/betSlipStore';
 import { cn } from '@/lib/utils';
@@ -10,7 +10,7 @@ interface BottomNavProps {
 const tabs = [
   { id: '/', icon: Home, label: 'Home' },
   { id: '/ao-vivo', icon: Zap, label: 'Ao Vivo' },
-  { id: '/busca', icon: Search, label: 'Busca' },
+  { id: '/chat', icon: MessageCircle, label: 'Social' },
   { id: 'betslip', icon: Receipt, label: 'Bilhete' },
   { id: '/perfil', icon: User, label: 'Perfil' },
 ];
