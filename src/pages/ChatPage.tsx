@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Users, TrendingUp, MessageCircle, Crown, Flame, ThumbsUp,
+  Send, Users, TrendingUp, MessageCircle, Crown, Flame, ThumbsUp,
   Plus, Clock, Target, Zap, UserCircle, Star, Copy,
-  MessageSquare, CheckCircle2, Share2, Bookmark,
+  MessageSquare, CheckCircle2, Share2, Bookmark, Link2, X,
   Flag, Radio, BarChart3, CreditCard, Swords, Award, CircleDot
 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
@@ -29,9 +29,19 @@ interface FeedPost {
     result?: 'green' | 'red' | 'pending';
   };
   likes: number;
-  comments: number;
+  comments: Comment[];
   copies: number;
   liked?: boolean;
+}
+
+interface Comment {
+  id: string;
+  user: string;
+  avatar: string;
+  verified: boolean;
+  text: string;
+  timeAgo: string;
+  likes: number;
 }
 
 type Tab = 'popular' | 'apostas' | 'criar' | 'recentes' | 'odds100' | 'gols' | 'jogadores';
@@ -61,6 +71,17 @@ const avatars = [
   'https://i.pravatar.cc/80?img=12',
 ];
 
+const makeComments = (texts: string[]): Comment[] =>
+  texts.map((t, i) => ({
+    id: `c${i}`,
+    user: ['Lucas M.', 'Bruna S.', 'Felipe R.', 'Camila D.', 'Andre L.', 'Tatiana P.'][i % 6],
+    avatar: `https://i.pravatar.cc/40?img=${20 + i}`,
+    verified: i === 0,
+    text: t,
+    timeAgo: `${i + 1}h`,
+    likes: Math.floor(Math.random() * 50),
+  }));
+
 const feedPosts: FeedPost[] = [
   {
     id: '1',
@@ -68,7 +89,7 @@ const feedPosts: FeedPost[] = [
     timeAgo: '2 min',
     text: 'Confia nessa, galera! Fla vai destruir hoje',
     bet: { match: 'Flamengo x Palmeiras', league: 'Brasileirao Serie A', market: 'Resultado Final - Flamengo', odd: 2.10, stake: 50, result: 'pending' },
-    likes: 124, comments: 32, copies: 18,
+    likes: 124, comments: makeComments(['Bora Mengao!', 'Vou copiar essa', 'Arriscado hein']), copies: 18,
   },
   {
     id: '2',
@@ -76,14 +97,14 @@ const feedPosts: FeedPost[] = [
     timeAgo: '15 min',
     text: 'Bora Brasil! Sem medo',
     bet: { match: 'Brasil x Franca', league: 'Amistoso Internacional', market: 'Resultado Final - Brasil', odd: 3.20, stake: 1000, result: 'pending' },
-    likes: 8943, comments: 1204, copies: 3421,
+    likes: 8943, comments: makeComments(['O cara apostou 1000 reais', 'Se o Ney ta confiante eu to tambem', 'Vamo selecao!', 'Copiado!', 'Odd boa demais']), copies: 3421,
   },
   {
     id: '3',
     user: { name: 'Ana Paula', username: '@anapbet', avatar: avatars[2], level: 'Ouro', verified: false },
     timeAgo: '28 min',
     bet: { match: 'Real Madrid x Barcelona', league: 'La Liga', market: 'Ambos Marcam - Sim', odd: 1.72, stake: 30, result: 'green' },
-    likes: 89, comments: 14, copies: 45,
+    likes: 89, comments: makeComments(['Green bonito', 'Essa sempre paga']), copies: 45,
   },
   {
     id: '4',
@@ -91,14 +112,14 @@ const feedPosts: FeedPost[] = [
     timeAgo: '1h',
     text: 'Tip do dia. Confiem no pai',
     bet: { match: 'Liverpool x Arsenal', league: 'Premier League', market: 'Over 2.5 Gols', odd: 1.85, stake: 100, result: 'green' },
-    likes: 567, comments: 89, copies: 234,
+    likes: 567, comments: makeComments(['Monstro demais', 'Sempre acerta', 'Melhor tipster da plataforma', 'Green!']), copies: 234,
   },
   {
     id: '5',
     user: { name: 'Thiago Fernandes', username: '@thifern', avatar: avatars[4], level: 'Prata', verified: false },
     timeAgo: '1h',
     bet: { match: 'Corinthians x Sao Paulo', league: 'Brasileirao Serie A', market: 'Empate', odd: 3.40, stake: 20, result: 'red' },
-    likes: 12, comments: 8, copies: 2,
+    likes: 12, comments: makeComments(['Nao deu dessa vez']), copies: 2,
   },
   {
     id: '6',
@@ -106,7 +127,7 @@ const feedPosts: FeedPost[] = [
     timeAgo: '2h',
     text: 'Multipla insana, quem tem coragem?',
     bet: { match: 'Multipla 5 jogos', league: 'Varias ligas', market: 'Combo especial', odd: 145.00, stake: 10, result: 'pending' },
-    likes: 4521, comments: 890, copies: 1567,
+    likes: 4521, comments: makeComments(['Loucura total', 'Se pagar eu te sigo pra sempre', 'Copiado na fe', 'All in!']), copies: 1567,
   },
   {
     id: '7',
@@ -114,14 +135,14 @@ const feedPosts: FeedPost[] = [
     timeAgo: '2h',
     text: 'GREEN! Obrigada @rafaelk pela dica',
     bet: { match: 'Manchester City x Chelsea', league: 'Premier League', market: 'Vit. Man City + Over 1.5', odd: 2.45, stake: 40, result: 'green' },
-    likes: 234, comments: 45, copies: 67,
+    likes: 234, comments: makeComments(['Parabens!', 'Quanto ganhou?', 'Vou seguir ele tambem']), copies: 67,
   },
   {
     id: '8',
     user: { name: 'Diego Silva', username: '@diegosil', avatar: avatars[7], level: 'VIP', verified: true },
     timeAgo: '3h',
     bet: { match: 'Boca Juniors x River Plate', league: 'Libertadores', market: 'Ambos Marcam + Over 2.5', odd: 3.80, stake: 25, result: 'pending' },
-    likes: 345, comments: 56, copies: 89,
+    likes: 345, comments: makeComments(['Superclassico!', 'Odd linda']), copies: 89,
   },
   {
     id: '9',
@@ -129,14 +150,14 @@ const feedPosts: FeedPost[] = [
     timeAgo: '4h',
     text: 'Vini Jr vai marcar, pode printar',
     bet: { match: 'Real Madrid x Barcelona', league: 'La Liga', market: 'Vini Jr - Marca a qualquer momento', odd: 2.10, stake: 50, result: 'green' },
-    likes: 456, comments: 78, copies: 123,
+    likes: 456, comments: makeComments(['Craque demais', 'Printei e deu green!', 'Vou copiar na proxima']), copies: 123,
   },
   {
     id: '10',
     user: { name: 'Pedro Henrique', username: '@pedroh99', avatar: avatars[9], level: 'Bronze', verified: false },
     timeAgo: '5h',
     bet: { match: 'Gremio x Internacional', league: 'Brasileirao Serie A', market: 'Resultado Final - Gremio', odd: 2.30, stake: 15, result: 'red' },
-    likes: 18, comments: 5, copies: 1,
+    likes: 18, comments: makeComments(['Grenal e sempre imprevisivel']), copies: 1,
   },
   {
     id: '11',
@@ -144,14 +165,14 @@ const feedPosts: FeedPost[] = [
     timeAgo: '6h',
     text: 'METEU ESSA? Odd absurda pagou!',
     bet: { match: 'Multipla 8 jogos', league: 'Varias ligas', market: 'Super Combo', odd: 320.00, stake: 5, result: 'green' },
-    likes: 12400, comments: 3200, copies: 5600,
+    likes: 12400, comments: makeComments(['IMPOSSIVEL', 'Quanto esse maluco ganhou?', 'R$ 1600 com 5 reais???', 'Lenda', 'Casimiro eh outro nivel']), copies: 5600,
   },
   {
     id: '12',
     user: { name: 'Mariana Santos', username: '@marisantos', avatar: avatars[11], level: 'Ouro', verified: false },
     timeAgo: '7h',
     bet: { match: 'Bayern x Dortmund', league: 'Bundesliga', market: 'Over 3.5 Gols', odd: 2.00, stake: 35, result: 'green' },
-    likes: 156, comments: 23, copies: 45,
+    likes: 156, comments: makeComments(['Bundesliga sempre da gol', 'Boa!']), copies: 45,
   },
 ];
 
@@ -179,6 +200,8 @@ const ChatPage = () => {
   const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
   const [savedPosts, setSavedPosts] = useState<Set<string>>(new Set());
   const [createName, setCreateName] = useState('');
+  const [openComments, setOpenComments] = useState<string | null>(null);
+  const [sharePost, setSharePost] = useState<string | null>(null);
 
   const toggleLike = (postId: string) => {
     setLikedPosts(prev => {
@@ -230,6 +253,10 @@ const ChatPage = () => {
   const PostCard = ({ post }: { post: FeedPost }) => {
     const isLiked = likedPosts.has(post.id);
     const isSaved = savedPosts.has(post.id);
+    const isCommentsOpen = openComments === post.id;
+    const [newComment, setNewComment] = useState('');
+    const [localComments, setLocalComments] = useState(post.comments);
+    const commentInputRef = useRef<HTMLInputElement>(null);
 
     return (
       <motion.div
@@ -329,11 +356,17 @@ const ChatPage = () => {
                 {formatNumber(post.likes + (isLiked ? 1 : 0))}
               </span>
             </button>
-            <button className="flex items-center gap-1.5 min-h-[36px] text-muted-foreground hover:text-foreground transition-colors">
+            <button
+              onClick={() => setOpenComments(isCommentsOpen ? null : post.id)}
+              className={`flex items-center gap-1.5 min-h-[36px] transition-colors ${isCommentsOpen ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+            >
               <MessageSquare size={16} />
-              <span className="text-xs font-body">{formatNumber(post.comments)}</span>
+              <span className="text-xs font-body">{formatNumber(localComments.length)}</span>
             </button>
-            <button className="flex items-center gap-1.5 min-h-[36px] text-muted-foreground hover:text-foreground transition-colors">
+            <button
+              onClick={() => setSharePost(post.id)}
+              className="flex items-center gap-1.5 min-h-[36px] text-muted-foreground hover:text-foreground transition-colors"
+            >
               <Share2 size={16} />
             </button>
           </div>
@@ -354,6 +387,89 @@ const ChatPage = () => {
             </motion.button>
           </div>
         </div>
+
+        {/* Comments section */}
+        <AnimatePresence>
+          {isCommentsOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="overflow-hidden"
+            >
+              <div className="px-3 pb-3 space-y-2">
+                <div className="h-px bg-surface-interactive" />
+
+                {/* Comment list */}
+                <div className="space-y-2 max-h-[240px] overflow-y-auto">
+                  {localComments.map((c) => (
+                    <div key={c.id} className="flex gap-2">
+                      <img src={c.avatar} alt={c.user} className="w-7 h-7 rounded-full object-cover flex-shrink-0 mt-0.5" />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-xs font-display font-bold text-foreground">{c.user}</span>
+                          {c.verified && <CheckCircle2 size={10} className="text-primary flex-shrink-0" fill="currentColor" strokeWidth={0} />}
+                          <span className="text-[0.55rem] text-muted-foreground font-body">{c.timeAgo}</span>
+                        </div>
+                        <p className="text-xs font-body text-foreground/80 mt-0.5">{c.text}</p>
+                        <button className="flex items-center gap-1 mt-1 text-muted-foreground hover:text-primary transition-colors">
+                          <ThumbsUp size={10} />
+                          <span className="text-[0.55rem] font-body">{c.likes}</span>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Add comment */}
+                <div className="flex gap-2 pt-1">
+                  <input
+                    ref={commentInputRef}
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && newComment.trim()) {
+                        if (!isLoggedIn) { navigate('/auth'); return; }
+                        setLocalComments([...localComments, {
+                          id: `new-${Date.now()}`,
+                          user: 'Voce',
+                          avatar: 'https://i.pravatar.cc/40?img=50',
+                          verified: false,
+                          text: newComment,
+                          timeAgo: 'agora',
+                          likes: 0,
+                        }]);
+                        setNewComment('');
+                      }
+                    }}
+                    placeholder="Escreva um comentario..."
+                    className="flex-1 bg-surface-interactive rounded-lg py-2 px-3 text-xs font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[36px]"
+                  />
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                      if (!newComment.trim()) return;
+                      if (!isLoggedIn) { navigate('/auth'); return; }
+                      setLocalComments([...localComments, {
+                        id: `new-${Date.now()}`,
+                        user: 'Voce',
+                        avatar: 'https://i.pravatar.cc/40?img=50',
+                        verified: false,
+                        text: newComment,
+                        timeAgo: 'agora',
+                        likes: 0,
+                      }]);
+                      setNewComment('');
+                    }}
+                    className="bg-primary text-primary-foreground w-9 h-9 rounded-lg flex items-center justify-center min-w-[36px]"
+                  >
+                    <Send size={14} />
+                  </motion.button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
     );
   };
@@ -453,6 +569,77 @@ const ChatPage = () => {
           )}
         </AnimatePresence>
       </div>
+
+      {/* Share Bottom Sheet */}
+      <AnimatePresence>
+        {sharePost && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/60 z-40"
+              onClick={() => setSharePost(null)}
+            />
+            <motion.div
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="fixed bottom-0 left-0 right-0 z-50 bg-surface-section rounded-t-2xl p-4 pb-8"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-display font-bold text-base">Compartilhar</h3>
+                <button onClick={() => setSharePost(null)} className="min-w-[44px] min-h-[44px] flex items-center justify-center text-muted-foreground">
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="grid grid-cols-4 gap-3 mb-4">
+                {[
+                  { label: 'WhatsApp', bg: 'bg-[#25D366]/20', color: 'text-[#25D366]', icon: MessageCircle },
+                  { label: 'Telegram', bg: 'bg-[#0088cc]/20', color: 'text-[#0088cc]', icon: Send },
+                  { label: 'Twitter/X', bg: 'bg-foreground/10', color: 'text-foreground', icon: Share2 },
+                  { label: 'Instagram', bg: 'bg-[#E4405F]/20', color: 'text-[#E4405F]', icon: MessageSquare },
+                ].map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <button
+                      key={item.label}
+                      onClick={() => setSharePost(null)}
+                      className="flex flex-col items-center gap-2 min-h-[44px]"
+                    >
+                      <div className={`w-12 h-12 rounded-full ${item.bg} flex items-center justify-center`}>
+                        <Icon size={20} className={item.color} />
+                      </div>
+                      <span className="text-[0.6rem] font-body text-muted-foreground">{item.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="flex gap-2">
+                <motion.button
+                  whileTap={{ scale: 0.97 }}
+                  onClick={() => setSharePost(null)}
+                  className="flex-1 flex items-center justify-center gap-2 bg-surface-interactive text-foreground font-body font-semibold text-sm py-3 rounded-xl min-h-[44px]"
+                >
+                  <Link2 size={16} />
+                  Copiar Link
+                </motion.button>
+                <motion.button
+                  whileTap={{ scale: 0.97 }}
+                  onClick={() => setSharePost(null)}
+                  className="flex-1 flex items-center justify-center gap-2 bg-primary text-primary-foreground font-display font-bold text-sm py-3 rounded-xl min-h-[44px]"
+                >
+                  <Copy size={16} />
+                  Copiar Bilhete
+                </motion.button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
