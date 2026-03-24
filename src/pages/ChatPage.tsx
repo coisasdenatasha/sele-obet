@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Users, TrendingUp, MessageCircle, Crown, Flame, ThumbsUp,
@@ -71,6 +71,17 @@ const avatars = [
   'https://i.pravatar.cc/80?img=12',
 ];
 
+const makeComments = (texts: string[]): Comment[] =>
+  texts.map((t, i) => ({
+    id: `c${i}`,
+    user: ['Lucas M.', 'Bruna S.', 'Felipe R.', 'Camila D.', 'Andre L.', 'Tatiana P.'][i % 6],
+    avatar: `https://i.pravatar.cc/40?img=${20 + i}`,
+    verified: i === 0,
+    text: t,
+    timeAgo: `${i + 1}h`,
+    likes: Math.floor(Math.random() * 50),
+  }));
+
 const feedPosts: FeedPost[] = [
   {
     id: '1',
@@ -78,7 +89,7 @@ const feedPosts: FeedPost[] = [
     timeAgo: '2 min',
     text: 'Confia nessa, galera! Fla vai destruir hoje',
     bet: { match: 'Flamengo x Palmeiras', league: 'Brasileirao Serie A', market: 'Resultado Final - Flamengo', odd: 2.10, stake: 50, result: 'pending' },
-    likes: 124, comments: 32, copies: 18,
+    likes: 124, comments: makeComments(['Bora Mengao!', 'Vou copiar essa', 'Arriscado hein']), copies: 18,
   },
   {
     id: '2',
@@ -86,14 +97,14 @@ const feedPosts: FeedPost[] = [
     timeAgo: '15 min',
     text: 'Bora Brasil! Sem medo',
     bet: { match: 'Brasil x Franca', league: 'Amistoso Internacional', market: 'Resultado Final - Brasil', odd: 3.20, stake: 1000, result: 'pending' },
-    likes: 8943, comments: 1204, copies: 3421,
+    likes: 8943, comments: makeComments(['O cara apostou 1000 reais', 'Se o Ney ta confiante eu to tambem', 'Vamo selecao!', 'Copiado!', 'Odd boa demais']), copies: 3421,
   },
   {
     id: '3',
     user: { name: 'Ana Paula', username: '@anapbet', avatar: avatars[2], level: 'Ouro', verified: false },
     timeAgo: '28 min',
     bet: { match: 'Real Madrid x Barcelona', league: 'La Liga', market: 'Ambos Marcam - Sim', odd: 1.72, stake: 30, result: 'green' },
-    likes: 89, comments: 14, copies: 45,
+    likes: 89, comments: makeComments(['Green bonito', 'Essa sempre paga']), copies: 45,
   },
   {
     id: '4',
@@ -101,14 +112,14 @@ const feedPosts: FeedPost[] = [
     timeAgo: '1h',
     text: 'Tip do dia. Confiem no pai',
     bet: { match: 'Liverpool x Arsenal', league: 'Premier League', market: 'Over 2.5 Gols', odd: 1.85, stake: 100, result: 'green' },
-    likes: 567, comments: 89, copies: 234,
+    likes: 567, comments: makeComments(['Monstro demais', 'Sempre acerta', 'Melhor tipster da plataforma', 'Green!']), copies: 234,
   },
   {
     id: '5',
     user: { name: 'Thiago Fernandes', username: '@thifern', avatar: avatars[4], level: 'Prata', verified: false },
     timeAgo: '1h',
     bet: { match: 'Corinthians x Sao Paulo', league: 'Brasileirao Serie A', market: 'Empate', odd: 3.40, stake: 20, result: 'red' },
-    likes: 12, comments: 8, copies: 2,
+    likes: 12, comments: makeComments(['Nao deu dessa vez']), copies: 2,
   },
   {
     id: '6',
@@ -116,7 +127,7 @@ const feedPosts: FeedPost[] = [
     timeAgo: '2h',
     text: 'Multipla insana, quem tem coragem?',
     bet: { match: 'Multipla 5 jogos', league: 'Varias ligas', market: 'Combo especial', odd: 145.00, stake: 10, result: 'pending' },
-    likes: 4521, comments: 890, copies: 1567,
+    likes: 4521, comments: makeComments(['Loucura total', 'Se pagar eu te sigo pra sempre', 'Copiado na fe', 'All in!']), copies: 1567,
   },
   {
     id: '7',
@@ -124,14 +135,14 @@ const feedPosts: FeedPost[] = [
     timeAgo: '2h',
     text: 'GREEN! Obrigada @rafaelk pela dica',
     bet: { match: 'Manchester City x Chelsea', league: 'Premier League', market: 'Vit. Man City + Over 1.5', odd: 2.45, stake: 40, result: 'green' },
-    likes: 234, comments: 45, copies: 67,
+    likes: 234, comments: makeComments(['Parabens!', 'Quanto ganhou?', 'Vou seguir ele tambem']), copies: 67,
   },
   {
     id: '8',
     user: { name: 'Diego Silva', username: '@diegosil', avatar: avatars[7], level: 'VIP', verified: true },
     timeAgo: '3h',
     bet: { match: 'Boca Juniors x River Plate', league: 'Libertadores', market: 'Ambos Marcam + Over 2.5', odd: 3.80, stake: 25, result: 'pending' },
-    likes: 345, comments: 56, copies: 89,
+    likes: 345, comments: makeComments(['Superclassico!', 'Odd linda']), copies: 89,
   },
   {
     id: '9',
@@ -139,14 +150,14 @@ const feedPosts: FeedPost[] = [
     timeAgo: '4h',
     text: 'Vini Jr vai marcar, pode printar',
     bet: { match: 'Real Madrid x Barcelona', league: 'La Liga', market: 'Vini Jr - Marca a qualquer momento', odd: 2.10, stake: 50, result: 'green' },
-    likes: 456, comments: 78, copies: 123,
+    likes: 456, comments: makeComments(['Craque demais', 'Printei e deu green!', 'Vou copiar na proxima']), copies: 123,
   },
   {
     id: '10',
     user: { name: 'Pedro Henrique', username: '@pedroh99', avatar: avatars[9], level: 'Bronze', verified: false },
     timeAgo: '5h',
     bet: { match: 'Gremio x Internacional', league: 'Brasileirao Serie A', market: 'Resultado Final - Gremio', odd: 2.30, stake: 15, result: 'red' },
-    likes: 18, comments: 5, copies: 1,
+    likes: 18, comments: makeComments(['Grenal e sempre imprevisivel']), copies: 1,
   },
   {
     id: '11',
@@ -154,14 +165,14 @@ const feedPosts: FeedPost[] = [
     timeAgo: '6h',
     text: 'METEU ESSA? Odd absurda pagou!',
     bet: { match: 'Multipla 8 jogos', league: 'Varias ligas', market: 'Super Combo', odd: 320.00, stake: 5, result: 'green' },
-    likes: 12400, comments: 3200, copies: 5600,
+    likes: 12400, comments: makeComments(['IMPOSSIVEL', 'Quanto esse maluco ganhou?', 'R$ 1600 com 5 reais???', 'Lenda', 'Casimiro eh outro nivel']), copies: 5600,
   },
   {
     id: '12',
     user: { name: 'Mariana Santos', username: '@marisantos', avatar: avatars[11], level: 'Ouro', verified: false },
     timeAgo: '7h',
     bet: { match: 'Bayern x Dortmund', league: 'Bundesliga', market: 'Over 3.5 Gols', odd: 2.00, stake: 35, result: 'green' },
-    likes: 156, comments: 23, copies: 45,
+    likes: 156, comments: makeComments(['Bundesliga sempre da gol', 'Boa!']), copies: 45,
   },
 ];
 
