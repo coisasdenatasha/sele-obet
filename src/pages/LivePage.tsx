@@ -394,6 +394,7 @@ const LivePage = () => {
               <p className="text-xs font-body text-foreground/60 mt-1">MetLife Stadium, Nova York</p>
               <motion.button
                 whileTap={{ scale: 0.97 }}
+                onClick={() => window.open('https://www.plus.fifa.com/pt/?gl=br', '_blank')}
                 className="mt-3 px-4 py-2 rounded-xl bg-primary text-primary-foreground font-display font-bold text-xs min-h-[40px] flex items-center gap-2"
               >
                 <Play size={12} />
