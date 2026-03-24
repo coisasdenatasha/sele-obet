@@ -511,7 +511,7 @@ const ChatPage = () => {
               className={`flex items-center gap-1.5 min-h-[36px] transition-colors ${isCommentsOpen ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
             >
               <MessageSquare size={16} />
-              <span className="text-xs font-body">{formatNumber(localComments.length)}</span>
+              <span className="text-xs font-body">{formatNumber(allComments.length)}</span>
             </button>
             <button
               onClick={() => setSharePost(post.id)}
@@ -552,7 +552,7 @@ const ChatPage = () => {
 
                 {/* Comment list */}
                 <div className="space-y-2 max-h-[240px] overflow-y-auto">
-                  {localComments.map((c) => (
+                  {allComments.map((c) => (
                     <div key={c.id} className="flex gap-2">
                       <img src={c.avatar} alt={c.user} className="w-7 h-7 rounded-full object-cover flex-shrink-0 mt-0.5" />
                       <div className="flex-1 min-w-0">
