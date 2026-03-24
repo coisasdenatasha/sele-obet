@@ -19,6 +19,7 @@ import PopularTournamentsSection from '@/components/home/PopularTournamentsSecti
 import GoalReplaysSection from '@/components/home/GoalReplaysSection';
 import MultiCreatorBanner from '@/components/home/MultiCreatorBanner';
 import LiveInPlaySection from '@/components/home/LiveInPlaySection';
+import StreamingSection from '@/components/home/StreamingSection';
 import NewsSection from '@/components/home/NewsSection';
 import SuperSocialCTA from '@/components/home/SuperSocialCTA';
 
@@ -232,21 +233,8 @@ const HomePage = () => {
       {/* Quick Access Row */}
       <QuickAccessRow />
 
-      {/* 2. Live Matches */}
-      <SectionReveal>
-      <section className="px-4">
-        <SectionTitle icon={<Zap size={20} className="text-secondary" />} action="Ver Todos" actionRoute="/ao-vivo">
-          Ao Vivo Popular
-        </SectionTitle>
-        <motion.div className="space-y-3" variants={staggerContainer} initial="hidden" whileInView="show" viewport={{ once: true }}>
-          {liveMatches.map((match) => (
-            <motion.div key={match.id} variants={staggerItem}>
-              <MatchCard {...match} />
-            </motion.div>
-          ))}
-        </motion.div>
-      </section>
-      </SectionReveal>
+      {/* 2. Streaming Esportivo */}
+      <StreamingSection />
 
       <SectionReveal delay={0.1}>
       <section className="px-4 space-y-3">
