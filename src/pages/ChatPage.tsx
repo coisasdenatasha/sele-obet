@@ -577,39 +577,39 @@ const ChatPage = () => {
                     ref={commentInputRef}
                     value={newComment}
                     onChange={(e) => setNewComment(e.target.value)}
-                    onKeyDown={(e) => {
+                    onKeyDown={async (e) => {
                       if (e.key === 'Enter' && newComment.trim()) {
                         if (!isLoggedIn) { navigate('/auth'); return; }
-                        setLocalComments([...localComments, {
-                          id: `new-${Date.now()}`,
-                          user: 'Voce',
-                          avatar: 'https://i.pravatar.cc/40?img=50',
-                          verified: false,
-                          text: newComment,
-                          timeAgo: 'agora',
-                          likes: 0,
-                        }]);
+                        const text = newComment;
                         setNewComment('');
+                        if (realBetId) {
+                          await addComment(post.id, text);
+                        } else {
+                          setLocalComments([...localComments, {
+                            id: `new-${Date.now()}`, user: 'Você', avatar: 'https://i.pravatar.cc/40?img=50',
+                            verified: false, text, timeAgo: 'agora', likes: 0,
+                          }]);
+                        }
                       }
                     }}
-                    placeholder="Escreva um comentario..."
+                    placeholder="Escreva um comentário..."
                     className="flex-1 bg-surface-interactive rounded-lg py-2 px-3 text-xs font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[36px]"
                   />
                   <motion.button
                     whileTap={{ scale: 0.95 }}
-                    onClick={() => {
+                    onClick={async () => {
                       if (!newComment.trim()) return;
                       if (!isLoggedIn) { navigate('/auth'); return; }
-                      setLocalComments([...localComments, {
-                        id: `new-${Date.now()}`,
-                        user: 'Voce',
-                        avatar: 'https://i.pravatar.cc/40?img=50',
-                        verified: false,
-                        text: newComment,
-                        timeAgo: 'agora',
-                        likes: 0,
-                      }]);
+                      const text = newComment;
                       setNewComment('');
+                      if (realBetId) {
+                        await addComment(post.id, text);
+                      } else {
+                        setLocalComments([...localComments, {
+                          id: `new-${Date.now()}`, user: 'Você', avatar: 'https://i.pravatar.cc/40?img=50',
+                          verified: false, text, timeAgo: 'agora', likes: 0,
+                        }]);
+                      }
                     }}
                     className="bg-primary text-primary-foreground w-9 h-9 rounded-lg flex items-center justify-center min-w-[36px]"
                   >
