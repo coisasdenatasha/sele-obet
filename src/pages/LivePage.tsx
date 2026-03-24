@@ -50,11 +50,8 @@ const LivePage = () => {
 
       <motion.div className="space-y-3" variants={staggerContainer} initial="hidden" animate="show">
         {allLive.map((match) => (
-          <motion.div key={match.id} variants={staggerItem} className="relative">
+          <motion.div key={match.id} variants={staggerItem}>
             <MatchCard {...match} />
-            <button className="absolute top-3 right-3 p-2 min-w-[44px] min-h-[44px] flex items-center justify-center bg-surface-interactive rounded-lg text-muted-foreground hover:text-foreground transition-colors">
-              <Video size={16} />
-            </button>
           </motion.div>
         ))}
       </motion.div>
