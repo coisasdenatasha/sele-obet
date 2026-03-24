@@ -71,8 +71,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   updateProfile: async (data) => {
     const user = get().user;
     if (!user) return;
-    await supabase.from('profiles').update(data).eq('user_id', user.id);
-    set((s) => ({ profile: s.profile ? { ...s.profile, ...data } : null }));
+    // Convert empty strings to null for nullable DB columns
+    const cleaned = Object.fromEntries(
+      Object.entries(data).map(([k, v]) => [k, v === '' ? null : v])
+    );
+    await supabase.from('profiles').update(cleaned).eq('user_id', user.id);
+    set((s) => ({ profile: s.profile ? { ...s.profile, ...cleaned } : null }));
   },
 
   signUp: async (email, password, metadata) => {
