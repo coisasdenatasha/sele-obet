@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Home, Zap, Search, Receipt, User } from 'lucide-react';
+import { Home, Radio, Trophy, Receipt, Dices } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useBetSlipStore } from '@/store/betSlipStore';
 import { cn } from '@/lib/utils';
@@ -9,11 +9,11 @@ interface BottomNavProps {
 }
 
 const tabs = [
-  { id: '/', icon: Home, label: 'Home' },
-  { id: '/ao-vivo', icon: Zap, label: 'Ao Vivo' },
-  { id: '/busca', icon: Search, label: 'Busca' },
-  { id: 'betslip', icon: Receipt, label: 'Bilhete' },
-  { id: '/perfil', icon: User, label: 'Perfil' },
+  { id: '/', icon: Home, label: 'Página ...' },
+  { id: '/ao-vivo', icon: Radio, label: 'Ao vivo' },
+  { id: '/esportes', icon: Trophy, label: 'Esportes' },
+  { id: 'betslip', icon: Receipt, label: 'Apostas' },
+  { id: '/cassino', icon: Dices, label: 'Cassino' },
 ];
 
 const BottomNav = ({ onBetSlipToggle }: BottomNavProps) => {
