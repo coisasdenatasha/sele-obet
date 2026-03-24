@@ -10,6 +10,7 @@ const replays = [
 ];
 
 const GoalReplaysSection = () => {
+  const navigate = useNavigate();
   return (
     <SectionReveal>
       <section className="px-4">
@@ -23,7 +24,7 @@ const GoalReplaysSection = () => {
             <Play size={20} className="text-secondary" fill="currentColor" />
             Replays de Gols ({replays.length})
           </h2>
-          <button className="text-xs text-primary font-body font-semibold flex items-center gap-0.5 min-h-[44px]">
+          <button onClick={() => navigate('/ao-vivo')} className="text-xs text-primary font-body font-semibold flex items-center gap-0.5 min-h-[44px]">
             Ver tudo <ChevronRight size={14} />
           </button>
         </motion.div>

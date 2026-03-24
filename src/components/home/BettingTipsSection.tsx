@@ -38,6 +38,7 @@ const tips = [
 ];
 
 const BettingTipsSection = () => {
+  const navigate = useNavigate();
   const addBet = useBetSlipStore((s) => s.addBet);
 
   return (
@@ -53,7 +54,7 @@ const BettingTipsSection = () => {
             <TrendingUp size={20} className="text-secondary" />
             Dicas de Aposta
           </h2>
-          <button className="text-xs text-primary font-body font-semibold flex items-center gap-0.5 min-h-[44px]">
+          <button onClick={() => navigate('/esportes')} className="text-xs text-primary font-body font-semibold flex items-center gap-0.5 min-h-[44px]">
             Ver tudo <ChevronRight size={14} />
           </button>
         </motion.div>

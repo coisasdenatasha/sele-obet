@@ -25,6 +25,7 @@ const news = [
 ];
 
 const NewsSection = () => {
+  const navigate = useNavigate();
   return (
     <SectionReveal>
       <section className="px-4">
@@ -38,7 +39,7 @@ const NewsSection = () => {
             <Newspaper size={20} className="text-primary" />
             Notícias
           </h2>
-          <button className="text-xs text-primary font-body font-semibold flex items-center gap-0.5 min-h-[44px]">
+          <button onClick={() => navigate('/esportes')} className="text-xs text-primary font-body font-semibold flex items-center gap-0.5 min-h-[44px]">
             Ver tudo <ChevronRight size={14} />
           </button>
         </motion.div>
