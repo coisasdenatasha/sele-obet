@@ -74,7 +74,7 @@ const ProfilePage = () => {
       const avatarUrl = `${urlData.publicUrl}?t=${Date.now()}`;
 
       await updateProfile({ avatar_url: avatarUrl } as any);
-      await fetchProfile();
+      if (user) await fetchProfile(user.id);
       toast.success('Foto atualizada!');
     } catch (err: any) {
       console.error(err);
