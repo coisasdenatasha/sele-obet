@@ -52,6 +52,7 @@ const SectionTitle = ({ children, icon, action, actionRoute }: { children: React
 const HeroCarousel = () => {
   const [current, setCurrent] = useState(0);
   const timerRef = useRef<NodeJS.Timeout>();
+  const navigate = useNavigate();
 
   useEffect(() => {
     timerRef.current = setInterval(() => {
@@ -117,6 +118,7 @@ const HeroCarousel = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
                 whileTap={{ scale: 0.97 }}
+                onClick={() => navigate((heroBanners[current] as any).route || '/esportes')}
                 className="mt-3 bg-primary text-primary-foreground font-display font-bold text-sm px-5 py-2.5 rounded-lg min-h-[44px] hover:brightness-110 transition-all animate-glow-pulse"
               >
                 {heroBanners[current].cta}
