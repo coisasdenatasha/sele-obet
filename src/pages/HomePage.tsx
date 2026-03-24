@@ -11,9 +11,16 @@ import { liveMatches, boostedMatches, upcomingMatches, popularMultiples, playerP
 import { useBetSlipStore } from '@/store/betSlipStore';
 import { useAuthStore } from '@/store/authStore';
 import { Flame, ChevronRight, Trophy, Gift, Zap, User, Calendar, Target, Scale, CreditCard, CornerDownRight, Award, Star, LayoutGrid } from 'lucide-react';
+import { PageTransition, SectionReveal, staggerContainer, staggerItem } from '@/components/animations';
 
 const SectionTitle = ({ children, icon, action }: { children: React.ReactNode; icon?: React.ReactNode; action?: string }) => (
-  <div className="flex items-center justify-between mb-3">
+  <motion.div
+    className="flex items-center justify-between mb-3"
+    initial={{ opacity: 0, x: -12 }}
+    whileInView={{ opacity: 1, x: 0 }}
+    viewport={{ once: true }}
+    transition={{ duration: 0.4 }}
+  >
     <h2 className="font-display text-lg font-bold flex items-center gap-2">
       {icon}
       {children}
@@ -23,7 +30,7 @@ const SectionTitle = ({ children, icon, action }: { children: React.ReactNode; i
         {action} <ChevronRight size={14} />
       </button>
     )}
-  </div>
+  </motion.div>
 );
 
 /* ───────── Hero Carousel ───────── */
@@ -133,6 +140,7 @@ const HomePage = () => {
   const { isLoggedIn } = useAuthStore();
 
   return (
+    <PageTransition>
     <div className="space-y-6 pb-20">
       {/* Visitor Banner */}
       {!isLoggedIn && <VisitorBanner />}
@@ -140,34 +148,38 @@ const HomePage = () => {
       {/* 1. Hero Carousel */}
       <HeroCarousel />
 
-
       {/* 2. Live Matches */}
+      <SectionReveal>
       <section className="px-4">
         <SectionTitle icon={<Zap size={20} className="text-secondary" />} action="Ver Todos">
           Ao Vivo
         </SectionTitle>
-        <div className="space-y-3">
+        <motion.div className="space-y-3" variants={staggerContainer} initial="hidden" whileInView="show" viewport={{ once: true }}>
           {liveMatches.map((match) => (
-            <motion.div key={match.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+            <motion.div key={match.id} variants={staggerItem}>
               <MatchCard {...match} />
             </motion.div>
           ))}
-        </div>
+        </motion.div>
       </section>
+      </SectionReveal>
 
-      {/* 3. Boosted Odds */}
+      <SectionReveal delay={0.1}>
       <section className="px-4">
         <SectionTitle icon={<Flame size={20} className="text-primary" />} action="Ver Todas">
           Odds Turbinadas
         </SectionTitle>
-        <div className="space-y-3">
+        <motion.div className="space-y-3" variants={staggerContainer} initial="hidden" whileInView="show" viewport={{ once: true }}>
           {boostedMatches.map((match) => (
-            <MatchCard key={match.id} {...match} />
+            <motion.div key={match.id} variants={staggerItem}>
+              <MatchCard {...match} />
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </section>
+      </SectionReveal>
 
-      {/* 4. Popular Multiples */}
+      <SectionReveal delay={0.15}>
       <section className="px-4">
         <SectionTitle icon={<Trophy size={20} className="text-primary" />} action="Ver Mais">
           Múltiplas Populares
@@ -219,8 +231,9 @@ const HomePage = () => {
           ))}
         </div>
       </section>
+      </SectionReveal>
 
-      {/* 5. Player Props Carousel */}
+      <SectionReveal delay={0.1}>
       <section>
         <div className="px-4">
           <SectionTitle icon={<User size={20} className="text-primary" />} action="Ver Todos">
@@ -229,14 +242,14 @@ const HomePage = () => {
         </div>
         <PlayerPropsCarousel />
       </section>
+      </SectionReveal>
 
-      {/* 6. Upcoming Matches */}
+      <SectionReveal>
       <section className="px-4">
         <SectionTitle icon={<Calendar size={20} className="text-primary" />} action="Ver Todos">
           Próximos Jogos
         </SectionTitle>
-        {/* Compact table */}
-        <div className="bg-surface-card rounded-xl overflow-hidden">
+        <motion.div className="bg-surface-card rounded-xl overflow-hidden" initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
           <div className="grid grid-cols-[1fr_auto_auto_auto] gap-x-2 items-center px-4 py-2 text-[0.6rem] font-body text-muted-foreground uppercase tracking-wider">
             <span>Partida</span>
             <span className="w-12 text-center">1</span>
@@ -256,6 +269,7 @@ const HomePage = () => {
                 <motion.button
                   key={j}
                   whileTap={{ scale: 0.95 }}
+                  whileHover={{ scale: 1.05 }}
                   onClick={() =>
                     addBet({
                       id: `${m.id}-${j}`,
@@ -272,17 +286,18 @@ const HomePage = () => {
               ))}
             </div>
           ))}
-        </div>
+        </motion.div>
       </section>
+      </SectionReveal>
 
-      {/* 7. Competições */}
+      <SectionReveal>
       <section className="px-4">
         <SectionTitle icon={<Trophy size={20} className="text-secondary" />} action="Ver Todas">
           Competições
         </SectionTitle>
-        <div className="space-y-2">
+        <motion.div className="space-y-2" variants={staggerContainer} initial="hidden" whileInView="show" viewport={{ once: true }}>
           {competitions.map((comp) => (
-            <div key={comp.id} className="bg-surface-card rounded-xl p-3.5 flex items-center gap-3">
+            <motion.div key={comp.id} variants={staggerItem} className="bg-surface-card rounded-xl p-3.5 flex items-center gap-3">
               <img src={comp.flag} alt={comp.country} className="w-8 h-6 object-cover rounded" />
               <div className="flex-1 min-w-0">
                 <p className="font-display text-sm font-bold truncate">{comp.name}</p>
@@ -291,19 +306,20 @@ const HomePage = () => {
               <span className="text-xs font-display font-bold text-primary bg-primary/15 px-2 py-1 rounded-lg">
                 {comp.matchCount} jogos
               </span>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </section>
+      </SectionReveal>
 
-      {/* 8. Especiais */}
+      <SectionReveal>
       <section className="px-4">
         <SectionTitle icon={<Star size={20} className="text-primary" />} action="Ver Todos">
           Especiais
         </SectionTitle>
-        <div className="space-y-3">
+        <motion.div className="space-y-3" variants={staggerContainer} initial="hidden" whileInView="show" viewport={{ once: true }}>
           {specials.map((spec) => (
-            <div key={spec.id} className="bg-surface-card rounded-xl p-4 space-y-2.5">
+            <motion.div key={spec.id} variants={staggerItem} className="bg-surface-card rounded-xl p-4 space-y-2.5">
               <div className="flex items-start justify-between gap-2">
                 <div className="flex-1 min-w-0">
                   <span className="text-[0.6rem] font-display font-bold text-secondary bg-secondary/15 px-2 py-0.5 rounded-full">
@@ -324,6 +340,7 @@ const HomePage = () => {
               </div>
               <motion.button
                 whileTap={{ scale: 0.97 }}
+                whileHover={{ scale: 1.02 }}
                 onClick={() =>
                   addBet({
                     id: spec.id,
@@ -337,17 +354,18 @@ const HomePage = () => {
               >
                 Apostar
               </motion.button>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </section>
+      </SectionReveal>
 
-      {/* 9. Odds por Categoria */}
+      <SectionReveal>
       <section className="px-4">
         <SectionTitle icon={<LayoutGrid size={20} className="text-primary" />} action="Ver Todas">
           Odds por Categoria
         </SectionTitle>
-        <div className="grid grid-cols-2 gap-3">
+        <motion.div className="grid grid-cols-2 gap-3" variants={staggerContainer} initial="hidden" whileInView="show" viewport={{ once: true }}>
           {oddsByCategory.map((cat) => {
             const iconMap: Record<string, React.ReactNode> = {
               trophy: <Trophy size={20} className="text-primary" />,
@@ -360,21 +378,25 @@ const HomePage = () => {
             return (
               <motion.div
                 key={cat.id}
+                variants={staggerItem}
                 whileTap={{ scale: 0.97 }}
+                whileHover={{ scale: 1.03 }}
                 className="bg-surface-card rounded-xl p-4 space-y-2 cursor-pointer"
               >
-                <div className="w-10 h-10 rounded-lg bg-primary/15 flex items-center justify-center">
+                <motion.div className="w-10 h-10 rounded-lg bg-primary/15 flex items-center justify-center" whileHover={{ rotate: 10 }}>
                   {iconMap[cat.icon]}
-                </div>
+                </motion.div>
                 <h3 className="font-display text-sm font-bold">{cat.category}</h3>
                 <p className="text-[0.6rem] font-body text-muted-foreground">{cat.description}</p>
                 <span className="text-xs font-display font-bold text-secondary">{cat.matches} mercados</span>
               </motion.div>
             );
           })}
-        </div>
+        </motion.div>
       </section>
+      </SectionReveal>
     </div>
+    </PageTransition>
   );
 };
 
