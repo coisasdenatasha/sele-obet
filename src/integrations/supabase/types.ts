@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      bets: {
+        Row: {
+          created_at: string
+          id: string
+          payout: number | null
+          potential_return: number
+          selections: Json
+          settled_at: string | null
+          stake: number
+          status: string
+          total_odds: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          payout?: number | null
+          potential_return: number
+          selections?: Json
+          settled_at?: string | null
+          stake: number
+          status?: string
+          total_odds: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          payout?: number | null
+          potential_return?: number
+          selections?: Json
+          settled_at?: string | null
+          stake?: number
+          status?: string
+          total_odds?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
