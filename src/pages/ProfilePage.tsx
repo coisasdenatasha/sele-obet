@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   User, TrendingUp, History, Shield, Settings, LogOut, ChevronRight,
   Award, Trophy, CreditCard, Star, UserPlus, LogIn, Pencil, Check, X,
-  Mail, Phone, MapPin, Calendar, FileText, Camera
+  Mail, Phone, MapPin, Calendar, FileText, Camera, Image, Loader2
 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -33,6 +33,10 @@ const ProfilePage = () => {
   const { isLoggedIn, user, profile, logout, updateProfile, fetchProfile } = useAuthStore();
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [showPhotoMenu, setShowPhotoMenu] = useState(false);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
   const [form, setForm] = useState({
     full_name: '',
     username: '',
@@ -45,6 +49,40 @@ const ProfilePage = () => {
   });
   const [newEmail, setNewEmail] = useState('');
   const [emailEditing, setEmailEditing] = useState(false);
+
+  const handlePhotoUpload = async (file: File) => {
+    if (!user) return;
+    setUploadingPhoto(true);
+    setShowPhotoMenu(false);
+    try {
+      const ext = file.name.split('.').pop() || 'jpg';
+      const path = `${user.id}/avatar.${ext}`;
+
+      // Remove old avatar if exists
+      await supabase.storage.from('avatars').remove([path]);
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(path, file, { upsert: true, contentType: file.type });
+
+      if (uploadError) throw uploadError;
+
+      const { data: urlData } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(path);
+
+      const avatarUrl = `${urlData.publicUrl}?t=${Date.now()}`;
+
+      await updateProfile({ avatar_url: avatarUrl } as any);
+      if (user) await fetchProfile(user.id);
+      toast.success('Foto atualizada!');
+    } catch (err: any) {
+      console.error(err);
+      toast.error('Erro ao enviar foto');
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
 
   useEffect(() => {
     if (profile) {
@@ -159,16 +197,73 @@ const ProfilePage = () => {
           transition={{ duration: 0.4 }}
         >
           <div className="relative">
-            <div className="w-18 h-18 rounded-full bg-accent flex items-center justify-center w-[72px] h-[72px]">
-              {profile?.avatar_url ? (
+            <div className="w-[72px] h-[72px] rounded-full bg-accent flex items-center justify-center overflow-hidden">
+              {uploadingPhoto ? (
+                <Loader2 size={24} className="text-primary animate-spin" />
+              ) : profile?.avatar_url ? (
                 <img src={profile.avatar_url} alt="Avatar" className="w-full h-full rounded-full object-cover" />
               ) : (
                 <User size={30} className="text-primary" />
               )}
             </div>
-            <button className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
+            <button
+              onClick={() => setShowPhotoMenu(!showPhotoMenu)}
+              className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center"
+            >
               <Camera size={14} />
             </button>
+
+            {/* Hidden file inputs */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handlePhotoUpload(file);
+                e.target.value = '';
+              }}
+            />
+            <input
+              ref={cameraInputRef}
+              type="file"
+              accept="image/*"
+              capture="user"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handlePhotoUpload(file);
+                e.target.value = '';
+              }}
+            />
+
+            {/* Photo menu popup */}
+            <AnimatePresence>
+              {showPhotoMenu && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9, y: -5 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.9, y: -5 }}
+                  className="absolute top-full left-0 mt-2 bg-surface-card rounded-xl shadow-lg z-20 overflow-hidden w-48"
+                >
+                  <button
+                    onClick={() => { cameraInputRef.current?.click(); setShowPhotoMenu(false); }}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-sm font-body text-foreground hover:bg-surface-interactive transition-colors min-h-[44px]"
+                  >
+                    <Camera size={18} className="text-primary" />
+                    Tirar Foto
+                  </button>
+                  <button
+                    onClick={() => { fileInputRef.current?.click(); setShowPhotoMenu(false); }}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-sm font-body text-foreground hover:bg-surface-interactive transition-colors min-h-[44px]"
+                  >
+                    <Image size={18} className="text-primary" />
+                    Escolher da Galeria
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
           <div className="flex-1">
             <h2 className="font-display text-xl font-bold">{profile?.full_name || 'Usuário'}</h2>
