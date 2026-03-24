@@ -208,7 +208,7 @@ const PlansPage = () => {
 
         <div className="space-y-2">
           {streamingPlatforms.map((platform) => (
-            <div key={platform.name} className="bg-surface-card rounded-xl p-4 flex items-center gap-3">
+            <a key={platform.name} href={platform.url} target="_blank" rel="noopener noreferrer" className="bg-surface-card rounded-xl p-4 flex items-center gap-3 active:opacity-80 transition-opacity">
               <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
                 platform.type === 'free' ? 'bg-secondary/15' : 'bg-primary/15'
               }`}>
@@ -232,7 +232,7 @@ const PlansPage = () => {
                 <p className="text-xs font-body text-muted-foreground truncate">{platform.description}</p>
               </div>
               <ExternalLink size={16} className="text-muted-foreground shrink-0" />
-            </div>
+            </a>
           ))}
         </div>
       </div>
