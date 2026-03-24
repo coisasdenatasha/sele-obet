@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Newspaper, ChevronRight, Loader2, ExternalLink } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Newspaper, Loader2, ExternalLink } from 'lucide-react';
 import { SectionReveal } from '@/components/animations';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -13,10 +12,10 @@ interface FifaArticle {
 }
 
 const NewsSection = () => {
-  const navigate = useNavigate();
   const [articles, setArticles] = useState<FifaArticle[]>([]);
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchNews = async () => {
@@ -32,12 +31,49 @@ const NewsSection = () => {
         setLoading(false);
       }
     };
-
     fetchNews();
-    // Refresh every 5 minutes
     const interval = setInterval(fetchNews, 5 * 60 * 1000);
     return () => clearInterval(interval);
   }, []);
+
+  // Auto-scroll horizontally
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el || articles.length === 0) return;
+
+    let animId: number;
+    let paused = false;
+    let speed = 0.5;
+
+    const step = () => {
+      if (!paused && el) {
+        el.scrollLeft += speed;
+        // Reset to start when reaching the end
+        if (el.scrollLeft >= el.scrollWidth - el.clientWidth - 1) {
+          el.scrollLeft = 0;
+        }
+      }
+      animId = requestAnimationFrame(step);
+    };
+
+    const handlePointerDown = () => { paused = true; };
+    const handlePointerUp = () => { setTimeout(() => { paused = false; }, 2000); };
+
+    el.addEventListener('pointerdown', handlePointerDown);
+    el.addEventListener('pointerup', handlePointerUp);
+    el.addEventListener('touchstart', handlePointerDown, { passive: true });
+    el.addEventListener('touchend', handlePointerUp);
+
+    animId = requestAnimationFrame(step);
+
+    return () => {
+      cancelAnimationFrame(animId);
+      el.removeEventListener('pointerdown', handlePointerDown);
+      el.removeEventListener('pointerup', handlePointerUp);
+      el.removeEventListener('touchstart', handlePointerDown);
+      el.removeEventListener('touchend', handlePointerUp);
+    };
+  }, [articles]);
 
   const timeAgo = (iso: string) => {
     const diff = Date.now() - new Date(iso).getTime();
@@ -64,8 +100,9 @@ const NewsSection = () => {
               Notícias Copa 2026
             </h2>
             {lastUpdated && (
-              <p className="text-[0.55rem] font-body text-muted-foreground mt-0.5">
-                🔴 Ao vivo • Atualizado {timeAgo(lastUpdated)}
+              <p className="text-[0.55rem] font-body text-muted-foreground mt-0.5 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-destructive animate-pulse" />
+                Ao vivo · Atualizado {timeAgo(lastUpdated)}
               </p>
             )}
           </div>
@@ -84,7 +121,7 @@ const NewsSection = () => {
             <Loader2 size={24} className="animate-spin text-primary" />
           </div>
         ) : (
-          <div className="flex gap-3 overflow-x-auto no-scrollbar -mx-4 px-4 pb-1">
+          <div ref={scrollRef} className="flex gap-3 overflow-x-auto no-scrollbar -mx-4 px-4 pb-1">
             {articles.map((article, i) => (
               <motion.a
                 key={i}
