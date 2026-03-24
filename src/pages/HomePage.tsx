@@ -156,11 +156,14 @@ const HomePage = () => {
       {/* 1. Hero Carousel */}
       <HeroCarousel />
 
+      {/* Quick Access Row */}
+      <QuickAccessRow />
+
       {/* 2. Live Matches */}
       <SectionReveal>
       <section className="px-4">
         <SectionTitle icon={<Zap size={20} className="text-secondary" />} action="Ver Todos">
-          Ao Vivo
+          Ao Vivo Popular
         </SectionTitle>
         <motion.div className="space-y-3" variants={staggerContainer} initial="hidden" whileInView="show" viewport={{ once: true }}>
           {liveMatches.map((match) => (
