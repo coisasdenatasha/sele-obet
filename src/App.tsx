@@ -32,6 +32,11 @@ const AppLayout = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const location = useLocation();
   const isAuthPage = location.pathname === '/auth';
+  const initialize = useAuthStore((s) => s.initialize);
+
+  useEffect(() => {
+    initialize();
+  }, [initialize]);
 
   if (isAuthPage) {
     return (
