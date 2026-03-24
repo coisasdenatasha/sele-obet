@@ -2,7 +2,6 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import OddsChip from './OddsChip';
 import LiveBadge from './LiveBadge';
-import LiveBadge from './LiveBadge';
 
 interface MatchCardProps {
   id: string;
