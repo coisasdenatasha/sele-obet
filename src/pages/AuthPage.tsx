@@ -662,6 +662,10 @@ const AuthPage = () => {
                 )}
               </AnimatePresence>
 
+              {authError && (
+                <p className="text-[0.75rem] text-destructive font-body bg-destructive/10 rounded-lg p-3">{authError}</p>
+              )}
+
               {/* Navigation Buttons */}
               <div className="flex gap-3 pt-2">
                 {signupStep > 1 && (
@@ -687,18 +691,17 @@ const AuthPage = () => {
                       if (error) {
                         setAuthError(error);
                       } else {
-                        // After signup, update profile with additional data
                         setStep('success');
                       }
                     }
                   }}
-                  disabled={!currentStepValid}
+                  disabled={!currentStepValid || authLoading}
                   className={`flex-1 font-display font-bold text-sm py-3.5 rounded-xl min-h-[44px] transition-all ${
-                    currentStepValid
+                    currentStepValid && !authLoading
                       ? 'bg-primary text-primary-foreground hover:brightness-110'
                       : 'bg-surface-interactive text-muted-foreground cursor-not-allowed'
                   }`}>
-                  {signupStep < totalSignupSteps ? 'Próximo' : 'Cadastrar'}
+                  {authLoading ? 'Cadastrando...' : signupStep < totalSignupSteps ? 'Próximo' : 'Cadastrar'}
                 </motion.button>
               </div>
             </div>
