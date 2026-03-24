@@ -29,9 +29,19 @@ interface FeedPost {
     result?: 'green' | 'red' | 'pending';
   };
   likes: number;
-  comments: number;
+  comments: Comment[];
   copies: number;
   liked?: boolean;
+}
+
+interface Comment {
+  id: string;
+  user: string;
+  avatar: string;
+  verified: boolean;
+  text: string;
+  timeAgo: string;
+  likes: number;
 }
 
 type Tab = 'popular' | 'apostas' | 'criar' | 'recentes' | 'odds100' | 'gols' | 'jogadores';
