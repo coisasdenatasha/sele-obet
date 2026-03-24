@@ -594,18 +594,21 @@ const ChatPage = () => {
               <div className="bg-surface-card rounded-xl p-4 space-y-3">
                 <h3 className="font-display font-bold text-sm flex items-center gap-2">
                   <Plus size={16} className="text-primary" />
-                  Criar Publicacao
+                  Compartilhar sua Aposta
                 </h3>
+                <p className="text-xs font-body text-muted-foreground">
+                  Suas apostas confirmadas aparecem automaticamente no feed quando você compartilha. Vá em Histórico de Apostas para compartilhar!
+                </p>
                 <input
                   value={createName}
                   onChange={(e) => setCreateName(e.target.value)}
-                  placeholder="O que voce esta apostando?"
+                  placeholder="Adicione um comentário à sua aposta..."
                   className="w-full bg-surface-interactive rounded-xl py-3 px-4 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]"
                 />
                 <div className="space-y-2">
                   <p className="text-xs font-body text-muted-foreground">Tipo</p>
                   <div className="flex flex-wrap gap-1.5">
-                    {['Simples', 'Multipla', 'Tip', 'Analise', 'Resultado'].map(cat => (
+                    {['Simples', 'Múltipla', 'Tip', 'Análise', 'Resultado'].map(cat => (
                       <button key={cat} className="px-3 py-1.5 bg-surface-interactive rounded-full text-xs font-body text-foreground/70 hover:bg-primary hover:text-primary-foreground transition-colors min-h-[32px]">
                         {cat}
                       </button>
@@ -614,10 +617,14 @@ const ChatPage = () => {
                 </div>
                 <motion.button
                   whileTap={{ scale: 0.97 }}
-                  onClick={() => { if (!isLoggedIn) navigate('/auth'); }}
+                  onClick={() => {
+                    if (!isLoggedIn) { navigate('/auth'); return; }
+                    navigate('/historico');
+                    toast('Vá ao Histórico de Apostas', { description: 'Clique em "Compartilhar" em qualquer aposta para publicar no Social' });
+                  }}
                   className="w-full bg-primary text-primary-foreground font-display font-bold text-sm py-3 rounded-xl min-h-[44px]"
                 >
-                  Publicar
+                  Ver minhas Apostas
                 </motion.button>
               </div>
             </motion.div>
