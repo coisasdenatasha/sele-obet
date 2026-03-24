@@ -375,6 +375,8 @@ const AuthPage = () => {
                   </div>
                 </div>
 
+                {/* Senha */}
+                <div className="space-y-1.5">
                   <label className="text-xs font-body font-medium text-muted-foreground">Senha</label>
                   <div className="relative">
                     <Lock size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
