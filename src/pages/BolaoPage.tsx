@@ -75,7 +75,7 @@ const BolaoPage = () => {
             pointsByUser.set(p.user_id, (pointsByUser.get(p.user_id) || 0) + (p.points_earned || 0));
           });
 
-          const userIds = [...pointsByUser.keys()];
+          const userIds = Array.from(pointsByUser.keys());
           const { data: profiles } = await supabase
             .from('profiles')
             .select('user_id, full_name, username')
