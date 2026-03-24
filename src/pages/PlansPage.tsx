@@ -58,10 +58,10 @@ interface StreamingPlatform {
 
 const streamingPlatforms: StreamingPlatform[] = [
   { name: 'HBO Max', type: 'paid', color: 'hsl(var(--primary))', description: 'Filmes, séries e esportes ao vivo', url: 'https://www.hbomax.com/br/pt/sports' },
-  { name: 'Amazon Prime', type: 'paid', color: 'hsl(var(--primary))', description: 'Premier League e mais', url: 'https://www.primevideo.com/-/pt/channel/65837b7c-1c81-4f8a-80f5-d1bba5cde8f1' },
-  { name: 'Globoplay', type: 'paid', color: 'hsl(var(--primary))', description: 'Brasileirão e Copa do Brasil', url: 'https://premiere.globo.com/' },
-  { name: 'CazéTV', type: 'free', color: 'hsl(var(--secondary))', description: 'Transmissões ao vivo gratuitas', url: 'https://www.youtube.com/watch?v=FlWKYeWAi-M' },
-  { name: 'GoatTV', type: 'free', color: 'hsl(var(--secondary))', description: 'Futebol e esportes grátis', url: 'https://www.youtube.com/watch?v=NsXdU5YQ-i0' },
+  { name: 'Premiere', type: 'paid', color: 'hsl(var(--primary))', description: 'Brasileirão e Copa do Brasil', url: 'https://premiere.globo.com/' },
+  { name: 'Disney+', type: 'paid', color: 'hsl(var(--primary))', description: 'Futebol e esportes exclusivos', url: 'https://www.disneyplus.com/pt-br' },
+  { name: 'CazéTV', type: 'free', color: 'hsl(var(--secondary))', description: 'Transmissões ao vivo gratuitas', url: 'https://www.youtube.com/@CazeTV' },
+  { name: 'Canal GOAT', type: 'free', color: 'hsl(var(--secondary))', description: 'Futebol e esportes grátis', url: 'https://www.youtube.com/@canalgoatbr' },
 ];
 
 const PlansPage = () => {
