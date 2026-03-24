@@ -301,6 +301,23 @@ const HomePage = () => {
       </section>
       </SectionReveal>
 
+      {/* Super Odds / Boosted section stays */}
+
+      {/* Dicas de Aposta Populares */}
+      <BettingTipsSection />
+
+      {/* Torneios Populares */}
+      <PopularTournamentsSection />
+
+      {/* Replays de Gols */}
+      <GoalReplaysSection />
+
+      {/* Multi Criar Aposta */}
+      <MultiCreatorBanner />
+
+      {/* Em Jogo - Ao Vivo */}
+      <LiveInPlaySection />
+
       <SectionReveal>
       <section className="px-4">
         <SectionTitle icon={<Trophy size={20} className="text-secondary" />} action="Ver Todas">
@@ -406,6 +423,12 @@ const HomePage = () => {
         </motion.div>
       </section>
       </SectionReveal>
+
+      {/* Notícias */}
+      <NewsSection />
+
+      {/* Social CTA */}
+      <SuperSocialCTA />
     </div>
     </PageTransition>
   );
