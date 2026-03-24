@@ -671,9 +671,26 @@ const AuthPage = () => {
                   </motion.button>
                 )}
                 <motion.button whileTap={{ scale: 0.97 }}
-                  onClick={() => {
-                    if (signupStep < totalSignupSteps) setSignupStep(signupStep + 1);
-                    else setStep('kyc');
+                  onClick={async () => {
+                    if (signupStep < totalSignupSteps) {
+                      setSignupStep(signupStep + 1);
+                    } else {
+                      setAuthError(null);
+                      setAuthLoading(true);
+                      const { error } = await signUp(email, password, {
+                        full_name: fullName,
+                        username,
+                        cpf: cpf.replace(/\D/g, ''),
+                        phone: telefone.replace(/\D/g, ''),
+                      });
+                      setAuthLoading(false);
+                      if (error) {
+                        setAuthError(error);
+                      } else {
+                        // After signup, update profile with additional data
+                        setStep('success');
+                      }
+                    }
                   }}
                   disabled={!currentStepValid}
                   className={`flex-1 font-display font-bold text-sm py-3.5 rounded-xl min-h-[44px] transition-all ${
