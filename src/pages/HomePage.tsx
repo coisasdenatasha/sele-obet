@@ -204,7 +204,7 @@ const HomePage = () => {
       {/* 2. Live Matches */}
       <SectionReveal>
       <section className="px-4">
-        <SectionTitle icon={<Zap size={20} className="text-secondary" />} action="Ver Todos">
+        <SectionTitle icon={<Zap size={20} className="text-secondary" />} action="Ver Todos" actionRoute="/ao-vivo">
           Ao Vivo Popular
         </SectionTitle>
         <motion.div className="space-y-3" variants={staggerContainer} initial="hidden" whileInView="show" viewport={{ once: true }}>
@@ -289,7 +289,7 @@ const HomePage = () => {
       <SectionReveal delay={0.1}>
       <section>
         <div className="px-4">
-          <SectionTitle icon={<User size={20} className="text-primary" />} action="Ver Todos">
+          <SectionTitle icon={<User size={20} className="text-primary" />} action="Ver Todos" actionRoute="/esportes">
             Player Props
           </SectionTitle>
         </div>
@@ -299,7 +299,7 @@ const HomePage = () => {
 
       <SectionReveal>
       <section className="px-4">
-        <SectionTitle icon={<Calendar size={20} className="text-primary" />} action="Ver Todos">
+        <SectionTitle icon={<Calendar size={20} className="text-primary" />} action="Ver Todos" actionRoute="/esportes">
           Próximos Jogos
         </SectionTitle>
         <motion.div className="bg-surface-card rounded-xl overflow-hidden" initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
@@ -384,7 +384,7 @@ const HomePage = () => {
 
       <SectionReveal>
       <section className="px-4">
-        <SectionTitle icon={<Star size={20} className="text-primary" />} action="Ver Todos">
+        <SectionTitle icon={<Star size={20} className="text-primary" />} action="Ver Todos" actionRoute="/esportes">
           Especiais
         </SectionTitle>
         <motion.div className="space-y-3" variants={staggerContainer} initial="hidden" whileInView="show" viewport={{ once: true }}>
