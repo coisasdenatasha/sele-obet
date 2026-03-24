@@ -26,6 +26,7 @@ interface Bet {
   status: BetStatus;
   payout: number;
   settled_at: string | null;
+  shared?: boolean;
 }
 
 const statusConfig: Record<BetStatus, { label: string; color: string; icon: typeof Check }> = {
