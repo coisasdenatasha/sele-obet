@@ -1,4 +1,3 @@
-import { useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Play, ChevronRight, ExternalLink } from 'lucide-react';
 import { SectionReveal } from '@/components/animations';
@@ -63,46 +62,7 @@ const replays = [
 ];
 
 const GoalReplaysSection = () => {
-  const scrollRef = useRef<HTMLDivElement>(null);
-
-  // Auto-scroll card by card
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-
-    let paused = false;
-    const cardWidth = 240 + 12; // w-[240px] + gap-3
-
-    const interval = setInterval(() => {
-      if (paused || !el) return;
-      const maxScroll = el.scrollWidth - el.clientWidth;
-      if (el.scrollLeft >= maxScroll - 2) {
-        el.scrollTo({ left: 0, behavior: 'smooth' });
-      } else {
-        el.scrollBy({ left: cardWidth, behavior: 'smooth' });
-      }
-    }, 4000);
-
-    const pause = () => { paused = true; };
-    const resume = () => { setTimeout(() => { paused = false; }, 3000); };
-
-    el.addEventListener('pointerdown', pause);
-    el.addEventListener('pointerup', resume);
-    el.addEventListener('pointerenter', pause);
-    el.addEventListener('pointerleave', resume);
-    el.addEventListener('touchstart', pause, { passive: true });
-    el.addEventListener('touchend', resume);
-
-    return () => {
-      clearInterval(interval);
-      el.removeEventListener('pointerdown', pause);
-      el.removeEventListener('pointerup', resume);
-      el.removeEventListener('pointerenter', pause);
-      el.removeEventListener('pointerleave', resume);
-      el.removeEventListener('touchstart', pause);
-      el.removeEventListener('touchend', resume);
-    };
-  }, []);
+  const duplicated = [...replays, ...replays];
 
   return (
     <SectionReveal>
@@ -140,10 +100,15 @@ const GoalReplaysSection = () => {
           </motion.a>
         </motion.div>
 
-        <div ref={scrollRef} className="flex gap-3 overflow-x-auto no-scrollbar -mx-4 px-4 pb-1">
-          {replays.map((r, i) => (
+        <div className="overflow-hidden -mx-4">
+          <motion.div
+            className="flex gap-3 px-4 w-max"
+            animate={{ x: ['0%', '-50%'] }}
+            transition={{ x: { duration: 50, repeat: Infinity, ease: 'linear' } }}
+          >
+          {duplicated.map((r, i) => (
             <motion.a
-              key={r.id}
+              key={`${r.id}-${i}`}
               href={r.url}
               target="_blank"
               rel="noopener noreferrer"
@@ -190,6 +155,7 @@ const GoalReplaysSection = () => {
               </div>
             </motion.a>
           ))}
+          </motion.div>
         </div>
       </section>
     </SectionReveal>
