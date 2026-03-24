@@ -65,26 +65,26 @@ const replays = [
 const GoalReplaysSection = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll card by card
+  // Auto-scroll contínuo e lento
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
 
+    let animId: number;
     let paused = false;
-    const cardWidth = 240 + 12; // w-[240px] + gap-3
 
-    const interval = setInterval(() => {
-      if (paused || !el) return;
-      const maxScroll = el.scrollWidth - el.clientWidth;
-      if (el.scrollLeft >= maxScroll - 2) {
-        el.scrollTo({ left: 0, behavior: 'smooth' });
-      } else {
-        el.scrollBy({ left: cardWidth, behavior: 'smooth' });
+    const step = () => {
+      if (!paused && el) {
+        el.scrollLeft += 0.3;
+        if (el.scrollLeft >= el.scrollWidth - el.clientWidth - 1) {
+          el.scrollLeft = 0;
+        }
       }
-    }, 4000);
+      animId = requestAnimationFrame(step);
+    };
 
     const pause = () => { paused = true; };
-    const resume = () => { setTimeout(() => { paused = false; }, 3000); };
+    const resume = () => { setTimeout(() => { paused = false; }, 2000); };
 
     el.addEventListener('pointerdown', pause);
     el.addEventListener('pointerup', resume);
@@ -93,8 +93,10 @@ const GoalReplaysSection = () => {
     el.addEventListener('touchstart', pause, { passive: true });
     el.addEventListener('touchend', resume);
 
+    animId = requestAnimationFrame(step);
+
     return () => {
-      clearInterval(interval);
+      cancelAnimationFrame(animId);
       el.removeEventListener('pointerdown', pause);
       el.removeEventListener('pointerup', resume);
       el.removeEventListener('pointerenter', pause);
