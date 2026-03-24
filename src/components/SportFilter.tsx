@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import {
   CircleDot, Dribbble, Target, Gamepad2, Swords, Circle, Bike, Waves, Zap,
-  Trophy, Flag, Crosshair, Dumbbell, Timer, Car, Horse, Volleyball,
+  Trophy, Flag, Crosshair, Dumbbell, Timer, Car, Volleyball,
   type LucideIcon
 } from 'lucide-react';
 
@@ -24,7 +24,7 @@ const sports: { id: string; label: string; icon: LucideIcon }[] = [
   { id: 'ciclismo', label: 'Ciclismo', icon: Bike },
   { id: 'natacao', label: 'Natação', icon: Waves },
   { id: 'atletismo', label: 'Atletismo', icon: Timer },
-  { id: 'corrida-cavalos', label: 'Corrida de Cavalos', icon: Horse },
+  { id: 'corrida-cavalos', label: 'Corrida de Cavalos', icon: Trophy },
   { id: 'cricket', label: 'Cricket', icon: Crosshair },
   { id: 'dardos', label: 'Dardos', icon: Target },
   { id: 'sinuca', label: 'Sinuca', icon: Circle },
