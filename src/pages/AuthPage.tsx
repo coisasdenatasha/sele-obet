@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import heroBanner from '@/assets/hero-banner.jpg';
 import { useAuthStore } from '@/store/authStore';
+import { supabase } from '@/integrations/supabase/client';
 
 type AuthStep = 'welcome' | 'login' | 'signup' | 'recovery' | 'kyc' | 'otp' | 'success';
 
@@ -110,6 +111,9 @@ const AuthPage = () => {
   const [loginUsername, setLoginUsername] = useState('');
   const [loginCpf, setLoginCpf] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [authLoading, setAuthLoading] = useState(false);
+  const { signUp, signIn } = useAuthStore();
 
   // Recovery
   const [recoveryEmail, setRecoveryEmail] = useState('');
