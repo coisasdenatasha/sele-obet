@@ -1,52 +1,56 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  ChevronRight, ChevronDown, X, Flame,
-  CircleDot, Trophy
+  ChevronRight, ChevronDown, X, Flame, Trophy,
+  CircleDot, Dribbble, CircleEllipsis, Gamepad2, Activity,
+  Crosshair, Sword, TableProperties, Joystick, Snowflake,
+  Swords, BoxSelect, Hand, Circle, Footprints, Hexagon,
+  Diamond, Target, Disc, Bike, Car, Waves, PersonStanding,
+  Wind, Gem, Glasses, Zap, Globe, type LucideIcon
 } from 'lucide-react';
 import { useBetSlipStore } from '@/store/betSlipStore';
 
-// Sport list with real icon images
-const sportsList = [
-  { id: 'futebol', label: 'Futebol', img: 'https://img.icons8.com/fluency/48/soccer-ball.png' },
-  { id: 'basquete', label: 'Basquete', img: 'https://img.icons8.com/fluency/48/basketball.png' },
-  { id: 'tenis', label: 'Tênis', img: 'https://img.icons8.com/fluency/48/tennis-ball.png' },
-  { id: 'esoccer', label: 'e-Soccer', img: 'https://img.icons8.com/fluency/48/controller.png' },
-  { id: 'volei', label: 'Vôlei', img: 'https://img.icons8.com/fluency/48/volleyball.png' },
-  { id: 'cs2', label: 'Counter-Strike 2', img: 'https://img.icons8.com/fluency/48/aim.png' },
-  { id: 'lol', label: 'League of Legends', img: 'https://img.icons8.com/fluency/48/sword.png' },
-  { id: 'tenis-mesa', label: 'Tênis de mesa', img: 'https://img.icons8.com/fluency/48/ping-pong.png' },
-  { id: 'ebasketball', label: 'e-Basketball', img: 'https://img.icons8.com/fluency/48/controller.png' },
-  { id: 'hoquei', label: 'Hóquei no gelo', img: 'https://img.icons8.com/fluency/48/ice-hockey.png' },
-  { id: 'mma', label: 'MMA/UFC', img: 'https://img.icons8.com/fluency/48/martial-arts.png' },
-  { id: 'boxe', label: 'Boxe', img: 'https://img.icons8.com/fluency/48/boxing-glove.png' },
-  { id: 'handebol', label: 'Handebol', img: 'https://img.icons8.com/fluency/48/handball.png' },
-  { id: 'rugby', label: 'Rugby', img: 'https://img.icons8.com/fluency/48/rugby.png' },
-  { id: 'futsal', label: 'Futsal', img: 'https://img.icons8.com/fluency/48/soccer-ball.png' },
-  { id: 'fut-americano', label: 'Futebol Americano', img: 'https://img.icons8.com/fluency/48/american-football.png' },
-  { id: 'beisebol', label: 'Beisebol', img: 'https://img.icons8.com/fluency/48/baseball-ball.png' },
-  { id: 'cricket', label: 'Cricket', img: 'https://img.icons8.com/fluency/48/cricket.png' },
-  { id: 'dardos', label: 'Dardos', img: 'https://img.icons8.com/fluency/48/darts.png' },
-  { id: 'sinuca', label: 'Sinuca', img: 'https://img.icons8.com/fluency/48/billiards.png' },
-  { id: 'badminton', label: 'Badminton', img: 'https://img.icons8.com/fluency/48/badminton.png' },
-  { id: 'ciclismo', label: 'Ciclismo', img: 'https://img.icons8.com/fluency/48/cycling.png' },
-  { id: 'automobilismo', label: 'Automobilismo', img: 'https://img.icons8.com/fluency/48/racing-car.png' },
-  { id: 'f1', label: 'Fórmula 1', img: 'https://img.icons8.com/fluency/48/racing-car.png' },
-  { id: 'natacao', label: 'Natação', img: 'https://img.icons8.com/fluency/48/swimming.png' },
-  { id: 'atletismo', label: 'Atletismo', img: 'https://img.icons8.com/fluency/48/running.png' },
-  { id: 'surf', label: 'Surf', img: 'https://img.icons8.com/fluency/48/surfing.png' },
-  { id: 'skate', label: 'Skate', img: 'https://img.icons8.com/fluency/48/skateboard.png' },
-  { id: 'golf', label: 'Golfe', img: 'https://img.icons8.com/fluency/48/golf.png' },
-  { id: 'corrida-cavalos', label: 'Corrida de Cavalos', img: 'https://img.icons8.com/fluency/48/horse.png' },
-  { id: 'valorant', label: 'Valorant', img: 'https://img.icons8.com/fluency/48/aim.png' },
-  { id: 'dota2', label: 'Dota 2', img: 'https://img.icons8.com/fluency/48/sword.png' },
-  { id: 'starcraft', label: 'StarCraft', img: 'https://img.icons8.com/fluency/48/controller.png' },
-  { id: 'kings-glory', label: 'King of Glory', img: 'https://img.icons8.com/fluency/48/controller.png' },
-  { id: 'futevolei', label: 'Futevôlei', img: 'https://img.icons8.com/fluency/48/volleyball.png' },
-  { id: 'polo-aquatico', label: 'Polo Aquático', img: 'https://img.icons8.com/fluency/48/swimming.png' },
-  { id: 'squash', label: 'Squash', img: 'https://img.icons8.com/fluency/48/tennis-ball.png' },
-  { id: 'esgrima', label: 'Esgrima', img: 'https://img.icons8.com/fluency/48/fencing.png' },
-  { id: 'luta-livre', label: 'Luta Livre', img: 'https://img.icons8.com/fluency/48/martial-arts.png' },
+// Sport list with Lucide icons
+const sportsList: { id: string; label: string; icon: LucideIcon }[] = [
+  { id: 'futebol', label: 'Futebol', icon: CircleDot },
+  { id: 'basquete', label: 'Basquete', icon: Dribbble },
+  { id: 'tenis', label: 'Tênis', icon: CircleEllipsis },
+  { id: 'esoccer', label: 'e-Soccer', icon: Gamepad2 },
+  { id: 'volei', label: 'Vôlei', icon: Activity },
+  { id: 'cs2', label: 'Counter-Strike 2', icon: Crosshair },
+  { id: 'lol', label: 'League of Legends', icon: Sword },
+  { id: 'tenis-mesa', label: 'Tênis de mesa', icon: TableProperties },
+  { id: 'ebasketball', label: 'e-Basketball', icon: Joystick },
+  { id: 'hoquei', label: 'Hóquei no gelo', icon: Snowflake },
+  { id: 'mma', label: 'MMA/UFC', icon: Swords },
+  { id: 'boxe', label: 'Boxe', icon: BoxSelect },
+  { id: 'handebol', label: 'Handebol', icon: Hand },
+  { id: 'rugby', label: 'Rugby', icon: Circle },
+  { id: 'futsal', label: 'Futsal', icon: Footprints },
+  { id: 'fut-americano', label: 'Futebol Americano', icon: Hexagon },
+  { id: 'beisebol', label: 'Beisebol', icon: Diamond },
+  { id: 'cricket', label: 'Cricket', icon: Target },
+  { id: 'dardos', label: 'Dardos', icon: Target },
+  { id: 'sinuca', label: 'Sinuca', icon: Disc },
+  { id: 'badminton', label: 'Badminton', icon: Wind },
+  { id: 'ciclismo', label: 'Ciclismo', icon: Bike },
+  { id: 'automobilismo', label: 'Automobilismo', icon: Car },
+  { id: 'f1', label: 'Fórmula 1', icon: Zap },
+  { id: 'natacao', label: 'Natação', icon: Waves },
+  { id: 'atletismo', label: 'Atletismo', icon: PersonStanding },
+  { id: 'surf', label: 'Surf', icon: Waves },
+  { id: 'skate', label: 'Skate', icon: Zap },
+  { id: 'golf', label: 'Golfe', icon: Globe },
+  { id: 'corrida-cavalos', label: 'Corrida de Cavalos', icon: Gem },
+  { id: 'valorant', label: 'Valorant', icon: Crosshair },
+  { id: 'dota2', label: 'Dota 2', icon: Sword },
+  { id: 'starcraft', label: 'StarCraft', icon: Gamepad2 },
+  { id: 'kings-glory', label: 'King of Glory', icon: Gamepad2 },
+  { id: 'futevolei', label: 'Futevôlei', icon: Activity },
+  { id: 'polo-aquatico', label: 'Polo Aquático', icon: Waves },
+  { id: 'squash', label: 'Squash', icon: CircleEllipsis },
+  { id: 'esgrima', label: 'Esgrima', icon: Swords },
+  { id: 'luta-livre', label: 'Luta Livre', icon: Swords },
 ];
 
 // Calendar days (real dates)
@@ -211,7 +215,7 @@ const EsportesPage = () => {
           onClick={() => setSportPickerOpen(true)}
           className="w-full flex items-center justify-center gap-2 py-3 min-h-[44px]"
         >
-          <img src={selectedSport.img} alt="" className="w-6 h-6" />
+          <selectedSport.icon size={22} className="text-primary" />
           <span className="font-display text-lg font-extrabold uppercase tracking-wide text-foreground">
             {selectedSport.label}
           </span>
@@ -264,7 +268,7 @@ const EsportesPage = () => {
                       isSelected ? 'bg-primary/15' : 'bg-surface-card hover:bg-surface-interactive'
                     }`}
                   >
-                    <img src={sport.img} alt={sport.label} className="w-7 h-7 flex-shrink-0" />
+                    <sport.icon size={20} className={`flex-shrink-0 ${isSelected ? 'text-primary' : 'text-muted-foreground'}`} />
                     <span className={`text-sm font-display font-bold ${isSelected ? 'text-primary' : 'text-foreground'}`}>
                       {sport.label}
                     </span>
@@ -303,7 +307,7 @@ const EsportesPage = () => {
             {/* Event count banner */}
             <div className="bg-destructive rounded-xl px-4 py-2.5 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <img src={selectedSport.img} alt="" className="w-5 h-5" />
+                <selectedSport.icon size={18} className="text-destructive-foreground" />
                 <span className="text-sm font-display font-bold text-destructive-foreground">
                   {events.length * 3} eventos em {events.length} competições
                 </span>
@@ -329,7 +333,7 @@ const EsportesPage = () => {
                     <div key={ev.id} className="bg-surface-card rounded-xl p-4 space-y-3">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2 text-xs font-body text-muted-foreground">
-                          <img src={selectedSport.img} alt="" className="w-4 h-4" />
+                          <selectedSport.icon size={14} className="text-muted-foreground" />
                           <span>{ev.sport}</span>
                           <span>·</span>
                           <span>{ev.country}</span>
@@ -376,7 +380,7 @@ const EsportesPage = () => {
 
             {events.length === 0 && (
               <div className="flex flex-col items-center justify-center py-12 text-center">
-                <img src={selectedSport.img} alt="" className="w-12 h-12 opacity-30 mb-3" />
+                <selectedSport.icon size={48} className="text-muted-foreground/30 mb-3" />
                 <p className="font-display text-sm font-bold text-muted-foreground">Nenhum evento disponível agora</p>
                 <p className="text-xs font-body text-muted-foreground mt-1">Volte em breve para novos eventos</p>
               </div>
