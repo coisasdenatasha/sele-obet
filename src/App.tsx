@@ -21,6 +21,7 @@ import PlansPage from "@/pages/PlansPage";
 import SettingsPage from "@/pages/SettingsPage";
 import CasinoPage from "@/pages/CasinoPage";
 import CrashPage from "@/pages/CrashPage";
+import EsportesPage from "@/pages/EsportesPage";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -47,6 +48,7 @@ const AppLayout = () => {
           <Route path="/" element={<HomePage />} />
           <Route path="/ao-vivo" element={<LivePage />} />
           <Route path="/cassino" element={<CasinoPage />} />
+          <Route path="/esportes" element={<EsportesPage />} />
           <Route path="/crash" element={<CrashPage />} />
           <Route path="/chat" element={<ChatPage />} />
           <Route path="/busca" element={<SearchPage />} />
