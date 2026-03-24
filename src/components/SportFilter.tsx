@@ -1,14 +1,17 @@
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { CircleDot, Dribbble, Target, Gamepad2, Swords, Circle, type LucideIcon } from 'lucide-react';
+import { CircleDot, Dribbble, Target, Gamepad2, Swords, Circle, Bike, Waves, Zap, type LucideIcon } from 'lucide-react';
 
 const sports: { id: string; label: string; icon: LucideIcon }[] = [
   { id: 'futebol', label: 'Futebol', icon: CircleDot },
   { id: 'basquete', label: 'Basquete', icon: Dribbble },
   { id: 'tenis', label: 'Tênis', icon: Target },
-  { id: 'esports', label: 'Esports', icon: Gamepad2 },
-  { id: 'mma', label: 'MMA', icon: Swords },
+  { id: 'mma', label: 'MMA/UFC', icon: Swords },
   { id: 'volei', label: 'Vôlei', icon: Circle },
+  { id: 'esports', label: 'Esports', icon: Gamepad2 },
+  { id: 'f1', label: 'Fórmula 1', icon: Zap },
+  { id: 'ciclismo', label: 'Ciclismo', icon: Bike },
+  { id: 'natacao', label: 'Natação', icon: Waves },
 ];
 
 interface SportFilterProps {

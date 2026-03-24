@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Trash2 } from 'lucide-react';
+import { X, Trash2, Sparkles } from 'lucide-react';
 import { useBetSlipStore } from '@/store/betSlipStore';
 
 interface BetSlipPanelProps {
@@ -29,8 +29,13 @@ const BetSlipPanel = ({ isOpen, onClose }: BetSlipPanelProps) => {
             className="fixed bottom-0 left-0 right-0 z-50 glass rounded-t-2xl max-h-[80vh] overflow-y-auto lg:static lg:w-80 lg:rounded-xl lg:max-h-none"
           >
             <div className="p-4 space-y-4">
+              {/* Handle bar */}
+              <div className="flex justify-center lg:hidden">
+                <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
+              </div>
+
               <div className="flex items-center justify-between">
-                <h3 className="font-display text-lg">Meu Bilhete</h3>
+                <h3 className="font-display text-lg font-bold">Meu Bilhete</h3>
                 <div className="flex items-center gap-2">
                   {bets.length > 0 && (
                     <button onClick={clearBets} className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-muted-foreground hover:text-destructive transition-colors">
@@ -67,6 +72,14 @@ const BetSlipPanel = ({ isOpen, onClose }: BetSlipPanelProps) => {
                         </div>
                       </div>
                     ))}
+                  </div>
+
+                  {/* AI Suggestion */}
+                  <div className="bg-accent/30 rounded-xl p-3 flex items-start gap-2">
+                    <Sparkles size={16} className="text-primary mt-0.5 shrink-0" />
+                    <p className="text-xs font-body text-foreground/80">
+                      Para este nível de risco, recomendamos apostar <span className="text-primary font-bold">R$ {Math.max(5, Math.round(stake * 0.75))}</span>
+                    </p>
                   </div>
 
                   <div className="space-y-3">

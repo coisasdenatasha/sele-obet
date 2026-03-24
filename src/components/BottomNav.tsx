@@ -1,54 +1,38 @@
-import { Home, Zap, MessageCircle, Receipt, User } from 'lucide-react';
+import { Trophy, Zap, Dice5, Rocket, User } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useBetSlipStore } from '@/store/betSlipStore';
 import { cn } from '@/lib/utils';
 
-interface BottomNavProps {
-  onBetSlipToggle: () => void;
-}
-
 const tabs = [
-  { id: '/', icon: Home, label: 'Home' },
+  { id: '/', icon: Trophy, label: 'Esportes' },
   { id: '/ao-vivo', icon: Zap, label: 'Ao Vivo' },
-  { id: '/chat', icon: MessageCircle, label: 'Social' },
-  { id: 'betslip', icon: Receipt, label: 'Bilhete' },
-  { id: '/perfil', icon: User, label: 'Perfil' },
+  { id: '/cassino', icon: Dice5, label: 'Cassino' },
+  { id: '/crash', icon: Rocket, label: 'Crash' },
+  { id: '/perfil', icon: User, label: 'Conta' },
 ];
 
-const BottomNav = ({ onBetSlipToggle }: BottomNavProps) => {
+const BottomNav = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const betCount = useBetSlipStore((s) => s.bets.length);
-
-  const handleTap = (id: string) => {
-    if (id === 'betslip') {
-      onBetSlipToggle();
-    } else {
-      navigate(id);
-    }
-  };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-30 glass lg:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 z-30 bg-surface-section lg:hidden safe-area-bottom">
       <div className="flex items-center justify-around h-16">
         {tabs.map((tab) => {
-          const isActive = tab.id !== 'betslip' && location.pathname === tab.id;
+          const isActive = location.pathname === tab.id;
           const Icon = tab.icon;
           return (
             <button
               key={tab.id}
-              onClick={() => handleTap(tab.id)}
+              onClick={() => navigate(tab.id)}
               className={cn(
-                "flex flex-col items-center justify-center gap-0.5 min-w-[44px] min-h-[44px] transition-colors relative",
+                "flex flex-col items-center justify-center gap-0.5 min-w-[44px] min-h-[44px] transition-colors relative flex-1",
                 isActive ? "text-primary" : "text-muted-foreground"
               )}
             >
               <Icon size={22} />
               <span className="text-[0.6rem] font-body font-medium">{tab.label}</span>
-              {tab.id === 'betslip' && betCount > 0 && (
-                <span className="absolute -top-0.5 right-0.5 bg-primary text-primary-foreground text-[0.55rem] font-display font-bold w-4 h-4 rounded-full flex items-center justify-center">
-                  {betCount}
-                </span>
+              {isActive && (
+                <span className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-0.5 rounded-full bg-primary" />
               )}
             </button>
           );
