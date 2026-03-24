@@ -49,28 +49,24 @@ const SportFilter = ({ onFilterChange }: SportFilterProps) => {
     onFilterChange?.(id);
   };
 
-  const visibleSports = expanded ? sports : sports.slice(0, 8);
+  const visibleSports = expanded ? sports : sports.slice(0, 6);
 
   return (
-    <div className="space-y-2">
-      {/* Vertical grid list */}
-      <div className="grid grid-cols-2 gap-1.5">
+    <div className="space-y-1.5">
+      <div className="grid grid-cols-3 gap-1">
         {visibleSports.map((sport) => (
           <button
             key={sport.id}
             onClick={() => handleClick(sport.id)}
             className={cn(
-              "flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-left transition-colors min-h-[44px]",
+              "flex flex-col items-center gap-1 px-2 py-2 rounded-xl text-center transition-colors min-h-[44px]",
               active === sport.id
                 ? "bg-primary/10 text-primary"
                 : "bg-surface-card text-foreground/80 hover:bg-surface-interactive"
             )}
           >
-            <sport.icon size={18} className={active === sport.id ? 'text-primary' : 'text-muted-foreground'} />
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-body font-semibold truncate">{sport.label}</p>
-              <p className="text-[0.55rem] font-body text-muted-foreground">{sport.count} eventos</p>
-            </div>
+            <sport.icon size={16} className={active === sport.id ? 'text-primary' : 'text-muted-foreground'} />
+            <p className="text-[0.6rem] font-body font-medium truncate w-full">{sport.label}</p>
           </button>
         ))}
       </div>
