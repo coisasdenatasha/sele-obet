@@ -7,6 +7,12 @@ interface Profile {
   username: string | null;
   level: string;
   avatar_url: string | null;
+  phone: string | null;
+  cpf: string | null;
+  dob: string | null;
+  country: string | null;
+  state: string | null;
+  city: string | null;
 }
 
 interface AuthState {
@@ -54,7 +60,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   fetchProfile: async (userId: string) => {
     const { data } = await supabase
       .from('profiles')
-      .select('full_name, username, level, avatar_url')
+      .select('full_name, username, level, avatar_url, phone, cpf, dob, country, state, city')
       .eq('user_id', userId)
       .single();
     if (data) {
@@ -92,6 +98,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   // Legacy compat for mock flows
-  login: (user) => set({ isLoggedIn: true, profile: { full_name: user.name, username: user.username, level: user.level, avatar_url: null } }),
+  login: (user) => set({ isLoggedIn: true, profile: { full_name: user.name, username: user.username, level: user.level, avatar_url: null, phone: null, cpf: null, dob: null, country: null, state: null, city: null } }),
   logout: () => { get().signOut(); },
 }));
