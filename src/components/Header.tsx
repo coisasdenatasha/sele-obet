@@ -17,9 +17,9 @@ const Header = ({ onMenuToggle }: HeaderProps) => {
           <button onClick={onMenuToggle} className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-foreground/70 hover:text-foreground transition-colors lg:hidden">
             <Menu size={22} />
           </button>
-          <button onClick={() => navigate('/')} className="flex items-center gap-1.5">
-            <span className="font-display text-xl text-primary font-extrabold tracking-tight">Seleção</span>
-            <span className="font-display text-xl text-foreground font-extrabold tracking-tight">Bet</span>
+          <button onClick={() => navigate('/')} className="flex items-center">
+            <span className="font-display text-xl text-primary font-extrabold tracking-tight">Seleção</span><span className="font-display text-xl text-foreground font-extrabold tracking-tight">Bet</span>
+          </button>
           </button>
         </div>
 
