@@ -887,7 +887,12 @@ const AuthPage = () => {
                         className="w-full bg-surface-interactive rounded-xl py-3 pl-11 pr-4 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]" />
                     </div>
                   </div>
-                  <motion.button whileTap={{ scale: 0.97 }} onClick={() => setRecoverySent(true)}
+                  <motion.button whileTap={{ scale: 0.97 }} onClick={async () => {
+                    await supabase.auth.resetPasswordForEmail(recoveryEmail, {
+                      redirectTo: `${window.location.origin}/reset-password`,
+                    });
+                    setRecoverySent(true);
+                  }}
                     disabled={!isEmailValid(recoveryEmail)}
                     className={`w-full font-display font-bold text-base py-3.5 rounded-xl min-h-[44px] transition-all ${
                       isEmailValid(recoveryEmail)
