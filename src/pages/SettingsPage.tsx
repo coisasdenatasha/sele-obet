@@ -119,6 +119,27 @@ const SettingsPage = () => {
           </motion.div>
         </section>
 
+        {/* Account Management - at the end */}
+        <section className="space-y-3">
+          <h2 className="font-display text-sm font-bold flex items-center gap-2">
+            <UserCog size={16} className="text-primary" /> Conta
+          </h2>
+
+          <button
+            onClick={() => setAccountModalOpen(true)}
+            className="w-full bg-surface-card rounded-xl p-4 flex items-center justify-between min-h-[52px] hover:bg-surface-interactive transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <AlertTriangle size={18} className="text-destructive" />
+              <div className="text-left">
+                <p className="text-sm font-body font-medium text-foreground">Gerenciar conta</p>
+                <p className="text-[0.65rem] text-muted-foreground font-body">Desativar ou excluir sua conta</p>
+              </div>
+            </div>
+            <ChevronRight size={16} className="text-muted-foreground" />
+          </button>
+        </section>
+
         {/* Account Modal */}
         <AnimatePresence>
           {accountModalOpen && !confirmAction && (
