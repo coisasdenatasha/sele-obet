@@ -195,7 +195,7 @@ export const heroBanners = [
   {
     id: 'banner-1',
     title: 'Rumo ao Hexa',
-    subtitle: 'Aposte nos jogos da Seleção com odds especiais',
+    subtitle: 'A contagem regressiva para a Copa do Mundo 2026 está a todo vapor!',
     cta: 'Apostar Agora',
     accent: 'Brasil',
   },
