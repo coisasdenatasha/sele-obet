@@ -13,7 +13,7 @@ const tabs = [
   { id: '/ao-vivo', icon: Radio, label: 'Ao vivo' },
   { id: '/esportes', icon: Trophy, label: 'Esportes' },
   { id: 'betslip', icon: Receipt, label: 'Apostas' },
-  { id: '/cassino', icon: Dices, label: 'Cassino' },
+  { id: '/perfil', icon: User, label: 'Perfil' },
 ];
 
 const BottomNav = ({ onBetSlipToggle }: BottomNavProps) => {
