@@ -212,6 +212,31 @@ export const heroBanners = [
   },
 ];
 
+export const competitions = [
+  { id: 'comp-1', name: 'Brasileirão Série A', country: 'Brasil', matchCount: 38, flag: 'https://flagcdn.com/w40/br.png' },
+  { id: 'comp-2', name: 'Premier League', country: 'Inglaterra', matchCount: 24, flag: 'https://flagcdn.com/w40/gb-eng.png' },
+  { id: 'comp-3', name: 'La Liga', country: 'Espanha', matchCount: 18, flag: 'https://flagcdn.com/w40/es.png' },
+  { id: 'comp-4', name: 'Champions League', country: 'Europa', matchCount: 12, flag: 'https://flagcdn.com/w40/eu.png' },
+  { id: 'comp-5', name: 'Copa do Brasil', country: 'Brasil', matchCount: 8, flag: 'https://flagcdn.com/w40/br.png' },
+  { id: 'comp-6', name: 'Serie A', country: 'Itália', matchCount: 15, flag: 'https://flagcdn.com/w40/it.png' },
+];
+
+export const specials = [
+  { id: 'spec-1', title: 'Quem será campeão do Brasileirão 2026?', market: 'Longo Prazo', topPick: 'Flamengo', topOdds: 3.50, options: 20 },
+  { id: 'spec-2', title: 'Artilheiro da Champions League', market: 'Longo Prazo', topPick: 'Haaland', topOdds: 4.00, options: 30 },
+  { id: 'spec-3', title: 'Brasil ganha a Copa do Mundo?', market: 'Especial', topPick: 'Sim', topOdds: 5.50, options: 8 },
+  { id: 'spec-4', title: 'Próximo técnico da Seleção', market: 'Especial', topPick: 'Abel Ferreira', topOdds: 6.00, options: 12 },
+];
+
+export const oddsByCategory = [
+  { id: 'cat-1', category: 'Resultado Final', icon: 'trophy', matches: 142, description: '1X2' },
+  { id: 'cat-2', category: 'Gols', icon: 'target', matches: 98, description: 'Mais/Menos, Ambos Marcam' },
+  { id: 'cat-3', category: 'Handicap', icon: 'scale', matches: 76, description: 'Handicap Asiático e Europeu' },
+  { id: 'cat-4', category: 'Cartões', icon: 'card', matches: 54, description: 'Amarelos, Vermelhos, Total' },
+  { id: 'cat-5', category: 'Escanteios', icon: 'corner', matches: 62, description: 'Mais/Menos, Asiático' },
+  { id: 'cat-6', category: 'Jogadores', icon: 'user', matches: 88, description: 'Gols, Assistências, Chutes' },
+];
+
 export const allSports = [
   { id: 'futebol', label: 'Futebol' },
   { id: 'basquete', label: 'Basquete' },
