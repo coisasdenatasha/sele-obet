@@ -71,6 +71,7 @@ const AuthPage = () => {
   const [cep, setCep] = useState('');
   const [estado, setEstado] = useState('');
   const [cidade, setCidade] = useState('');
+  const [telefone, setTelefone] = useState('');
   const [dob, setDob] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -359,6 +360,22 @@ const AuthPage = () => {
                   </div>
                 </div>
 
+                {/* Telefone */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-body font-medium text-muted-foreground">Telefone</label>
+                  <div className="relative">
+                    <Smartphone size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    <input type="tel" value={telefone} onChange={(e) => {
+                      const d = e.target.value.replace(/\D/g, '').slice(0, 11);
+                      if (d.length <= 2) setTelefone(d.length ? `(${d}` : '');
+                      else if (d.length <= 7) setTelefone(`(${d.slice(0, 2)}) ${d.slice(2)}`);
+                      else setTelefone(`(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`);
+                    }} placeholder="(11) 99999-9999"
+                      className="w-full bg-surface-interactive rounded-xl py-3 pl-11 pr-4 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]" />
+                  </div>
+                </div>
+
+                {/* Senha */}
                 <div className="space-y-1.5">
                   <label className="text-xs font-body font-medium text-muted-foreground">Senha</label>
                   <div className="relative">
