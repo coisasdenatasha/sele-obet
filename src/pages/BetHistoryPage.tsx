@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Check, X, Clock, ChevronDown, ChevronUp, Trophy, Calendar, Loader2 } from 'lucide-react';
+import { ArrowLeft, Check, X, Clock, ChevronDown, ChevronUp, Trophy, Calendar, Loader2, Share2 } from 'lucide-react';
 import { PageTransition, staggerContainer, staggerItem } from '@/components/animations';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStore } from '@/store/authStore';
+import { toast } from 'sonner';
 
 type BetStatus = 'won' | 'lost' | 'pending' | 'cashout';
 
