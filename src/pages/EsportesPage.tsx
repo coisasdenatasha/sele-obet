@@ -2,52 +2,51 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ChevronRight, ChevronDown, X, Flame,
-  CircleDot, Dribbble, Target, Swords, Zap, Gamepad2,
-  Disc3, Crosshair, Trophy, Award
+  CircleDot, Trophy
 } from 'lucide-react';
 import { useBetSlipStore } from '@/store/betSlipStore';
 
-// Sport list with icons
+// Sport list with real icon images
 const sportsList = [
-  { id: 'futebol', label: 'Futebol', icon: CircleDot },
-  { id: 'basquete', label: 'Basquete', icon: Dribbble },
-  { id: 'tenis', label: 'Tênis', icon: Disc3 },
-  { id: 'esoccer', label: 'e-Soccer', icon: Gamepad2 },
-  { id: 'volei', label: 'Vôlei', icon: Target },
-  { id: 'cs2', label: 'Counter-Strike 2', icon: Crosshair },
-  { id: 'lol', label: 'League of Legends', icon: Swords },
-  { id: 'tenis-mesa', label: 'Tênis de mesa', icon: Disc3 },
-  { id: 'ebasketball', label: 'e-Basketball', icon: Gamepad2 },
-  { id: 'hoquei', label: 'Hóquei no gelo', icon: Zap },
-  { id: 'mma', label: 'MMA/UFC', icon: Swords },
-  { id: 'boxe', label: 'Boxe', icon: Zap },
-  { id: 'handebol', label: 'Handebol', icon: Target },
-  { id: 'rugby', label: 'Rugby', icon: CircleDot },
-  { id: 'futsal', label: 'Futsal', icon: CircleDot },
-  { id: 'fut-americano', label: 'Futebol Americano', icon: CircleDot },
-  { id: 'beisebol', label: 'Beisebol', icon: Target },
-  { id: 'cricket', label: 'Cricket', icon: Swords },
-  { id: 'dardos', label: 'Dardos', icon: Crosshair },
-  { id: 'sinuca', label: 'Sinuca', icon: Disc3 },
-  { id: 'badminton', label: 'Badminton', icon: Disc3 },
-  { id: 'ciclismo', label: 'Ciclismo', icon: Zap },
-  { id: 'automobilismo', label: 'Automobilismo', icon: Zap },
-  { id: 'f1', label: 'Fórmula 1', icon: Zap },
-  { id: 'natacao', label: 'Natação', icon: Target },
-  { id: 'atletismo', label: 'Atletismo', icon: Zap },
-  { id: 'surf', label: 'Surf', icon: Target },
-  { id: 'skate', label: 'Skate', icon: Zap },
-  { id: 'golf', label: 'Golfe', icon: Crosshair },
-  { id: 'corrida-cavalos', label: 'Corrida de Cavalos', icon: Zap },
-  { id: 'valorant', label: 'Valorant', icon: Gamepad2 },
-  { id: 'dota2', label: 'Dota 2', icon: Gamepad2 },
-  { id: 'starcraft', label: 'StarCraft', icon: Gamepad2 },
-  { id: 'kings-glory', label: 'King of Glory', icon: Gamepad2 },
-  { id: 'futevolei', label: 'Futevôlei', icon: Target },
-  { id: 'polo-aquatico', label: 'Polo Aquático', icon: Target },
-  { id: 'squash', label: 'Squash', icon: Disc3 },
-  { id: 'esgrima', label: 'Esgrima', icon: Swords },
-  { id: 'luta-livre', label: 'Luta Livre', icon: Swords },
+  { id: 'futebol', label: 'Futebol', img: 'https://img.icons8.com/fluency/48/soccer-ball.png' },
+  { id: 'basquete', label: 'Basquete', img: 'https://img.icons8.com/fluency/48/basketball.png' },
+  { id: 'tenis', label: 'Tênis', img: 'https://img.icons8.com/fluency/48/tennis-ball.png' },
+  { id: 'esoccer', label: 'e-Soccer', img: 'https://img.icons8.com/fluency/48/controller.png' },
+  { id: 'volei', label: 'Vôlei', img: 'https://img.icons8.com/fluency/48/volleyball.png' },
+  { id: 'cs2', label: 'Counter-Strike 2', img: 'https://img.icons8.com/fluency/48/aim.png' },
+  { id: 'lol', label: 'League of Legends', img: 'https://img.icons8.com/fluency/48/sword.png' },
+  { id: 'tenis-mesa', label: 'Tênis de mesa', img: 'https://img.icons8.com/fluency/48/ping-pong.png' },
+  { id: 'ebasketball', label: 'e-Basketball', img: 'https://img.icons8.com/fluency/48/controller.png' },
+  { id: 'hoquei', label: 'Hóquei no gelo', img: 'https://img.icons8.com/fluency/48/ice-hockey.png' },
+  { id: 'mma', label: 'MMA/UFC', img: 'https://img.icons8.com/fluency/48/martial-arts.png' },
+  { id: 'boxe', label: 'Boxe', img: 'https://img.icons8.com/fluency/48/boxing-glove.png' },
+  { id: 'handebol', label: 'Handebol', img: 'https://img.icons8.com/fluency/48/handball.png' },
+  { id: 'rugby', label: 'Rugby', img: 'https://img.icons8.com/fluency/48/rugby.png' },
+  { id: 'futsal', label: 'Futsal', img: 'https://img.icons8.com/fluency/48/soccer-ball.png' },
+  { id: 'fut-americano', label: 'Futebol Americano', img: 'https://img.icons8.com/fluency/48/american-football.png' },
+  { id: 'beisebol', label: 'Beisebol', img: 'https://img.icons8.com/fluency/48/baseball-ball.png' },
+  { id: 'cricket', label: 'Cricket', img: 'https://img.icons8.com/fluency/48/cricket.png' },
+  { id: 'dardos', label: 'Dardos', img: 'https://img.icons8.com/fluency/48/darts.png' },
+  { id: 'sinuca', label: 'Sinuca', img: 'https://img.icons8.com/fluency/48/billiards.png' },
+  { id: 'badminton', label: 'Badminton', img: 'https://img.icons8.com/fluency/48/badminton.png' },
+  { id: 'ciclismo', label: 'Ciclismo', img: 'https://img.icons8.com/fluency/48/cycling.png' },
+  { id: 'automobilismo', label: 'Automobilismo', img: 'https://img.icons8.com/fluency/48/racing-car.png' },
+  { id: 'f1', label: 'Fórmula 1', img: 'https://img.icons8.com/fluency/48/racing-car.png' },
+  { id: 'natacao', label: 'Natação', img: 'https://img.icons8.com/fluency/48/swimming.png' },
+  { id: 'atletismo', label: 'Atletismo', img: 'https://img.icons8.com/fluency/48/running.png' },
+  { id: 'surf', label: 'Surf', img: 'https://img.icons8.com/fluency/48/surfing.png' },
+  { id: 'skate', label: 'Skate', img: 'https://img.icons8.com/fluency/48/skateboard.png' },
+  { id: 'golf', label: 'Golfe', img: 'https://img.icons8.com/fluency/48/golf.png' },
+  { id: 'corrida-cavalos', label: 'Corrida de Cavalos', img: 'https://img.icons8.com/fluency/48/horse.png' },
+  { id: 'valorant', label: 'Valorant', img: 'https://img.icons8.com/fluency/48/aim.png' },
+  { id: 'dota2', label: 'Dota 2', img: 'https://img.icons8.com/fluency/48/sword.png' },
+  { id: 'starcraft', label: 'StarCraft', img: 'https://img.icons8.com/fluency/48/controller.png' },
+  { id: 'kings-glory', label: 'King of Glory', img: 'https://img.icons8.com/fluency/48/controller.png' },
+  { id: 'futevolei', label: 'Futevôlei', img: 'https://img.icons8.com/fluency/48/volleyball.png' },
+  { id: 'polo-aquatico', label: 'Polo Aquático', img: 'https://img.icons8.com/fluency/48/swimming.png' },
+  { id: 'squash', label: 'Squash', img: 'https://img.icons8.com/fluency/48/tennis-ball.png' },
+  { id: 'esgrima', label: 'Esgrima', img: 'https://img.icons8.com/fluency/48/fencing.png' },
+  { id: 'luta-livre', label: 'Luta Livre', img: 'https://img.icons8.com/fluency/48/martial-arts.png' },
 ];
 
 // Calendar days (real dates)
@@ -67,17 +66,103 @@ const buildCalendar = () => {
 };
 const calendarDays = buildCalendar();
 
-// Mock events per sport
-const popularEvents: Record<string, { id: string; sport: string; country: string; league: string; time: string; home: string; away: string; oddsHome: number; oddsDraw: number; oddsAway: number }[]> = {
+type EventType = { id: string; sport: string; country: string; league: string; time: string; home: string; away: string; oddsHome: number; oddsDraw: number; oddsAway: number };
+
+// Real events per sport
+const popularEvents: Record<string, EventType[]> = {
   futebol: [
     { id: 'ev1', sport: 'Futebol', country: 'Brasil', league: 'Brasileirão Série A', time: 'Hoje, 21:30', home: 'Ferroviário CE', away: 'Fortaleza', oddsHome: 4.80, oddsDraw: 3.40, oddsAway: 1.69 },
     { id: 'ev2', sport: 'Futebol', country: 'Brasil', league: 'Brasileirão Série A', time: 'Hoje, 19:00', home: 'Flamengo', away: 'Palmeiras', oddsHome: 2.10, oddsDraw: 3.30, oddsAway: 3.50 },
     { id: 'ev3', sport: 'Futebol', country: 'Brasil', league: 'Copa do Brasil', time: 'Amanhã, 20:00', home: 'Corinthians', away: 'Grêmio', oddsHome: 2.40, oddsDraw: 3.20, oddsAway: 2.90 },
     { id: 'ev4', sport: 'Futebol', country: 'Europa', league: 'Champions League', time: 'Qua, 16:00', home: 'PSG', away: 'Bayern Munich', oddsHome: 2.50, oddsDraw: 3.60, oddsAway: 2.70 },
+    { id: 'ev5', sport: 'Futebol', country: 'Brasil', league: 'Brasileirão Série A', time: 'Amanhã, 16:00', home: 'São Paulo', away: 'Santos', oddsHome: 1.85, oddsDraw: 3.50, oddsAway: 4.20 },
   ],
   basquete: [
-    { id: 'bk1', sport: 'Basquete', country: 'EUA', league: 'NBA', time: 'Hoje, 22:00', home: 'Lakers', away: 'Celtics', oddsHome: 1.90, oddsDraw: 0, oddsAway: 1.95 },
+    { id: 'bk1', sport: 'Basquete', country: 'EUA', league: 'NBA', time: 'Hoje, 22:00', home: 'LA Lakers', away: 'Boston Celtics', oddsHome: 1.90, oddsDraw: 0, oddsAway: 1.95 },
     { id: 'bk2', sport: 'Basquete', country: 'Brasil', league: 'NBB', time: 'Amanhã, 19:30', home: 'Flamengo', away: 'Franca', oddsHome: 1.75, oddsDraw: 0, oddsAway: 2.10 },
+    { id: 'bk3', sport: 'Basquete', country: 'EUA', league: 'NBA', time: 'Amanhã, 21:00', home: 'Golden State Warriors', away: 'Milwaukee Bucks', oddsHome: 2.05, oddsDraw: 0, oddsAway: 1.80 },
+    { id: 'bk4', sport: 'Basquete', country: 'Europa', league: 'Euroliga', time: 'Qua, 16:30', home: 'Real Madrid', away: 'Barcelona', oddsHome: 1.65, oddsDraw: 0, oddsAway: 2.25 },
+  ],
+  tenis: [
+    { id: 'tn1', sport: 'Tênis', country: 'Internacional', league: 'ATP 1000 Madrid', time: 'Hoje, 14:00', home: 'Carlos Alcaraz', away: 'Novak Djokovic', oddsHome: 1.75, oddsDraw: 0, oddsAway: 2.10 },
+    { id: 'tn2', sport: 'Tênis', country: 'Internacional', league: 'WTA Roma', time: 'Hoje, 16:00', home: 'Iga Swiatek', away: 'Aryna Sabalenka', oddsHome: 1.60, oddsDraw: 0, oddsAway: 2.30 },
+    { id: 'tn3', sport: 'Tênis', country: 'Internacional', league: 'ATP 500 Barcelona', time: 'Amanhã, 13:00', home: 'Jannik Sinner', away: 'Daniil Medvedev', oddsHome: 1.55, oddsDraw: 0, oddsAway: 2.45 },
+  ],
+  volei: [
+    { id: 'vl1', sport: 'Vôlei', country: 'Brasil', league: 'Superliga Masc.', time: 'Hoje, 19:00', home: 'Sada Cruzeiro', away: 'Taubaté', oddsHome: 1.50, oddsDraw: 0, oddsAway: 2.55 },
+    { id: 'vl2', sport: 'Vôlei', country: 'Brasil', league: 'Superliga Fem.', time: 'Amanhã, 20:00', home: 'Praia Clube', away: 'Minas', oddsHome: 1.70, oddsDraw: 0, oddsAway: 2.15 },
+    { id: 'vl3', sport: 'Vôlei', country: 'Europa', league: 'Champions League', time: 'Qua, 15:00', home: 'Perugia', away: 'Zenit Kazan', oddsHome: 1.85, oddsDraw: 0, oddsAway: 1.95 },
+  ],
+  mma: [
+    { id: 'mma1', sport: 'MMA', country: 'EUA', league: 'UFC 310', time: 'Sáb, 23:00', home: 'Alex Pereira', away: 'Jamahal Hill', oddsHome: 1.45, oddsDraw: 0, oddsAway: 2.75 },
+    { id: 'mma2', sport: 'MMA', country: 'EUA', league: 'UFC 310', time: 'Sáb, 22:00', home: 'Islam Makhachev', away: 'Charles Oliveira', oddsHome: 1.55, oddsDraw: 0, oddsAway: 2.50 },
+    { id: 'mma3', sport: 'MMA', country: 'EUA', league: 'UFC Fight Night', time: 'Dom, 20:00', home: 'Amanda Nunes', away: 'Valentina Shevchenko', oddsHome: 2.10, oddsDraw: 0, oddsAway: 1.75 },
+  ],
+  cs2: [
+    { id: 'cs1', sport: 'CS2', country: 'Internacional', league: 'IEM Katowice', time: 'Hoje, 15:00', home: 'NAVI', away: 'FaZe Clan', oddsHome: 1.85, oddsDraw: 0, oddsAway: 1.95 },
+    { id: 'cs2a', sport: 'CS2', country: 'Internacional', league: 'BLAST Premier', time: 'Amanhã, 13:00', home: 'G2 Esports', away: 'Team Vitality', oddsHome: 2.10, oddsDraw: 0, oddsAway: 1.75 },
+    { id: 'cs3', sport: 'CS2', country: 'Brasil', league: 'FURIA Invitational', time: 'Amanhã, 18:00', home: 'FURIA', away: 'LOUD', oddsHome: 1.70, oddsDraw: 0, oddsAway: 2.15 },
+  ],
+  lol: [
+    { id: 'lol1', sport: 'LoL', country: 'Internacional', league: 'Worlds 2026', time: 'Hoje, 10:00', home: 'T1', away: 'Gen.G', oddsHome: 1.90, oddsDraw: 0, oddsAway: 1.90 },
+    { id: 'lol2', sport: 'LoL', country: 'Brasil', league: 'CBLOL', time: 'Sáb, 15:00', home: 'LOUD', away: 'paiN Gaming', oddsHome: 1.60, oddsDraw: 0, oddsAway: 2.30 },
+    { id: 'lol3', sport: 'LoL', country: 'Internacional', league: 'LCK', time: 'Amanhã, 08:00', home: 'DRX', away: 'KT Rolster', oddsHome: 1.75, oddsDraw: 0, oddsAway: 2.10 },
+  ],
+  boxe: [
+    { id: 'bx1', sport: 'Boxe', country: 'Internacional', league: 'WBC Heavyweight', time: 'Sáb, 23:00', home: 'Tyson Fury', away: 'Oleksandr Usyk', oddsHome: 2.20, oddsDraw: 15.0, oddsAway: 1.70 },
+    { id: 'bx2', sport: 'Boxe', country: 'Internacional', league: 'WBA Super Middle', time: 'Sáb, 22:00', home: 'Canelo Álvarez', away: 'David Benavidez', oddsHome: 1.65, oddsDraw: 18.0, oddsAway: 2.25 },
+  ],
+  'fut-americano': [
+    { id: 'nfl1', sport: 'Fut. Americano', country: 'EUA', league: 'NFL', time: 'Dom, 18:00', home: 'Kansas City Chiefs', away: 'San Francisco 49ers', oddsHome: 1.85, oddsDraw: 0, oddsAway: 2.00 },
+    { id: 'nfl2', sport: 'Fut. Americano', country: 'EUA', league: 'NFL', time: 'Dom, 21:30', home: 'Dallas Cowboys', away: 'Philadelphia Eagles', oddsHome: 2.30, oddsDraw: 0, oddsAway: 1.65 },
+  ],
+  hoquei: [
+    { id: 'hk1', sport: 'Hóquei', country: 'EUA/Canadá', league: 'NHL', time: 'Hoje, 21:00', home: 'Toronto Maple Leafs', away: 'Montreal Canadiens', oddsHome: 1.70, oddsDraw: 4.20, oddsAway: 2.20 },
+    { id: 'hk2', sport: 'Hóquei', country: 'EUA/Canadá', league: 'NHL', time: 'Amanhã, 22:00', home: 'Edmonton Oilers', away: 'Colorado Avalanche', oddsHome: 1.95, oddsDraw: 3.80, oddsAway: 1.90 },
+  ],
+  valorant: [
+    { id: 'val1', sport: 'Valorant', country: 'Internacional', league: 'VCT Champions', time: 'Hoje, 14:00', home: 'Sentinels', away: 'LOUD', oddsHome: 2.05, oddsDraw: 0, oddsAway: 1.80 },
+    { id: 'val2', sport: 'Valorant', country: 'Internacional', league: 'VCT Americas', time: 'Amanhã, 16:00', home: 'MIBR', away: 'Leviatán', oddsHome: 2.40, oddsDraw: 0, oddsAway: 1.58 },
+  ],
+  rugby: [
+    { id: 'rg1', sport: 'Rugby', country: 'Internacional', league: 'Six Nations', time: 'Sáb, 12:00', home: 'Inglaterra', away: 'França', oddsHome: 2.10, oddsDraw: 18.0, oddsAway: 1.75 },
+    { id: 'rg2', sport: 'Rugby', country: 'Internacional', league: 'Super Rugby', time: 'Dom, 07:00', home: 'Crusaders', away: 'Blues', oddsHome: 1.90, oddsDraw: 20.0, oddsAway: 1.90 },
+  ],
+  beisebol: [
+    { id: 'bb1', sport: 'Beisebol', country: 'EUA', league: 'MLB', time: 'Hoje, 20:00', home: 'NY Yankees', away: 'LA Dodgers', oddsHome: 1.85, oddsDraw: 0, oddsAway: 2.00 },
+    { id: 'bb2', sport: 'Beisebol', country: 'EUA', league: 'MLB', time: 'Amanhã, 19:00', home: 'Houston Astros', away: 'Atlanta Braves', oddsHome: 1.95, oddsDraw: 0, oddsAway: 1.90 },
+  ],
+  'tenis-mesa': [
+    { id: 'tm1', sport: 'Tênis de mesa', country: 'Internacional', league: 'WTT Champions', time: 'Hoje, 11:00', home: 'Fan Zhendong', away: 'Ma Long', oddsHome: 1.80, oddsDraw: 0, oddsAway: 2.00 },
+    { id: 'tm2', sport: 'Tênis de mesa', country: 'Brasil', league: 'Liga Nacional', time: 'Amanhã, 14:00', home: 'Hugo Calderano', away: 'Gustavo Tsuboi', oddsHome: 1.40, oddsDraw: 0, oddsAway: 2.90 },
+  ],
+  dota2: [
+    { id: 'dt1', sport: 'Dota 2', country: 'Internacional', league: 'The International', time: 'Hoje, 12:00', home: 'Team Spirit', away: 'Tundra Esports', oddsHome: 1.85, oddsDraw: 0, oddsAway: 1.95 },
+    { id: 'dt2', sport: 'Dota 2', country: 'Internacional', league: 'DPC', time: 'Amanhã, 14:00', home: 'OG', away: 'Team Liquid', oddsHome: 2.20, oddsDraw: 0, oddsAway: 1.70 },
+  ],
+  esoccer: [
+    { id: 'es1', sport: 'e-Soccer', country: 'Internacional', league: 'eFootball Pro', time: 'Hoje, 18:00', home: 'Manchester United eSports', away: 'Barcelona eSports', oddsHome: 2.10, oddsDraw: 3.40, oddsAway: 1.80 },
+    { id: 'es2', sport: 'e-Soccer', country: 'Internacional', league: 'FIFA eWorld Cup', time: 'Amanhã, 20:00', home: 'Tekkz', away: 'Ollelito', oddsHome: 1.65, oddsDraw: 0, oddsAway: 2.25 },
+  ],
+  ebasketball: [
+    { id: 'eb1', sport: 'e-Basketball', country: 'EUA', league: 'NBA 2K League', time: 'Hoje, 21:00', home: 'Knicks Gaming', away: 'Wizards DG', oddsHome: 1.75, oddsDraw: 0, oddsAway: 2.10 },
+  ],
+  handebol: [
+    { id: 'hb1', sport: 'Handebol', country: 'Europa', league: 'EHF Champions', time: 'Amanhã, 18:00', home: 'Barcelona', away: 'THW Kiel', oddsHome: 1.55, oddsDraw: 8.50, oddsAway: 2.40 },
+    { id: 'hb2', sport: 'Handebol', country: 'Europa', league: 'EHF Champions', time: 'Qua, 19:00', home: 'PSG', away: 'Aalborg', oddsHome: 1.45, oddsDraw: 9.00, oddsAway: 2.70 },
+  ],
+  futsal: [
+    { id: 'fs1', sport: 'Futsal', country: 'Brasil', league: 'Liga Nacional', time: 'Hoje, 19:00', home: 'Magnus', away: 'Corinthians', oddsHome: 1.65, oddsDraw: 3.80, oddsAway: 2.20 },
+    { id: 'fs2', sport: 'Futsal', country: 'Brasil', league: 'Liga Nacional', time: 'Amanhã, 20:00', home: 'Pato', away: 'Cascavel', oddsHome: 1.80, oddsDraw: 3.50, oddsAway: 2.05 },
+  ],
+  f1: [
+    { id: 'f11', sport: 'Fórmula 1', country: 'Internacional', league: 'GP de Mônaco', time: 'Dom, 10:00', home: 'Max Verstappen', away: 'Lewis Hamilton', oddsHome: 1.90, oddsDraw: 0, oddsAway: 3.50 },
+  ],
+  automobilismo: [
+    { id: 'au1', sport: 'Automobilismo', country: 'Brasil', league: 'Stock Car', time: 'Dom, 14:00', home: 'Gabriel Casagrande', away: 'Daniel Serra', oddsHome: 3.50, oddsDraw: 0, oddsAway: 4.00 },
+  ],
+  golf: [
+    { id: 'gl1', sport: 'Golfe', country: 'EUA', league: 'PGA Tour - Masters', time: 'Dom, 16:00', home: 'Scottie Scheffler', away: 'Rory McIlroy', oddsHome: 2.50, oddsDraw: 0, oddsAway: 5.00 },
   ],
 };
 
@@ -89,16 +174,16 @@ const bettingTips = [
 ];
 
 const competitionsList = [
-  { id: 'c1', name: 'Brasileirão Série A', country: 'Brasil', flag: '🇧🇷', matches: 38 },
-  { id: 'c2', name: 'Copa do Brasil', country: 'Brasil', flag: '🇧🇷', matches: 8 },
-  { id: 'c3', name: 'Libertadores', country: 'América do Sul', flag: '🌎', matches: 12 },
-  { id: 'c4', name: 'Champions League', country: 'Europa', flag: '🇪🇺', matches: 16 },
-  { id: 'c5', name: 'Premier League', country: 'Inglaterra', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', matches: 24 },
-  { id: 'c6', name: 'La Liga', country: 'Espanha', flag: '🇪🇸', matches: 18 },
-  { id: 'c7', name: 'Serie A', country: 'Itália', flag: '🇮🇹', matches: 15 },
-  { id: 'c8', name: 'Bundesliga', country: 'Alemanha', flag: '🇩🇪', matches: 14 },
-  { id: 'c9', name: 'Ligue 1', country: 'França', flag: '🇫🇷', matches: 12 },
-  { id: 'c10', name: 'Eliminatórias', country: 'CONMEBOL', flag: '🌎', matches: 4 },
+  { id: 'c1', name: 'Brasileirão Série A', country: 'Brasil', flag: 'https://flagcdn.com/w40/br.png', matches: 38 },
+  { id: 'c2', name: 'Copa do Brasil', country: 'Brasil', flag: 'https://flagcdn.com/w40/br.png', matches: 8 },
+  { id: 'c3', name: 'Libertadores', country: 'América do Sul', flag: 'https://flagcdn.com/w40/br.png', matches: 12 },
+  { id: 'c4', name: 'Champions League', country: 'Europa', flag: 'https://flagcdn.com/w40/eu.png', matches: 16 },
+  { id: 'c5', name: 'Premier League', country: 'Inglaterra', flag: 'https://flagcdn.com/w40/gb-eng.png', matches: 24 },
+  { id: 'c6', name: 'La Liga', country: 'Espanha', flag: 'https://flagcdn.com/w40/es.png', matches: 18 },
+  { id: 'c7', name: 'Serie A', country: 'Itália', flag: 'https://flagcdn.com/w40/it.png', matches: 15 },
+  { id: 'c8', name: 'Bundesliga', country: 'Alemanha', flag: 'https://flagcdn.com/w40/de.png', matches: 14 },
+  { id: 'c9', name: 'Ligue 1', country: 'França', flag: 'https://flagcdn.com/w40/fr.png', matches: 12 },
+  { id: 'c10', name: 'Eliminatórias', country: 'CONMEBOL', flag: 'https://flagcdn.com/w40/br.png', matches: 4 },
 ];
 
 type Tab = 'social' | 'calendario' | 'competicoes';
@@ -110,7 +195,7 @@ const EsportesPage = () => {
   const [selectedDay, setSelectedDay] = useState(calendarDays[0].key);
   const addBet = useBetSlipStore((s) => s.addBet);
 
-  const events = popularEvents[selectedSport.id] || popularEvents.futebol || [];
+  const events = popularEvents[selectedSport.id] || [];
 
   const tabList: { id: Tab; label: string }[] = [
     { id: 'social', label: 'Social' },
@@ -126,6 +211,7 @@ const EsportesPage = () => {
           onClick={() => setSportPickerOpen(true)}
           className="w-full flex items-center justify-center gap-2 py-3 min-h-[44px]"
         >
+          <img src={selectedSport.img} alt="" className="w-6 h-6" />
           <span className="font-display text-lg font-extrabold uppercase tracking-wide text-foreground">
             {selectedSport.label}
           </span>
@@ -168,7 +254,6 @@ const EsportesPage = () => {
             </div>
             <div className="px-4 pb-8 space-y-1.5">
               {sportsList.map((sport) => {
-                const Icon = sport.icon;
                 const isSelected = selectedSport.id === sport.id;
                 return (
                   <motion.button
@@ -179,11 +264,7 @@ const EsportesPage = () => {
                       isSelected ? 'bg-primary/15' : 'bg-surface-card hover:bg-surface-interactive'
                     }`}
                   >
-                    <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${
-                      isSelected ? 'bg-primary/25' : 'bg-surface-interactive'
-                    }`}>
-                      <Icon size={18} className={isSelected ? 'text-primary' : 'text-muted-foreground'} />
-                    </div>
+                    <img src={sport.img} alt={sport.label} className="w-7 h-7 flex-shrink-0" />
                     <span className={`text-sm font-display font-bold ${isSelected ? 'text-primary' : 'text-foreground'}`}>
                       {sport.label}
                     </span>
@@ -222,6 +303,7 @@ const EsportesPage = () => {
             {/* Event count banner */}
             <div className="bg-destructive rounded-xl px-4 py-2.5 flex items-center justify-between">
               <div className="flex items-center gap-2">
+                <img src={selectedSport.img} alt="" className="w-5 h-5" />
                 <span className="text-sm font-display font-bold text-destructive-foreground">
                   {events.length * 3} eventos em {events.length} competições
                 </span>
@@ -232,63 +314,73 @@ const EsportesPage = () => {
             </div>
 
             {/* Popular Events */}
-            <div className="mt-2">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <Flame size={20} className="text-destructive" />
-                  <h3 className="font-display text-lg font-extrabold uppercase">Eventos Populares</h3>
-                </div>
-                <span className="text-sm font-display font-bold text-destructive">Ver tudo</span>
-              </div>
-
-              <div className="space-y-3">
-                {events.map((ev) => (
-                  <div key={ev.id} className="bg-surface-card rounded-xl p-4 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-xs font-body text-muted-foreground">
-                        <CircleDot size={14} className="text-secondary" />
-                        <span>{ev.sport}</span>
-                        <span>·</span>
-                        <span>{ev.country}</span>
-                        <span>·</span>
-                        <span className="truncate max-w-[80px]">{ev.league}</span>
-                      </div>
-                      <button className="text-xs font-display font-bold text-primary flex items-center gap-0.5">
-                        Criar Aposta <ChevronRight size={12} />
-                      </button>
-                    </div>
-                    <div>
-                      <p className="text-[0.65rem] text-muted-foreground font-body">{ev.time}</p>
-                      <p className="text-sm font-body font-semibold text-foreground">{ev.home}</p>
-                      <p className="text-sm font-body font-semibold text-foreground">{ev.away}</p>
-                    </div>
-                    <div className="flex gap-2">
-                      {[
-                        { label: '1', odds: ev.oddsHome, sel: ev.home },
-                        ...(ev.oddsDraw > 0 ? [{ label: 'X', odds: ev.oddsDraw, sel: 'Empate' }] : []),
-                        { label: '2', odds: ev.oddsAway, sel: ev.away },
-                      ].map((o) => (
-                        <motion.button
-                          key={o.label}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => addBet({
-                            id: `${ev.id}-${o.label}`,
-                            match: `${ev.home} vs ${ev.away}`,
-                            market: 'Resultado Final',
-                            selection: o.sel,
-                            odds: o.odds,
-                          })}
-                          className="flex-1 bg-surface-interactive rounded-lg py-2.5 flex items-center justify-center gap-2 min-h-[44px] hover:bg-muted transition-colors"
-                        >
-                          <span className="text-xs font-body text-muted-foreground">{o.label}</span>
-                          <span className="text-sm font-display font-extrabold text-foreground">{o.odds.toFixed(2)}</span>
-                        </motion.button>
-                      ))}
-                    </div>
+            {events.length > 0 && (
+              <div className="mt-2">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Flame size={20} className="text-destructive" />
+                    <h3 className="font-display text-lg font-extrabold uppercase">Eventos Populares</h3>
                   </div>
-                ))}
+                  <span className="text-sm font-display font-bold text-destructive">Ver tudo</span>
+                </div>
+
+                <div className="space-y-3">
+                  {events.map((ev) => (
+                    <div key={ev.id} className="bg-surface-card rounded-xl p-4 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2 text-xs font-body text-muted-foreground">
+                          <img src={selectedSport.img} alt="" className="w-4 h-4" />
+                          <span>{ev.sport}</span>
+                          <span>·</span>
+                          <span>{ev.country}</span>
+                          <span>·</span>
+                          <span className="truncate max-w-[80px]">{ev.league}</span>
+                        </div>
+                        <button className="text-xs font-display font-bold text-primary flex items-center gap-0.5">
+                          Criar Aposta <ChevronRight size={12} />
+                        </button>
+                      </div>
+                      <div>
+                        <p className="text-[0.65rem] text-muted-foreground font-body">{ev.time}</p>
+                        <p className="text-sm font-body font-semibold text-foreground">{ev.home}</p>
+                        <p className="text-sm font-body font-semibold text-foreground">{ev.away}</p>
+                      </div>
+                      <div className="flex gap-2">
+                        {[
+                          { label: '1', odds: ev.oddsHome, sel: ev.home },
+                          ...(ev.oddsDraw > 0 ? [{ label: 'X', odds: ev.oddsDraw, sel: 'Empate' }] : []),
+                          { label: '2', odds: ev.oddsAway, sel: ev.away },
+                        ].map((o) => (
+                          <motion.button
+                            key={o.label}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => addBet({
+                              id: `${ev.id}-${o.label}`,
+                              match: `${ev.home} vs ${ev.away}`,
+                              market: 'Resultado Final',
+                              selection: o.sel,
+                              odds: o.odds,
+                            })}
+                            className="flex-1 bg-surface-interactive rounded-lg py-2.5 flex items-center justify-center gap-2 min-h-[44px] hover:bg-muted transition-colors"
+                          >
+                            <span className="text-xs font-body text-muted-foreground">{o.label}</span>
+                            <span className="text-sm font-display font-extrabold text-foreground">{o.odds.toFixed(2)}</span>
+                          </motion.button>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
+
+            {events.length === 0 && (
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <img src={selectedSport.img} alt="" className="w-12 h-12 opacity-30 mb-3" />
+                <p className="font-display text-sm font-bold text-muted-foreground">Nenhum evento disponível agora</p>
+                <p className="text-xs font-body text-muted-foreground mt-1">Volte em breve para novos eventos</p>
+              </div>
+            )}
 
             {/* Betting Tips */}
             <div className="mt-4">
@@ -344,7 +436,7 @@ const EsportesPage = () => {
                 whileTap={{ scale: 0.98 }}
                 className="w-full flex items-center gap-3 bg-surface-card rounded-xl px-4 py-3.5 min-h-[52px] hover:bg-surface-interactive transition-colors"
               >
-                <span className="text-xl">{comp.flag}</span>
+                <img src={comp.flag} alt={comp.country} className="w-6 h-4 rounded-sm object-cover" />
                 <div className="flex-1 text-left">
                   <p className="text-sm font-display font-bold text-foreground">{comp.name}</p>
                   <p className="text-[0.6rem] font-body text-muted-foreground">{comp.country} · {comp.matches} jogos</p>
