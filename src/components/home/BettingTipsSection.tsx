@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { TrendingUp, ChevronRight, Receipt } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useBetSlipStore } from '@/store/betSlipStore';
 import { SectionReveal } from '@/components/animations';
 

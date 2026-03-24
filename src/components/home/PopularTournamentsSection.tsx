@@ -27,7 +27,7 @@ const PopularTournamentsSection = () => {
             <Trophy size={20} className="text-primary" />
             Torneios Populares
           </h2>
-          <button className="text-xs text-primary font-body font-semibold flex items-center gap-0.5 min-h-[44px]">
+          <button onClick={() => navigate('/esportes')} className="text-xs text-primary font-body font-semibold flex items-center gap-0.5 min-h-[44px]">
             Ver todos <ChevronRight size={14} />
           </button>
         </motion.div>

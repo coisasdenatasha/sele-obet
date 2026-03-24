@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Play, ChevronRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { SectionReveal } from '@/components/animations';
 
 const replays = [
