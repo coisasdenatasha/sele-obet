@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { User, TrendingUp, History, Shield, Settings, LogOut, ChevronRight, Award, Trophy, CreditCard, Star, UserPlus, LogIn } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { motion } from 'framer-motion';
+import { PageTransition, staggerContainer, staggerItem } from '@/components/animations';
 
 const stats = [
   { label: 'Apostas', value: '142' },
