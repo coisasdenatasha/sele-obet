@@ -81,6 +81,8 @@ const AuthPage = () => {
   const [notExcluded, setNotExcluded] = useState(false);
   const [acceptRegulation, setAcceptRegulation] = useState(false);
   const [promoCode, setPromoCode] = useState('');
+  const [signupStep, setSignupStep] = useState(1);
+  const totalSignupSteps = 4;
 
   // Login form
   const [loginEmail, setLoginEmail] = useState('');
@@ -110,18 +112,15 @@ const AuthPage = () => {
   const pwStrength = getPasswordStrength(password);
   const passwordsMatch = password === confirmPassword && confirmPassword.length > 0;
 
-  const signupValid =
-    fullName.trim().length >= 3 &&
-    username.trim().length >= 3 &&
-    isEmailValid(email) &&
-    cpfValid &&
-    dobValid &&
-    password.length >= 8 &&
-    passwordsMatch &&
-    over18 &&
-    acceptTerms &&
-    notExcluded &&
-    acceptRegulation;
+  // Step validations
+  const step1Valid = fullName.trim().length >= 3 && username.trim().length >= 3 && isEmailValid(email) && cpfValid && dobValid;
+  const step2Valid = telefone.replace(/\D/g, '').length >= 10;
+  const step3Valid = password.length >= 8 && passwordsMatch;
+  const step4Valid = over18 && acceptTerms && notExcluded && acceptRegulation;
+  const signupValid = step1Valid && step2Valid && step3Valid && step4Valid;
+  const currentStepValid = signupStep === 1 ? step1Valid : signupStep === 2 ? step2Valid : signupStep === 3 ? step3Valid : step4Valid;
+
+  const signupStepLabels = ['Dados Pessoais', 'Endereço', 'Segurança', 'Termos'];
 
   const BackButton = ({ to }: { to: AuthStep }) => (
     <button onClick={() => setStep(to)} className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-foreground/70 hover:text-foreground">
@@ -254,260 +253,285 @@ const AuthPage = () => {
         {/* SIGNUP */}
         {step === 'signup' && (
           <motion.div key="signup" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} className="flex-1 px-6 pt-4 pb-8 overflow-y-auto">
-            <BackButton to="welcome" />
+            <button onClick={() => { if (signupStep > 1) setSignupStep(signupStep - 1); else setStep('welcome'); }} className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-foreground/70 hover:text-foreground">
+              <ArrowLeft size={22} />
+            </button>
+
             <div className="mt-4 space-y-5">
               <div>
                 <h2 className="font-display text-2xl font-extrabold">Criar Conta</h2>
-                <p className="text-sm font-body text-muted-foreground mt-1">Preencha seus dados para começar</p>
+                <p className="text-sm font-body text-muted-foreground mt-1">
+                  Etapa {signupStep} de {totalSignupSteps} — {signupStepLabels[signupStep - 1]}
+                </p>
               </div>
 
-              <div className="space-y-4">
-                {/* Nome completo */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-body font-medium text-muted-foreground">Nome completo</label>
-                  <div className="relative">
-                    <User size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                    <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="João da Silva"
-                      className="w-full bg-surface-interactive rounded-xl py-3 pl-11 pr-10 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]" />
-                    {fullName.length > 0 && (
-                      <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                        <ValidationIcon valid={fullName.trim().length >= 3} />
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Username */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-body font-medium text-muted-foreground">Nome de usuário</label>
-                  <div className="relative">
-                    <AtSign size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                    <input type="text" value={username} onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))} placeholder="joaosilva"
-                      className="w-full bg-surface-interactive rounded-xl py-3 pl-11 pr-10 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]" />
-                    {username.length > 0 && (
-                      <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                        <ValidationIcon valid={username.trim().length >= 3} />
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Email */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-body font-medium text-muted-foreground">E-mail</label>
-                  <div className="relative">
-                    <Mail size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                    <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="seu@email.com"
-                      className="w-full bg-surface-interactive rounded-xl py-3 pl-11 pr-10 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]" />
-                    {email.length > 0 && (
-                      <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                        <ValidationIcon valid={isEmailValid(email)} />
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* CPF */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-body font-medium text-muted-foreground">CPF</label>
-                  <div className="relative">
-                    <CreditCard size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                    <input type="text" value={cpf} onChange={(e) => setCpf(maskCPF(e.target.value))} placeholder="000.000.000-00"
-                      className="w-full bg-surface-interactive rounded-xl py-3 pl-11 pr-10 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]" />
-                    {cpfClean.length === 11 && (
-                      <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                        <ValidationIcon valid={cpfValid} />
-                      </div>
-                    )}
-                  </div>
-                  {cpfClean.length === 11 && !cpfValid && (
-                    <p className="text-[0.65rem] text-destructive font-body">CPF inválido</p>
-                  )}
-                </div>
-
-                {/* Data de nascimento */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-body font-medium text-muted-foreground">Data de nascimento</label>
-                  <div className="relative">
-                    <Calendar size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                    <input type="text" value={dob} onChange={(e) => setDob(maskDate(e.target.value))} placeholder="DD/MM/AAAA"
-                      className="w-full bg-surface-interactive rounded-xl py-3 pl-11 pr-4 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]" />
-                  </div>
-                </div>
-
-                {/* País */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-body font-medium text-muted-foreground">País</label>
-                  <div className="relative">
-                    <MapPin size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                    <select value={pais} onChange={(e) => setPais(e.target.value)}
-                      className="w-full bg-surface-interactive rounded-xl py-3 pl-11 pr-4 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary min-h-[44px] appearance-none">
-                      {['Brasil','Portugal','Angola','Moçambique','Cabo Verde','Guiné-Bissau','São Tomé e Príncipe','Timor-Leste'].map(p => (
-                        <option key={p} value={p} className="bg-background">{p}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                {/* CEP */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-body font-medium text-muted-foreground">CEP</label>
-                  <div className="relative">
-                    <MapPin size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                    <input type="text" value={cep} onChange={(e) => {
-                      const v = e.target.value.replace(/\D/g, '').slice(0, 8);
-                      setCep(v.length > 5 ? `${v.slice(0, 5)}-${v.slice(5)}` : v);
-                    }} placeholder="00000-000"
-                      className="w-full bg-surface-interactive rounded-xl py-3 pl-11 pr-4 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]" />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-body font-medium text-muted-foreground">Estado</label>
-                    <select value={estado} onChange={(e) => setEstado(e.target.value)}
-                      className="w-full bg-surface-interactive rounded-xl py-3 px-4 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary min-h-[44px] appearance-none">
-                      <option value="" className="bg-background">UF</option>
-                      {['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'].map(uf => (
-                        <option key={uf} value={uf} className="bg-background">{uf}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-body font-medium text-muted-foreground">Cidade</label>
-                    <input type="text" value={cidade} onChange={(e) => setCidade(e.target.value)} placeholder="Sua cidade"
-                      className="w-full bg-surface-interactive rounded-xl py-3 px-4 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]" />
-                  </div>
-                </div>
-
-                {/* Telefone */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-body font-medium text-muted-foreground">Telefone</label>
-                  <div className="relative">
-                    <Smartphone size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                    <input type="tel" value={telefone} onChange={(e) => {
-                      const d = e.target.value.replace(/\D/g, '').slice(0, 11);
-                      if (d.length <= 2) setTelefone(d.length ? `(${d}` : '');
-                      else if (d.length <= 7) setTelefone(`(${d.slice(0, 2)}) ${d.slice(2)}`);
-                      else setTelefone(`(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`);
-                    }} placeholder="(11) 99999-9999"
-                      className="w-full bg-surface-interactive rounded-xl py-3 pl-11 pr-4 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]" />
-                  </div>
-                </div>
-
-                {/* Senha */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-body font-medium text-muted-foreground">Senha</label>
-                  <div className="relative">
-                    <Lock size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                    <input type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Mínimo 8 caracteres"
-                      className="w-full bg-surface-interactive rounded-xl py-3 pl-11 pr-12 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]" />
-                    <button type="button" onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 min-w-[44px] min-h-[44px] flex items-center justify-center text-muted-foreground">
-                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                    </button>
-                  </div>
-                  {password.length > 0 && (
-                    <div className="space-y-1.5">
-                      <div className="flex gap-1">
-                        {[1, 2, 3, 4, 5].map((i) => (
-                          <div key={i} className={`h-1 flex-1 rounded-full transition-colors ${i <= pwStrength.level ? pwStrength.color : 'bg-surface-interactive'}`} />
-                        ))}
-                      </div>
-                      <p className={`text-[0.65rem] font-body ${pwStrength.level <= 1 ? 'text-destructive' : pwStrength.level <= 3 ? 'text-primary' : 'text-secondary'}`}>
-                        Senha {pwStrength.label}
-                      </p>
+              {/* Progress Stepper */}
+              <div className="flex items-center gap-1">
+                {Array.from({ length: totalSignupSteps }, (_, i) => i + 1).map((s) => (
+                  <div key={s} className="flex-1 flex flex-col items-center gap-1.5">
+                    <div className="w-full flex items-center">
+                      <div className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${
+                        s < signupStep ? 'bg-secondary' : s === signupStep ? 'bg-primary' : 'bg-surface-interactive'
+                      }`} />
                     </div>
-                  )}
-                </div>
-
-                {/* Confirmar Senha */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-body font-medium text-muted-foreground">Confirmar senha</label>
-                  <div className="relative">
-                    <Lock size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                    <input type={showConfirmPassword ? 'text' : 'password'} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Repita a senha"
-                      className="w-full bg-surface-interactive rounded-xl py-3 pl-11 pr-12 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]" />
-                    <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 min-w-[44px] min-h-[44px] flex items-center justify-center text-muted-foreground">
-                      {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                    </button>
+                    <span className={`text-[0.55rem] font-body font-medium transition-colors ${
+                      s <= signupStep ? 'text-foreground' : 'text-muted-foreground/50'
+                    }`}>
+                      {signupStepLabels[s - 1]}
+                    </span>
                   </div>
-                  {confirmPassword.length > 0 && !passwordsMatch && (
-                    <p className="text-[0.65rem] text-destructive font-body">As senhas não conferem</p>
-                  )}
-                </div>
+                ))}
               </div>
 
-              {/* Código promocional */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-body font-medium text-muted-foreground">Código promocional (opcional)</label>
-                <div className="relative">
-                  <Gift size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                  <input type="text" value={promoCode} onChange={(e) => setPromoCode(e.target.value.toUpperCase())} placeholder="Ex: SELECAO500"
-                    className="w-full bg-surface-interactive rounded-xl py-3 pl-11 pr-4 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]" />
-                </div>
+              <AnimatePresence mode="wait">
+                {/* STEP 1: Dados Pessoais */}
+                {signupStep === 1 && (
+                  <motion.div key="s1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-body font-medium text-muted-foreground">Nome completo</label>
+                      <div className="relative">
+                        <User size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                        <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="João da Silva"
+                          className="w-full bg-surface-interactive rounded-xl py-3 pl-11 pr-10 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]" />
+                        {fullName.length > 0 && <div className="absolute right-3 top-1/2 -translate-y-1/2"><ValidationIcon valid={fullName.trim().length >= 3} /></div>}
+                      </div>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-body font-medium text-muted-foreground">Nome de usuário</label>
+                      <div className="relative">
+                        <AtSign size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                        <input type="text" value={username} onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))} placeholder="joaosilva"
+                          className="w-full bg-surface-interactive rounded-xl py-3 pl-11 pr-10 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]" />
+                        {username.length > 0 && <div className="absolute right-3 top-1/2 -translate-y-1/2"><ValidationIcon valid={username.trim().length >= 3} /></div>}
+                      </div>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-body font-medium text-muted-foreground">E-mail</label>
+                      <div className="relative">
+                        <Mail size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="seu@email.com"
+                          className="w-full bg-surface-interactive rounded-xl py-3 pl-11 pr-10 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]" />
+                        {email.length > 0 && <div className="absolute right-3 top-1/2 -translate-y-1/2"><ValidationIcon valid={isEmailValid(email)} /></div>}
+                      </div>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-body font-medium text-muted-foreground">CPF</label>
+                      <div className="relative">
+                        <CreditCard size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                        <input type="text" value={cpf} onChange={(e) => setCpf(maskCPF(e.target.value))} placeholder="000.000.000-00"
+                          className="w-full bg-surface-interactive rounded-xl py-3 pl-11 pr-10 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]" />
+                        {cpfClean.length === 11 && <div className="absolute right-3 top-1/2 -translate-y-1/2"><ValidationIcon valid={cpfValid} /></div>}
+                      </div>
+                      {cpfClean.length === 11 && !cpfValid && <p className="text-[0.65rem] text-destructive font-body">CPF inválido</p>}
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-body font-medium text-muted-foreground">Data de nascimento</label>
+                      <div className="relative">
+                        <Calendar size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                        <input type="text" value={dob} onChange={(e) => setDob(maskDate(e.target.value))} placeholder="DD/MM/AAAA"
+                          className="w-full bg-surface-interactive rounded-xl py-3 pl-11 pr-4 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]" />
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* STEP 2: Endereço e Contato */}
+                {signupStep === 2 && (
+                  <motion.div key="s2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-body font-medium text-muted-foreground">País</label>
+                      <div className="relative">
+                        <MapPin size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                        <select value={pais} onChange={(e) => setPais(e.target.value)}
+                          className="w-full bg-surface-interactive rounded-xl py-3 pl-11 pr-4 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary min-h-[44px] appearance-none">
+                          {['Brasil','Portugal','Angola','Moçambique','Cabo Verde','Guiné-Bissau','São Tomé e Príncipe','Timor-Leste'].map(p => (
+                            <option key={p} value={p} className="bg-background">{p}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-body font-medium text-muted-foreground">CEP</label>
+                      <div className="relative">
+                        <MapPin size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                        <input type="text" value={cep} onChange={(e) => {
+                          const v = e.target.value.replace(/\D/g, '').slice(0, 8);
+                          setCep(v.length > 5 ? `${v.slice(0, 5)}-${v.slice(5)}` : v);
+                        }} placeholder="00000-000"
+                          className="w-full bg-surface-interactive rounded-xl py-3 pl-11 pr-4 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]" />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-body font-medium text-muted-foreground">Estado</label>
+                        <select value={estado} onChange={(e) => setEstado(e.target.value)}
+                          className="w-full bg-surface-interactive rounded-xl py-3 px-4 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary min-h-[44px] appearance-none">
+                          <option value="" className="bg-background">UF</option>
+                          {['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'].map(uf => (
+                            <option key={uf} value={uf} className="bg-background">{uf}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-body font-medium text-muted-foreground">Cidade</label>
+                        <input type="text" value={cidade} onChange={(e) => setCidade(e.target.value)} placeholder="Sua cidade"
+                          className="w-full bg-surface-interactive rounded-xl py-3 px-4 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]" />
+                      </div>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-body font-medium text-muted-foreground">Telefone</label>
+                      <div className="relative">
+                        <Smartphone size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                        <input type="tel" value={telefone} onChange={(e) => {
+                          const d = e.target.value.replace(/\D/g, '').slice(0, 11);
+                          if (d.length <= 2) setTelefone(d.length ? `(${d}` : '');
+                          else if (d.length <= 7) setTelefone(`(${d.slice(0, 2)}) ${d.slice(2)}`);
+                          else setTelefone(`(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`);
+                        }} placeholder="(11) 99999-9999"
+                          className="w-full bg-surface-interactive rounded-xl py-3 pl-11 pr-4 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]" />
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* STEP 3: Senha e Segurança */}
+                {signupStep === 3 && (
+                  <motion.div key="s3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-body font-medium text-muted-foreground">Senha</label>
+                      <div className="relative">
+                        <Lock size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                        <input type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Mínimo 8 caracteres"
+                          className="w-full bg-surface-interactive rounded-xl py-3 pl-11 pr-12 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]" />
+                        <button type="button" onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 min-w-[44px] min-h-[44px] flex items-center justify-center text-muted-foreground">
+                          {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </button>
+                      </div>
+                      {password.length > 0 && (
+                        <div className="space-y-1.5">
+                          <div className="flex gap-1">
+                            {[1, 2, 3, 4, 5].map((i) => (
+                              <div key={i} className={`h-1 flex-1 rounded-full transition-colors ${i <= pwStrength.level ? pwStrength.color : 'bg-surface-interactive'}`} />
+                            ))}
+                          </div>
+                          <p className={`text-[0.65rem] font-body ${pwStrength.level <= 1 ? 'text-destructive' : pwStrength.level <= 3 ? 'text-primary' : 'text-secondary'}`}>
+                            Senha {pwStrength.label}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-body font-medium text-muted-foreground">Confirmar senha</label>
+                      <div className="relative">
+                        <Lock size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                        <input type={showConfirmPassword ? 'text' : 'password'} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Repita a senha"
+                          className="w-full bg-surface-interactive rounded-xl py-3 pl-11 pr-12 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]" />
+                        <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 min-w-[44px] min-h-[44px] flex items-center justify-center text-muted-foreground">
+                          {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </button>
+                      </div>
+                      {confirmPassword.length > 0 && !passwordsMatch && (
+                        <p className="text-[0.65rem] text-destructive font-body">As senhas não conferem</p>
+                      )}
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-body font-medium text-muted-foreground">Código promocional (opcional)</label>
+                      <div className="relative">
+                        <Gift size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                        <input type="text" value={promoCode} onChange={(e) => setPromoCode(e.target.value.toUpperCase())} placeholder="Ex: SELECAO500"
+                          className="w-full bg-surface-interactive rounded-xl py-3 pl-11 pr-4 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]" />
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* STEP 4: Termos e Condições */}
+                {signupStep === 4 && (
+                  <motion.div key="s4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
+                    <div className="bg-surface-card rounded-xl p-4 flex items-start gap-3">
+                      <Gift size={24} className="text-primary flex-shrink-0" />
+                      <div>
+                        <p className="text-sm font-display font-bold text-primary">Bônus de Boas-Vindas</p>
+                        <p className="text-xs font-body text-muted-foreground mt-0.5">
+                          Ganhe até R$ 500 em bônus no seu primeiro depósito!
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <button onClick={() => setOver18(!over18)} className="flex items-start gap-3 min-h-[44px] w-full text-left">
+                        <div className={`w-5 h-5 rounded flex-shrink-0 mt-0.5 flex items-center justify-center transition-colors ${over18 ? 'bg-primary' : 'bg-surface-interactive'}`}>
+                          {over18 && <Check size={12} className="text-primary-foreground" />}
+                        </div>
+                        <span className="text-xs font-body text-foreground/80">
+                          Declaro que tenho 18 (dezoito) anos ou mais e que possuo capacidade civil plena para realizar apostas, conforme o Art. 26 da Lei Nº 14.790/2023.
+                        </span>
+                      </button>
+
+                      <button onClick={() => setAcceptTerms(!acceptTerms)} className="flex items-start gap-3 min-h-[44px] w-full text-left">
+                        <div className={`w-5 h-5 rounded flex-shrink-0 mt-0.5 flex items-center justify-center transition-colors ${acceptTerms ? 'bg-primary' : 'bg-surface-interactive'}`}>
+                          {acceptTerms && <Check size={12} className="text-primary-foreground" />}
+                        </div>
+                        <span className="text-xs font-body text-foreground/80">
+                          Li e aceito os <span className="text-primary font-semibold">Termos e Condições de Uso</span>, a <span className="text-primary font-semibold">Política de Privacidade</span> e as <span className="text-primary font-semibold">Regras de Apostas</span> da SeleçãoBet. Estou ciente de que esta plataforma é regulamentada e monitorada pela Secretaria de Prêmios e Apostas do Ministério da Fazenda (SPA/MF).
+                        </span>
+                      </button>
+
+                      <button onClick={() => setNotExcluded(!notExcluded)} className="flex items-start gap-3 min-h-[44px] w-full text-left">
+                        <div className={`w-5 h-5 rounded flex-shrink-0 mt-0.5 flex items-center justify-center transition-colors ${notExcluded ? 'bg-primary' : 'bg-surface-interactive'}`}>
+                          {notExcluded && <Check size={12} className="text-primary-foreground" />}
+                        </div>
+                        <span className="text-xs font-body text-foreground/80">
+                          Confirmo e garanto que não estou incluído em nenhuma lista de autoexclusão, lista de sanções nacionais ou internacionais, e que meus recursos não são provenientes de atividades ilícitas, nos termos da Lei Nº 9.613/1998 (Lei de Lavagem de Dinheiro).
+                        </span>
+                      </button>
+
+                      <button onClick={() => setAcceptRegulation(!acceptRegulation)} className="flex items-start gap-3 min-h-[44px] w-full text-left">
+                        <div className={`w-5 h-5 rounded flex-shrink-0 mt-0.5 flex items-center justify-center transition-colors ${acceptRegulation ? 'bg-primary' : 'bg-surface-interactive'}`}>
+                          {acceptRegulation && <Check size={12} className="text-primary-foreground" />}
+                        </div>
+                        <span className="text-xs font-body text-foreground/80">
+                          Autorizo a SeleçãoBet a realizar a verificação de minha identidade (KYC) e a compartilhar meus dados cadastrais com a Secretaria de Prêmios e Apostas (SPA/MF) e demais órgãos reguladores, conforme exigido pela Lei Nº 14.790/2023 e regulamentações vigentes.
+                        </span>
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Navigation Buttons */}
+              <div className="flex gap-3 pt-2">
+                {signupStep > 1 && (
+                  <motion.button whileTap={{ scale: 0.97 }} onClick={() => setSignupStep(signupStep - 1)}
+                    className="flex-1 bg-surface-interactive text-foreground font-display font-bold text-sm py-3.5 rounded-xl min-h-[44px] hover:bg-muted transition-colors">
+                    Voltar
+                  </motion.button>
+                )}
+                <motion.button whileTap={{ scale: 0.97 }}
+                  onClick={() => {
+                    if (signupStep < totalSignupSteps) setSignupStep(signupStep + 1);
+                    else setStep('kyc');
+                  }}
+                  disabled={!currentStepValid}
+                  className={`flex-1 font-display font-bold text-sm py-3.5 rounded-xl min-h-[44px] transition-all ${
+                    currentStepValid
+                      ? 'bg-primary text-primary-foreground hover:brightness-110'
+                      : 'bg-surface-interactive text-muted-foreground cursor-not-allowed'
+                  }`}>
+                  {signupStep < totalSignupSteps ? 'Próximo' : 'Cadastrar'}
+                </motion.button>
               </div>
-
-              {/* Termos e Declarações */}
-              <div className="space-y-3">
-                <button onClick={() => setOver18(!over18)} className="flex items-start gap-3 min-h-[44px] w-full text-left">
-                  <div className={`w-5 h-5 rounded flex-shrink-0 mt-0.5 flex items-center justify-center transition-colors ${over18 ? 'bg-primary' : 'bg-surface-interactive'}`}>
-                    {over18 && <Check size={12} className="text-primary-foreground" />}
-                  </div>
-                  <span className="text-xs font-body text-foreground/80">
-                    Declaro que tenho 18 (dezoito) anos ou mais e que possuo capacidade civil plena para realizar apostas, conforme o Art. 26 da Lei Nº 14.790/2023.
-                  </span>
-                </button>
-
-                <button onClick={() => setAcceptTerms(!acceptTerms)} className="flex items-start gap-3 min-h-[44px] w-full text-left">
-                  <div className={`w-5 h-5 rounded flex-shrink-0 mt-0.5 flex items-center justify-center transition-colors ${acceptTerms ? 'bg-primary' : 'bg-surface-interactive'}`}>
-                    {acceptTerms && <Check size={12} className="text-primary-foreground" />}
-                  </div>
-                  <span className="text-xs font-body text-foreground/80">
-                    Li e aceito os <span className="text-primary font-semibold">Termos e Condições de Uso</span>, a <span className="text-primary font-semibold">Política de Privacidade</span> e as <span className="text-primary font-semibold">Regras de Apostas</span> da SeleçãoBet. Estou ciente de que esta plataforma é regulamentada e monitorada pela Secretaria de Prêmios e Apostas do Ministério da Fazenda (SPA/MF).
-                  </span>
-                </button>
-
-                <button onClick={() => setNotExcluded(!notExcluded)} className="flex items-start gap-3 min-h-[44px] w-full text-left">
-                  <div className={`w-5 h-5 rounded flex-shrink-0 mt-0.5 flex items-center justify-center transition-colors ${notExcluded ? 'bg-primary' : 'bg-surface-interactive'}`}>
-                    {notExcluded && <Check size={12} className="text-primary-foreground" />}
-                  </div>
-                  <span className="text-xs font-body text-foreground/80">
-                    Confirmo e garanto que não estou incluído em nenhuma lista de autoexclusão, lista de sanções nacionais ou internacionais, e que meus recursos não são provenientes de atividades ilícitas, nos termos da Lei Nº 9.613/1998 (Lei de Lavagem de Dinheiro).
-                  </span>
-                </button>
-
-                <button onClick={() => setAcceptRegulation(!acceptRegulation)} className="flex items-start gap-3 min-h-[44px] w-full text-left">
-                  <div className={`w-5 h-5 rounded flex-shrink-0 mt-0.5 flex items-center justify-center transition-colors ${acceptRegulation ? 'bg-primary' : 'bg-surface-interactive'}`}>
-                    {acceptRegulation && <Check size={12} className="text-primary-foreground" />}
-                  </div>
-                  <span className="text-xs font-body text-foreground/80">
-                    Autorizo a SeleçãoBet a realizar a verificação de minha identidade (KYC) e a compartilhar meus dados cadastrais com a Secretaria de Prêmios e Apostas (SPA/MF) e demais órgãos reguladores, conforme exigido pela Lei Nº 14.790/2023 e regulamentações vigentes.
-                  </span>
-                </button>
-              </div>
-
-              {/* Bônus */}
-              <div className="bg-surface-card rounded-xl p-4 flex items-start gap-3">
-                <Gift size={24} className="text-primary flex-shrink-0" />
-                <div>
-                  <p className="text-sm font-display font-bold text-primary">Bônus de Boas-Vindas</p>
-                  <p className="text-xs font-body text-muted-foreground mt-0.5">
-                    Ganhe até R$ 500 em bônus no seu primeiro depósito!
-                  </p>
-                </div>
-              </div>
-
-              <motion.button whileTap={{ scale: 0.97 }} onClick={() => setStep('kyc')}
-                disabled={!signupValid}
-                className={`w-full font-display font-bold text-base py-3.5 rounded-xl min-h-[44px] transition-all ${
-                  signupValid
-                    ? 'bg-primary text-primary-foreground hover:brightness-110'
-                    : 'bg-surface-interactive text-muted-foreground cursor-not-allowed'
-                }`}>
-                Cadastrar
-              </motion.button>
             </div>
           </motion.div>
         )}
