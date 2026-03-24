@@ -1,32 +1,37 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Send, Users, TrendingUp, MessageCircle, Crown, Flame, ThumbsUp,
-  Plus, Clock, Target, Zap, UserCircle, Trophy, Star, Hash,
+  Users, TrendingUp, MessageCircle, Crown, Flame, ThumbsUp,
+  Plus, Clock, Target, Zap, UserCircle, Star, Copy,
+  MessageSquare, CheckCircle2, Share2, Bookmark,
   Flag, Radio, BarChart3, CreditCard, Swords, Award, CircleDot
 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useNavigate } from 'react-router-dom';
 
-interface ChatMessage {
+interface FeedPost {
   id: string;
-  user: string;
-  username: string;
-  level: string;
-  text: string;
-  time: string;
+  user: {
+    name: string;
+    username: string;
+    avatar: string;
+    level: string;
+    verified: boolean;
+  };
+  timeAgo: string;
+  text?: string;
+  bet: {
+    match: string;
+    league: string;
+    market: string;
+    odd: number;
+    stake?: number;
+    result?: 'green' | 'red' | 'pending';
+  };
   likes: number;
-  isTip?: boolean;
-  betInfo?: { match: string; market: string; odd: number; result?: 'green' | 'red' };
-}
-
-interface ChatRoom {
-  id: string;
-  name: string;
-  icon: typeof Trophy;
-  members: number;
-  lastMessage: string;
-  category: string;
+  comments: number;
+  copies: number;
+  liked?: boolean;
 }
 
 type Tab = 'popular' | 'apostas' | 'criar' | 'recentes' | 'odds100' | 'gols' | 'jogadores';
@@ -41,43 +46,118 @@ const tabsList: { id: Tab; label: string; icon: typeof Flame }[] = [
   { id: 'criar', label: 'Criar', icon: Plus },
 ];
 
-const rooms: ChatRoom[] = [
-  { id: '1', name: 'Brasileirao Geral', icon: Flag, members: 4821, lastMessage: 'Flamengo hoje vai meter!', category: 'popular' },
-  { id: '2', name: 'Libertadores', icon: Trophy, members: 3210, lastMessage: 'Quem pega essa odd do Boca?', category: 'popular' },
-  { id: '3', name: 'Premier League BR', icon: Award, members: 2190, lastMessage: 'Arsenal ta voando demais', category: 'popular' },
-  { id: '4', name: 'Tips do Dia', icon: Star, members: 5670, lastMessage: 'Green de R$ 500 agora!', category: 'popular' },
-  { id: '5', name: 'Multiplas & Combos', icon: BarChart3, members: 3450, lastMessage: 'Multipla de 8.50 pagou!', category: 'apostas' },
-  { id: '6', name: 'Ao Vivo - Reacoes', icon: Radio, members: 7820, lastMessage: 'GOOOOL DO MENGAO!', category: 'apostas' },
-  { id: '7', name: 'Over/Under Club', icon: TrendingUp, members: 1890, lastMessage: 'Over 2.5 sempre paga no Espanhol', category: 'apostas' },
-  { id: '8', name: 'Cantos & Cartoes', icon: CreditCard, members: 980, lastMessage: 'Over 9.5 cantos pagou bonito', category: 'apostas' },
-  { id: '9', name: 'Odds Absurdas', icon: Zap, members: 6540, lastMessage: 'Peguei odd 250.00 e deu GREEN', category: 'odds100' },
-  { id: '10', name: 'Loucuras > 100x', icon: Flame, members: 4320, lastMessage: 'Multipla de 12 jogos, odd 340', category: 'odds100' },
-  { id: '11', name: 'Gols a Qualquer Momento', icon: CircleDot, members: 3200, lastMessage: 'Haaland marca primeiro, confia', category: 'gols' },
-  { id: '12', name: 'Placar Exato', icon: Target, members: 1450, lastMessage: '2x1 no classico, ta pago', category: 'gols' },
-  { id: '13', name: 'Ambos Marcam', icon: Swords, members: 2100, lastMessage: 'BTTS no Liverpool x City easy', category: 'gols' },
-  { id: '14', name: 'Neymar Watch', icon: Star, members: 8900, lastMessage: 'Sera que joga hoje?', category: 'jogadores' },
-  { id: '15', name: 'Vini Jr. Fan Club', icon: Award, members: 7650, lastMessage: 'Melhor do mundo, sem duvidas', category: 'jogadores' },
-  { id: '16', name: 'Haaland Machine', icon: Zap, members: 5430, lastMessage: 'Mais um hat-trick vindo ai', category: 'jogadores' },
-  { id: '17', name: 'Mbappe Zone', icon: Flame, members: 6780, lastMessage: 'Odd de gol dele ta barata', category: 'jogadores' },
-  { id: '18', name: 'Messi GOAT', icon: Crown, members: 9100, lastMessage: 'Ultimo jogo da carreira?', category: 'jogadores' },
+const avatars = [
+  'https://i.pravatar.cc/80?img=1',
+  'https://i.pravatar.cc/80?img=2',
+  'https://i.pravatar.cc/80?img=3',
+  'https://i.pravatar.cc/80?img=4',
+  'https://i.pravatar.cc/80?img=5',
+  'https://i.pravatar.cc/80?img=6',
+  'https://i.pravatar.cc/80?img=7',
+  'https://i.pravatar.cc/80?img=8',
+  'https://i.pravatar.cc/80?img=9',
+  'https://i.pravatar.cc/80?img=10',
+  'https://i.pravatar.cc/80?img=11',
+  'https://i.pravatar.cc/80?img=12',
 ];
 
-const mockMessages: ChatMessage[] = [
-  { id: '1', user: 'Carlos M.', username: '@carlosm', level: 'VIP', text: 'Flamengo vai meter 3 hoje, confia!', time: '14:32', likes: 24, betInfo: { match: 'Flamengo x Palmeiras', market: 'Over 2.5', odd: 1.85 } },
-  { id: '2', user: 'Ana Paula', username: '@anapbet', level: 'Ouro', text: 'Alguem viu a odd do Palmeiras? Ta valendo demais', time: '14:33', likes: 12 },
-  { id: '3', user: 'Lucas R.', username: '@lucasr10', level: 'Prata', text: 'Peguei a multipla de 15.00 ontem e deu green!!', time: '14:35', likes: 45, isTip: true, betInfo: { match: 'Multipla 4 jogos', market: 'Combo', odd: 15.00, result: 'green' } },
-  { id: '4', user: 'Thiago F.', username: '@thifern', level: 'VIP', text: 'Over 2.5 no jogo do Real Madrid ta pagando 1.85, bora', time: '14:36', likes: 18, betInfo: { match: 'Real Madrid x Barcelona', market: 'Over 2.5', odd: 1.85 } },
-  { id: '5', user: 'Mariana S.', username: '@marisantos', level: 'Ouro', text: 'Essa odd turbinada do Corinthians ta um roubo, peguem!', time: '14:38', likes: 31 },
-  { id: '6', user: 'Pedro H.', username: '@pedroh99', level: 'Bronze', text: 'Primeira vez aqui, qual aposta voces recomendam pro iniciante?', time: '14:39', likes: 8 },
-  { id: '7', user: 'Rafael K.', username: '@rafaelk', level: 'VIP', text: 'Tip do dia: Ambos Marcam no Liverpool x Arsenal @ 1.72. Confiem no pai.', time: '14:41', likes: 67, isTip: true, betInfo: { match: 'Liverpool x Arsenal', market: 'Ambos Marcam', odd: 1.72 } },
-  { id: '8', user: 'Juliana C.', username: '@julibet', level: 'Ouro', text: 'Green de R$ 380 agora! Obrigada pela dica @rafaelk', time: '14:42', likes: 22, betInfo: { match: 'Liverpool x Arsenal', market: 'Ambos Marcam', odd: 1.72, result: 'green' } },
-  { id: '9', user: 'Diego S.', username: '@diegosil', level: 'VIP', text: 'Quem tiver coragem: multipla de odd 145.00, 6 jogos, all in', time: '14:44', likes: 89, isTip: true, betInfo: { match: '6 jogos', market: 'Multipla', odd: 145.00 } },
-  { id: '10', user: 'Fernanda L.', username: '@ferbet', level: 'Ouro', text: 'Vini Jr marca a qualquer momento @ 2.10, easy money', time: '14:45', likes: 34, betInfo: { match: 'Real Madrid x Barcelona', market: 'Vini Jr - Gol', odd: 2.10 } },
+const feedPosts: FeedPost[] = [
+  {
+    id: '1',
+    user: { name: 'Carlos Mendes', username: '@carlosm', avatar: avatars[0], level: 'VIP', verified: true },
+    timeAgo: '2 min',
+    text: 'Confia nessa, galera! Fla vai destruir hoje',
+    bet: { match: 'Flamengo x Palmeiras', league: 'Brasileirao Serie A', market: 'Resultado Final - Flamengo', odd: 2.10, stake: 50, result: 'pending' },
+    likes: 124, comments: 32, copies: 18,
+  },
+  {
+    id: '2',
+    user: { name: 'Neymar Jr', username: '@neymarjr', avatar: avatars[1], level: 'VIP', verified: true },
+    timeAgo: '15 min',
+    text: 'Bora Brasil! Sem medo',
+    bet: { match: 'Brasil x Franca', league: 'Amistoso Internacional', market: 'Resultado Final - Brasil', odd: 3.20, stake: 1000, result: 'pending' },
+    likes: 8943, comments: 1204, copies: 3421,
+  },
+  {
+    id: '3',
+    user: { name: 'Ana Paula', username: '@anapbet', avatar: avatars[2], level: 'Ouro', verified: false },
+    timeAgo: '28 min',
+    bet: { match: 'Real Madrid x Barcelona', league: 'La Liga', market: 'Ambos Marcam - Sim', odd: 1.72, stake: 30, result: 'green' },
+    likes: 89, comments: 14, copies: 45,
+  },
+  {
+    id: '4',
+    user: { name: 'Rafael Koch', username: '@rafaelk', avatar: avatars[3], level: 'VIP', verified: true },
+    timeAgo: '1h',
+    text: 'Tip do dia. Confiem no pai',
+    bet: { match: 'Liverpool x Arsenal', league: 'Premier League', market: 'Over 2.5 Gols', odd: 1.85, stake: 100, result: 'green' },
+    likes: 567, comments: 89, copies: 234,
+  },
+  {
+    id: '5',
+    user: { name: 'Thiago Fernandes', username: '@thifern', avatar: avatars[4], level: 'Prata', verified: false },
+    timeAgo: '1h',
+    bet: { match: 'Corinthians x Sao Paulo', league: 'Brasileirao Serie A', market: 'Empate', odd: 3.40, stake: 20, result: 'red' },
+    likes: 12, comments: 8, copies: 2,
+  },
+  {
+    id: '6',
+    user: { name: 'Ronaldo Fenomeno', username: '@ronaldo', avatar: avatars[5], level: 'VIP', verified: true },
+    timeAgo: '2h',
+    text: 'Multipla insana, quem tem coragem?',
+    bet: { match: 'Multipla 5 jogos', league: 'Varias ligas', market: 'Combo especial', odd: 145.00, stake: 10, result: 'pending' },
+    likes: 4521, comments: 890, copies: 1567,
+  },
+  {
+    id: '7',
+    user: { name: 'Juliana Costa', username: '@julibet', avatar: avatars[6], level: 'Ouro', verified: false },
+    timeAgo: '2h',
+    text: 'GREEN! Obrigada @rafaelk pela dica',
+    bet: { match: 'Manchester City x Chelsea', league: 'Premier League', market: 'Vit. Man City + Over 1.5', odd: 2.45, stake: 40, result: 'green' },
+    likes: 234, comments: 45, copies: 67,
+  },
+  {
+    id: '8',
+    user: { name: 'Diego Silva', username: '@diegosil', avatar: avatars[7], level: 'VIP', verified: true },
+    timeAgo: '3h',
+    bet: { match: 'Boca Juniors x River Plate', league: 'Libertadores', market: 'Ambos Marcam + Over 2.5', odd: 3.80, stake: 25, result: 'pending' },
+    likes: 345, comments: 56, copies: 89,
+  },
+  {
+    id: '9',
+    user: { name: 'Fernanda Lima', username: '@ferbet', avatar: avatars[8], level: 'Ouro', verified: false },
+    timeAgo: '4h',
+    text: 'Vini Jr vai marcar, pode printar',
+    bet: { match: 'Real Madrid x Barcelona', league: 'La Liga', market: 'Vini Jr - Marca a qualquer momento', odd: 2.10, stake: 50, result: 'green' },
+    likes: 456, comments: 78, copies: 123,
+  },
+  {
+    id: '10',
+    user: { name: 'Pedro Henrique', username: '@pedroh99', avatar: avatars[9], level: 'Bronze', verified: false },
+    timeAgo: '5h',
+    bet: { match: 'Gremio x Internacional', league: 'Brasileirao Serie A', market: 'Resultado Final - Gremio', odd: 2.30, stake: 15, result: 'red' },
+    likes: 18, comments: 5, copies: 1,
+  },
+  {
+    id: '11',
+    user: { name: 'Casimiro', username: '@casimiro', avatar: avatars[10], level: 'VIP', verified: true },
+    timeAgo: '6h',
+    text: 'METEU ESSA? Odd absurda pagou!',
+    bet: { match: 'Multipla 8 jogos', league: 'Varias ligas', market: 'Super Combo', odd: 320.00, stake: 5, result: 'green' },
+    likes: 12400, comments: 3200, copies: 5600,
+  },
+  {
+    id: '12',
+    user: { name: 'Mariana Santos', username: '@marisantos', avatar: avatars[11], level: 'Ouro', verified: false },
+    timeAgo: '7h',
+    bet: { match: 'Bayern x Dortmund', league: 'Bundesliga', market: 'Over 3.5 Gols', odd: 2.00, stake: 35, result: 'green' },
+    likes: 156, comments: 23, copies: 45,
+  },
 ];
 
 const onlineUsers = 12847;
 
-const getLevelColor = (level: string) => {
+const getLevelStyle = (level: string) => {
   switch (level) {
     case 'VIP': return 'text-primary bg-primary/20';
     case 'Ouro': return 'text-primary bg-primary/10';
@@ -87,166 +167,200 @@ const getLevelColor = (level: string) => {
   }
 };
 
+const formatNumber = (n: number) => {
+  if (n >= 1000) return `${(n / 1000).toFixed(1)}k`;
+  return n.toString();
+};
+
 const ChatPage = () => {
   const { isLoggedIn } = useAuthStore();
   const navigate = useNavigate();
-  const [message, setMessage] = useState('');
-  const [messages, setMessages] = useState(mockMessages);
   const [activeTab, setActiveTab] = useState<Tab>('popular');
-  const [activeRoom, setActiveRoom] = useState<string | null>(null);
+  const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
+  const [savedPosts, setSavedPosts] = useState<Set<string>>(new Set());
   const [createName, setCreateName] = useState('');
-  const bottomRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (activeRoom) bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, activeRoom]);
-
-  const sendMessage = () => {
-    if (!message.trim()) return;
-    if (!isLoggedIn) { navigate('/auth'); return; }
-    const newMsg: ChatMessage = {
-      id: Date.now().toString(),
-      user: 'Voce',
-      username: '@voce',
-      level: 'Bronze',
-      text: message,
-      time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
-      likes: 0,
-    };
-    setMessages([...messages, newMsg]);
-    setMessage('');
+  const toggleLike = (postId: string) => {
+    setLikedPosts(prev => {
+      const next = new Set(prev);
+      if (next.has(postId)) next.delete(postId); else next.add(postId);
+      return next;
+    });
   };
 
-  const filteredRooms = activeTab === 'popular'
-    ? rooms.filter(r => r.category === 'popular')
-    : activeTab === 'apostas'
-    ? rooms.filter(r => r.category === 'apostas')
-    : activeTab === 'odds100'
-    ? rooms.filter(r => r.category === 'odds100')
-    : activeTab === 'gols'
-    ? rooms.filter(r => r.category === 'gols')
-    : activeTab === 'jogadores'
-    ? rooms.filter(r => r.category === 'jogadores')
-    : activeTab === 'recentes'
-    ? rooms.slice(0, 6)
-    : [];
+  const toggleSave = (postId: string) => {
+    setSavedPosts(prev => {
+      const next = new Set(prev);
+      if (next.has(postId)) next.delete(postId); else next.add(postId);
+      return next;
+    });
+  };
 
-  const selectedRoom = rooms.find(r => r.id === activeRoom);
+  const getFilteredPosts = () => {
+    switch (activeTab) {
+      case 'popular': return feedPosts.sort((a, b) => b.likes - a.likes);
+      case 'apostas': return feedPosts.filter(p => p.bet.result === 'pending');
+      case 'recentes': return [...feedPosts].reverse();
+      case 'odds100': return feedPosts.filter(p => p.bet.odd >= 100);
+      case 'gols': return feedPosts.filter(p => p.bet.market.toLowerCase().includes('gol') || p.bet.market.toLowerCase().includes('marca') || p.bet.market.toLowerCase().includes('over'));
+      case 'jogadores': return feedPosts.filter(p => p.bet.market.includes('Vini') || p.bet.market.includes('Jr') || p.user.verified);
+      default: return feedPosts;
+    }
+  };
 
-  // Room chat view
-  if (activeRoom && selectedRoom) {
-    const RoomIcon = selectedRoom.icon;
+  const ResultBadge = ({ result }: { result?: 'green' | 'red' | 'pending' }) => {
+    if (!result) return null;
+    if (result === 'green') return (
+      <span className="flex items-center gap-1 text-[0.6rem] font-display font-bold text-secondary bg-secondary/15 px-2 py-0.5 rounded-full">
+        <CheckCircle2 size={10} /> GREEN
+      </span>
+    );
+    if (result === 'red') return (
+      <span className="flex items-center gap-1 text-[0.6rem] font-display font-bold text-destructive bg-destructive/15 px-2 py-0.5 rounded-full">
+        RED
+      </span>
+    );
     return (
-      <div className="flex flex-col h-[calc(100vh-8rem)] pb-16 pt-16">
-        <div className="px-4 py-3 bg-surface-section flex items-center gap-3">
-          <button onClick={() => setActiveRoom(null)} className="text-muted-foreground hover:text-foreground min-w-[44px] min-h-[44px] flex items-center justify-center">
-            <span className="text-lg">&larr;</span>
-          </button>
-          <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-            <RoomIcon size={16} className="text-primary" />
+      <span className="flex items-center gap-1 text-[0.6rem] font-display font-bold text-primary bg-primary/15 px-2 py-0.5 rounded-full">
+        <Clock size={10} /> AO VIVO
+      </span>
+    );
+  };
+
+  const PostCard = ({ post }: { post: FeedPost }) => {
+    const isLiked = likedPosts.has(post.id);
+    const isSaved = savedPosts.has(post.id);
+
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-surface-card rounded-xl overflow-hidden"
+      >
+        {/* User header */}
+        <div className="flex items-center gap-3 p-3 pb-2">
+          <div className="relative">
+            <img
+              src={post.user.avatar}
+              alt={post.user.name}
+              className="w-10 h-10 rounded-full object-cover"
+            />
+            {post.user.level === 'VIP' && (
+              <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-primary flex items-center justify-center">
+                <Crown size={8} className="text-primary-foreground" />
+              </div>
+            )}
           </div>
-          <div className="flex-1">
-            <p className="text-sm font-display font-bold">{selectedRoom.name}</p>
+          <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse" />
-              <span className="text-[0.6rem] font-body text-muted-foreground">{selectedRoom.members.toLocaleString('pt-BR')} membros</span>
+              <span className="text-sm font-display font-bold text-foreground truncate">{post.user.name}</span>
+              {post.user.verified && (
+                <CheckCircle2 size={14} className="text-primary flex-shrink-0" fill="currentColor" strokeWidth={0} />
+              )}
+              <span className={`text-[0.5rem] font-display font-bold px-1.5 py-0.5 rounded-full flex-shrink-0 ${getLevelStyle(post.user.level)}`}>
+                {post.user.level}
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="text-[0.65rem] font-body text-muted-foreground">{post.user.username}</span>
+              <span className="text-[0.5rem] text-muted-foreground/50">-</span>
+              <span className="text-[0.65rem] font-body text-muted-foreground">{post.timeAgo}</span>
             </div>
           </div>
-          <Users size={18} className="text-muted-foreground" />
+          <ResultBadge result={post.bet.result} />
         </div>
 
-        <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2">
-          {messages.map((msg) => (
-            <motion.div
-              key={msg.id}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              className={`rounded-xl p-3 space-y-1.5 ${msg.isTip ? 'bg-accent' : 'bg-surface-card'}`}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-full bg-surface-interactive flex items-center justify-center">
-                    <span className="text-xs font-display font-bold">{msg.user[0]}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-sm font-body font-semibold">{msg.user}</span>
-                    <span className={`text-[0.55rem] font-display font-bold px-1.5 py-0.5 rounded-full ${getLevelColor(msg.level)}`}>
-                      {msg.level === 'VIP' && <Crown size={8} className="inline mr-0.5" />}
-                      {msg.level}
-                    </span>
-                  </div>
-                </div>
-                <span className="text-[0.6rem] text-muted-foreground font-body">{msg.time}</span>
+        {/* Text */}
+        {post.text && (
+          <p className="px-3 pb-2 text-sm font-body text-foreground/90">{post.text}</p>
+        )}
+
+        {/* Bet card */}
+        <div className="mx-3 mb-3 rounded-xl bg-surface-section p-3 space-y-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded bg-primary/15 flex items-center justify-center">
+                <TrendingUp size={14} className="text-primary" />
               </div>
-              <p className="text-sm font-body text-foreground/90 pl-9">{msg.text}</p>
-              {msg.betInfo && (
-                <div className={`ml-9 rounded-lg p-2 text-xs font-body ${
-                  msg.betInfo.result === 'green' ? 'bg-secondary/15' : msg.betInfo.result === 'red' ? 'bg-destructive/15' : 'bg-surface-interactive'
-                }`}>
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">{msg.betInfo.match}</span>
-                    <span className={`font-display font-bold ${
-                      msg.betInfo.odd >= 100 ? 'text-primary' : msg.betInfo.result === 'green' ? 'text-secondary' : 'text-foreground'
-                    }`}>
-                      @{msg.betInfo.odd.toFixed(2)}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1 mt-0.5">
-                    <span className="text-foreground/70">{msg.betInfo.market}</span>
-                    {msg.betInfo.result === 'green' && <span className="text-secondary font-bold ml-auto">GREEN</span>}
-                    {msg.betInfo.result === 'red' && <span className="text-destructive font-bold ml-auto">RED</span>}
-                  </div>
+              <div>
+                <p className="text-[0.65rem] font-body text-muted-foreground uppercase tracking-wide">{post.bet.league}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-1">
+            <p className="text-sm font-display font-bold text-foreground">{post.bet.match}</p>
+            <p className="text-xs font-body text-foreground/70">{post.bet.market}</p>
+          </div>
+
+          <div className="flex items-center justify-between pt-1">
+            <div className="flex items-center gap-3">
+              <div className="bg-primary/20 rounded-lg px-3 py-1.5">
+                <span className="text-xs font-body text-muted-foreground">Odd</span>
+                <p className={`text-sm font-display font-extrabold ${post.bet.odd >= 100 ? 'text-primary' : 'text-foreground'}`}>
+                  {post.bet.odd.toFixed(2)}
+                </p>
+              </div>
+              {post.bet.stake && (
+                <div>
+                  <span className="text-xs font-body text-muted-foreground">Aposta</span>
+                  <p className="text-sm font-display font-bold text-foreground">R$ {post.bet.stake}</p>
                 </div>
               )}
-              <div className="flex items-center gap-3 pl-9">
-                <button className="flex items-center gap-1 text-muted-foreground hover:text-primary transition-colors min-h-[32px]">
-                  <ThumbsUp size={12} />
-                  <span className="text-[0.6rem] font-body">{msg.likes}</span>
-                </button>
-                {msg.isTip && (
-                  <div className="flex items-center gap-1 text-primary">
-                    <TrendingUp size={12} />
-                    <span className="text-[0.6rem] font-display font-bold">Super Dica</span>
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          ))}
-          <div ref={bottomRef} />
-        </div>
-
-        <div className="px-4 py-3">
-          {!isLoggedIn ? (
-            <button onClick={() => navigate('/auth')}
-              className="w-full bg-surface-card rounded-xl py-3.5 text-sm font-body text-muted-foreground text-center min-h-[44px]">
-              Faca login para participar
-            </button>
-          ) : (
-            <div className="flex gap-2">
-              <input
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
-                placeholder="Manda a visao..."
-                className="flex-1 bg-surface-card rounded-xl py-3 px-4 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]"
-              />
-              <motion.button
-                whileTap={{ scale: 0.95 }}
-                onClick={sendMessage}
-                className="bg-primary text-primary-foreground w-12 h-12 rounded-xl flex items-center justify-center min-w-[44px] min-h-[44px]"
-              >
-                <Send size={18} />
-              </motion.button>
+              {post.bet.stake && (
+                <div>
+                  <span className="text-xs font-body text-muted-foreground">Retorno</span>
+                  <p className="text-sm font-display font-bold text-secondary">R$ {(post.bet.stake * post.bet.odd).toFixed(2)}</p>
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
-      </div>
-    );
-  }
 
-  // Main view
+        {/* Actions */}
+        <div className="flex items-center justify-between px-3 pb-3">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => toggleLike(post.id)}
+              className="flex items-center gap-1.5 min-h-[36px] transition-colors"
+            >
+              <ThumbsUp size={16} className={isLiked ? 'text-primary fill-primary' : 'text-muted-foreground'} />
+              <span className={`text-xs font-body ${isLiked ? 'text-primary' : 'text-muted-foreground'}`}>
+                {formatNumber(post.likes + (isLiked ? 1 : 0))}
+              </span>
+            </button>
+            <button className="flex items-center gap-1.5 min-h-[36px] text-muted-foreground hover:text-foreground transition-colors">
+              <MessageSquare size={16} />
+              <span className="text-xs font-body">{formatNumber(post.comments)}</span>
+            </button>
+            <button className="flex items-center gap-1.5 min-h-[36px] text-muted-foreground hover:text-foreground transition-colors">
+              <Share2 size={16} />
+            </button>
+          </div>
+          <div className="flex items-center gap-2">
+            <motion.button
+              whileTap={{ scale: 0.9 }}
+              onClick={() => toggleSave(post.id)}
+              className="min-h-[36px] min-w-[36px] flex items-center justify-center"
+            >
+              <Bookmark size={16} className={isSaved ? 'text-primary fill-primary' : 'text-muted-foreground'} />
+            </motion.button>
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              className="flex items-center gap-1.5 bg-primary/15 text-primary px-3 py-1.5 rounded-lg text-xs font-display font-bold min-h-[36px] hover:bg-primary/25 transition-colors"
+            >
+              <Copy size={14} />
+              Copiar Bilhete
+            </motion.button>
+          </div>
+        </div>
+      </motion.div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-background pb-24 pt-16 overflow-y-auto">
+      {/* Header */}
       <div className="px-4 pt-3 pb-2 space-y-3">
         <div className="flex items-center justify-between">
           <h1 className="font-display text-xl font-extrabold flex items-center gap-2">
@@ -260,7 +374,7 @@ const ChatPage = () => {
           </div>
         </div>
 
-        {/* Tabs - horizontal scroll */}
+        {/* Tabs */}
         <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-4 px-4" style={{ WebkitOverflowScrolling: 'touch' }}>
           {tabsList.map((t) => {
             const Icon = t.icon;
@@ -284,23 +398,24 @@ const ChatPage = () => {
 
       <div className="px-4 mt-2">
         <AnimatePresence mode="wait">
+          {/* CRIAR TAB */}
           {activeTab === 'criar' && (
             <motion.div key="criar" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
               <div className="bg-surface-card rounded-xl p-4 space-y-3">
                 <h3 className="font-display font-bold text-sm flex items-center gap-2">
                   <Plus size={16} className="text-primary" />
-                  Criar Sala
+                  Criar Publicacao
                 </h3>
                 <input
                   value={createName}
                   onChange={(e) => setCreateName(e.target.value)}
-                  placeholder="Nome da sala..."
+                  placeholder="O que voce esta apostando?"
                   className="w-full bg-surface-interactive rounded-xl py-3 px-4 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]"
                 />
                 <div className="space-y-2">
-                  <p className="text-xs font-body text-muted-foreground">Categoria</p>
+                  <p className="text-xs font-body text-muted-foreground">Tipo</p>
                   <div className="flex flex-wrap gap-1.5">
-                    {['Futebol', 'Basquete', 'Tenis', 'E-Sports', 'Multiplas', 'Jogadores', 'Outros'].map(cat => (
+                    {['Simples', 'Multipla', 'Tip', 'Analise', 'Resultado'].map(cat => (
                       <button key={cat} className="px-3 py-1.5 bg-surface-interactive rounded-full text-xs font-body text-foreground/70 hover:bg-primary hover:text-primary-foreground transition-colors min-h-[32px]">
                         {cat}
                       </button>
@@ -312,35 +427,17 @@ const ChatPage = () => {
                   onClick={() => { if (!isLoggedIn) navigate('/auth'); }}
                   className="w-full bg-primary text-primary-foreground font-display font-bold text-sm py-3 rounded-xl min-h-[44px]"
                 >
-                  Criar Sala
+                  Publicar
                 </motion.button>
-              </div>
-
-              <div className="space-y-2">
-                <p className="text-xs font-body text-muted-foreground font-semibold uppercase tracking-wider">Salas criadas recentemente</p>
-                {rooms.slice(0, 3).map(room => {
-                  const RIcon = room.icon;
-                  return (
-                    <button key={room.id} onClick={() => setActiveRoom(room.id)}
-                      className="w-full flex items-center gap-3 bg-surface-card rounded-xl p-3 min-h-[44px]">
-                      <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                        <RIcon size={16} className="text-primary" />
-                      </div>
-                      <div className="flex-1 text-left">
-                        <p className="text-sm font-display font-bold">{room.name}</p>
-                        <p className="text-[0.6rem] font-body text-muted-foreground">{room.members} membros</p>
-                      </div>
-                    </button>
-                  );
-                })}
               </div>
             </motion.div>
           )}
 
+          {/* FEED */}
           {activeTab !== 'criar' && (
-            <motion.div key={activeTab} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-2">
+            <motion.div key={activeTab} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-3">
               {activeTab === 'odds100' && (
-                <div className="bg-gradient-to-r from-primary/20 to-primary/5 rounded-xl p-4 mb-3">
+                <div className="bg-gradient-to-r from-primary/20 to-primary/5 rounded-xl p-4 mb-1">
                   <div className="flex items-center gap-2 mb-1">
                     <Zap size={18} className="text-primary" />
                     <span className="font-display font-extrabold text-sm text-primary">ODDS INSANAS</span>
@@ -349,52 +446,9 @@ const ChatPage = () => {
                 </div>
               )}
 
-              {activeTab === 'gols' && (
-                <div className="bg-gradient-to-r from-secondary/20 to-secondary/5 rounded-xl p-4 mb-3">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Target size={18} className="text-secondary" />
-                    <span className="font-display font-extrabold text-sm text-secondary">MERCADO DE GOLS</span>
-                  </div>
-                  <p className="text-xs font-body text-foreground/70">Gols, placares, artilheiros e tudo sobre bola na rede</p>
-                </div>
-              )}
-
-              {activeTab === 'jogadores' && (
-                <div className="bg-gradient-to-r from-accent to-accent/50 rounded-xl p-4 mb-3">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Star size={18} className="text-primary" />
-                    <span className="font-display font-extrabold text-sm text-primary">CRAQUES</span>
-                  </div>
-                  <p className="text-xs font-body text-foreground/70">Discussoes e apostas focadas nos maiores jogadores do mundo</p>
-                </div>
-              )}
-
-              {filteredRooms.map((room) => {
-                const RIcon = room.icon;
-                return (
-                  <motion.button
-                    key={room.id}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => setActiveRoom(room.id)}
-                    className="w-full flex items-center gap-3 bg-surface-card rounded-xl p-3.5 min-h-[44px] hover:bg-surface-interactive transition-colors"
-                  >
-                    <div className="w-9 h-9 rounded-full bg-primary/15 flex items-center justify-center flex-shrink-0">
-                      <RIcon size={18} className="text-primary" />
-                    </div>
-                    <div className="flex-1 text-left min-w-0">
-                      <p className="text-sm font-display font-bold text-foreground truncate">{room.name}</p>
-                      <p className="text-[0.6rem] font-body text-muted-foreground mt-0.5 line-clamp-1">{room.lastMessage}</p>
-                    </div>
-                    <div className="text-right flex-shrink-0">
-                      <div className="flex items-center gap-1 text-muted-foreground">
-                        <Users size={12} />
-                        <span className="text-[0.6rem] font-body">{room.members.toLocaleString('pt-BR')}</span>
-                      </div>
-                      <span className="w-2 h-2 rounded-full bg-secondary inline-block mt-1" />
-                    </div>
-                  </motion.button>
-                );
-              })}
+              {getFilteredPosts().map((post) => (
+                <PostCard key={post.id} post={post} />
+              ))}
             </motion.div>
           )}
         </AnimatePresence>
