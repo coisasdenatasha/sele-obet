@@ -1,4 +1,5 @@
-import { Home, Zap, Trophy, Receipt, User } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Home, Zap, Search, Receipt, User } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useBetSlipStore } from '@/store/betSlipStore';
 import { cn } from '@/lib/utils';
@@ -10,7 +11,7 @@ interface BottomNavProps {
 const tabs = [
   { id: '/', icon: Home, label: 'Home' },
   { id: '/ao-vivo', icon: Zap, label: 'Ao Vivo' },
-  { id: '/esportes', icon: Trophy, label: 'Esportes' },
+  { id: '/busca', icon: Search, label: 'Busca' },
   { id: 'betslip', icon: Receipt, label: 'Bilhete' },
   { id: '/perfil', icon: User, label: 'Perfil' },
 ];
@@ -29,32 +30,48 @@ const BottomNav = ({ onBetSlipToggle }: BottomNavProps) => {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-30 bg-accent border-t border-foreground/10 lg:hidden safe-area-bottom">
+    <motion.nav
+      initial={{ y: 80 }}
+      animate={{ y: 0 }}
+      transition={{ type: 'spring', damping: 20, stiffness: 300, delay: 0.3 }}
+      className="fixed bottom-0 left-0 right-0 z-30 glass lg:hidden safe-area-bottom"
+    >
       <div className="flex items-center justify-around h-16">
         {tabs.map((tab) => {
           const isActive = tab.id !== 'betslip' && location.pathname === tab.id;
           const Icon = tab.icon;
           return (
-            <button
+            <motion.button
               key={tab.id}
               onClick={() => handleTap(tab.id)}
+              whileTap={{ scale: 0.85 }}
               className={cn(
                 "flex flex-col items-center justify-center gap-0.5 min-w-[44px] min-h-[44px] transition-colors relative",
                 isActive ? "text-primary" : "text-muted-foreground"
               )}
             >
-              <Icon size={22} />
+              <motion.div
+                animate={isActive ? { y: -2 } : { y: 0 }}
+                transition={{ type: 'spring', stiffness: 400 }}
+              >
+                <Icon size={22} />
+              </motion.div>
               <span className="text-[0.6rem] font-body font-medium">{tab.label}</span>
               {tab.id === 'betslip' && betCount > 0 && (
-                <span className="absolute top-0.5 right-0.5 bg-primary text-primary-foreground text-[0.55rem] font-display font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                <motion.span
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: 'spring', stiffness: 500 }}
+                  className="absolute top-0.5 right-0.5 bg-primary text-primary-foreground text-[0.55rem] font-display font-bold w-4 h-4 rounded-full flex items-center justify-center"
+                >
                   {betCount}
-                </span>
+                </motion.span>
               )}
-            </button>
+            </motion.button>
           );
         })}
       </div>
-    </nav>
+    </motion.nav>
   );
 };
 
