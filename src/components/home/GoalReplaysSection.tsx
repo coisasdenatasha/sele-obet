@@ -109,27 +109,34 @@ const GoalReplaysSection = () => {
       <section className="px-4">
         <motion.div
           className="flex items-center justify-between mb-3"
-          initial={{ opacity: 0, x: -12 }}
+          initial={{ opacity: 0, x: -20 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
+          transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
         >
           <div>
             <h2 className="font-display text-lg font-bold flex items-center gap-2">
-              <Play size={20} className="text-secondary" fill="currentColor" />
+              <motion.span
+                animate={{ scale: [1, 1.2, 1] }}
+                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+              >
+                <Play size={20} className="text-secondary" fill="currentColor" />
+              </motion.span>
               Replays - Eliminatórias
             </h2>
             <p className="text-[0.55rem] font-body text-muted-foreground mt-0.5">
               Copa do Mundo FIFA 26 · CAF
             </p>
           </div>
-          <a
+          <motion.a
             href="https://www.plus.fifa.com/pt/showcase/caf-jogos-completo/0d22d573-83e7-413c-bb8a-05d8283ae491?gl=br"
             target="_blank"
             rel="noopener noreferrer"
+            whileHover={{ x: 3 }}
             className="text-xs text-primary font-body font-semibold flex items-center gap-0.5 min-h-[44px]"
           >
             FIFA+ <ExternalLink size={12} />
-          </a>
+          </motion.a>
         </motion.div>
 
         <div ref={scrollRef} className="flex gap-3 overflow-x-auto no-scrollbar -mx-4 px-4 pb-1">
@@ -139,31 +146,45 @@ const GoalReplaysSection = () => {
               href={r.url}
               target="_blank"
               rel="noopener noreferrer"
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, y: 24, scale: 0.95 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.04 }}
-              className="flex-shrink-0 w-[240px] bg-surface-card rounded-xl overflow-hidden text-left group"
+              transition={{ delay: i * 0.06, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+              whileHover={{ y: -4, transition: { duration: 0.2 } }}
+              className="flex-shrink-0 w-[240px] bg-surface-card rounded-xl overflow-hidden text-left group card-shine"
             >
-              <div className="relative h-[135px]">
-                <img
+              <div className="relative h-[135px] overflow-hidden">
+                <motion.img
                   src={r.image}
                   alt={r.match}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="w-full h-full object-cover"
                   loading="lazy"
+                  whileHover={{ scale: 1.08 }}
+                  transition={{ duration: 0.4 }}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-12 h-12 rounded-full bg-foreground/20 backdrop-blur-sm flex items-center justify-center group-hover:bg-primary/80 transition-colors">
+                  <motion.div
+                    className="w-12 h-12 rounded-full bg-foreground/20 backdrop-blur-sm flex items-center justify-center group-hover:bg-primary/80 transition-colors"
+                    whileHover={{ scale: 1.15 }}
+                    animate={{ boxShadow: ['0 0 0px hsl(var(--primary) / 0)', '0 0 20px hsl(var(--primary) / 0.4)', '0 0 0px hsl(var(--primary) / 0)'] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
                     <Play size={20} className="text-foreground" fill="currentColor" />
-                  </div>
+                  </motion.div>
                 </div>
-                <span className="absolute top-2 left-2 bg-destructive text-destructive-foreground text-[0.5rem] font-display font-bold px-1.5 py-0.5 rounded">
+                <motion.span
+                  initial={{ x: -20, opacity: 0 }}
+                  whileInView={{ x: 0, opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.06 + 0.3 }}
+                  className="absolute top-2 left-2 bg-destructive text-destructive-foreground text-[0.5rem] font-display font-bold px-1.5 py-0.5 rounded"
+                >
                   REPLAY
-                </span>
+                </motion.span>
               </div>
               <div className="p-3">
-                <p className="font-display text-sm font-bold group-hover:text-primary transition-colors">{r.match}</p>
+                <p className="font-display text-sm font-bold group-hover:text-primary transition-colors duration-200">{r.match}</p>
                 <p className="text-[0.6rem] font-body text-muted-foreground mt-0.5">{r.phase} · Eliminatórias CAF</p>
               </div>
             </motion.a>
