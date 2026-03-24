@@ -4,7 +4,7 @@ import {
   ChevronRight, ChevronDown, X, Flame, Trophy,
   CircleDot, Dribbble, CircleEllipsis, Gamepad2, Activity,
   Crosshair, Sword, TableProperties, Joystick, Snowflake,
-  Swords, BoxSelect, Hand, Oval, Footprints, Football,
+  Swords, BoxSelect, Hand, Circle, Footprints, Hexagon,
   Diamond, Target, Disc, Bike, Car, Waves, PersonStanding,
   Wind, Gem, Glasses, Zap, Globe, type LucideIcon
 } from 'lucide-react';
