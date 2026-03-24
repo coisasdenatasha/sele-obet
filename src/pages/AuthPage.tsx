@@ -81,6 +81,8 @@ const AuthPage = () => {
   const [notExcluded, setNotExcluded] = useState(false);
   const [acceptRegulation, setAcceptRegulation] = useState(false);
   const [promoCode, setPromoCode] = useState('');
+  const [signupStep, setSignupStep] = useState(1);
+  const totalSignupSteps = 4;
 
   // Login form
   const [loginEmail, setLoginEmail] = useState('');
