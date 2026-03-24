@@ -222,7 +222,7 @@ export const heroBanners = [
   },
   {
     id: 'banner-5',
-    title: 'Brasil vs França',
+    title: 'Brasil vs Marrocos',
     subtitle: 'Quinta-feira - Clássico mundial com odds especiais',
     cta: 'Apostar Agora',
     accent: 'Brasil',
