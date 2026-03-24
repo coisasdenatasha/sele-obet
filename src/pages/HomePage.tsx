@@ -333,7 +333,7 @@ const HomePage = () => {
 
       <SectionReveal delay={0.15}>
       <section className="px-4">
-        <SectionTitle icon={<Trophy size={20} className="text-primary" />} action="Ver Mais">
+        <SectionTitle icon={<Trophy size={20} className="text-primary" />} action="Ver Mais" actionRoute="/esportes">
           Múltiplas Populares
         </SectionTitle>
         <div className="space-y-3">
