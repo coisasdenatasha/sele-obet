@@ -78,6 +78,9 @@ const AuthPage = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [over18, setOver18] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
+  const [notExcluded, setNotExcluded] = useState(false);
+  const [acceptRegulation, setAcceptRegulation] = useState(false);
+  const [promoCode, setPromoCode] = useState('');
 
   // Login form
   const [loginEmail, setLoginEmail] = useState('');
