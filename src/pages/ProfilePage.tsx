@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   User, TrendingUp, History, Shield, Settings, LogOut, ChevronRight,
   Award, Trophy, CreditCard, Star, UserPlus, LogIn, Pencil, Check, X,
-  Mail, Phone, MapPin, Calendar, FileText, Camera
+  Mail, Phone, MapPin, Calendar, FileText, Camera, Image, Loader2
 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { motion, AnimatePresence } from 'framer-motion';
