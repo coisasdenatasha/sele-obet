@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ChevronRight, ChevronDown, X, Flame, Trophy,
@@ -9,6 +9,7 @@ import {
   Wind, Gem, Glasses, Zap, Globe, type LucideIcon
 } from 'lucide-react';
 import { useBetSlipStore } from '@/store/betSlipStore';
+import { supabase } from '@/integrations/supabase/client';
 
 // Sport list with Lucide icons
 const sportsList: { id: string; label: string; icon: LucideIcon }[] = [
@@ -192,14 +193,111 @@ const competitionsList = [
 
 type Tab = 'social' | 'calendario' | 'competicoes';
 
+type SocialBetCard = {
+  id: string;
+  userName: string;
+  username: string;
+  level: string;
+  avatarUrl: string | null;
+  timeAgo: string;
+  message: string | null;
+  match: string;
+  market: string;
+  selection: string;
+  odds: number;
+  stake: number;
+  potentialReturn: number;
+  status: string;
+};
+
+const formatTimeAgo = (dateISO: string) => {
+  const minutes = Math.max(1, Math.floor((Date.now() - new Date(dateISO).getTime()) / 60000));
+  if (minutes < 60) return `${minutes} min`;
+  if (minutes < 1440) return `${Math.floor(minutes / 60)}h`;
+  return `${Math.floor(minutes / 1440)}d`;
+};
+
 const EsportesPage = () => {
   const [selectedSport, setSelectedSport] = useState(sportsList[0]);
   const [sportPickerOpen, setSportPickerOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>('calendario');
   const [selectedDay, setSelectedDay] = useState(calendarDays[0].key);
+  const [socialBets, setSocialBets] = useState<SocialBetCard[]>([]);
+  const [socialLoading, setSocialLoading] = useState(false);
   const addBet = useBetSlipStore((s) => s.addBet);
 
   const events = popularEvents[selectedSport.id] || [];
+
+  useEffect(() => {
+    if (activeTab !== 'social') return;
+
+    let isMounted = true;
+
+    const fetchSocialBets = async () => {
+      setSocialLoading(true);
+
+      try {
+        const { data: bets, error: betsError } = await supabase
+          .from('bets')
+          .select('id, user_id, created_at, selections, total_odds, stake, potential_return, status, shared_text')
+          .eq('shared', true)
+          .order('created_at', { ascending: false })
+          .limit(30);
+
+        if (betsError) throw betsError;
+
+        if (!bets || bets.length === 0) {
+          if (isMounted) setSocialBets([]);
+          return;
+        }
+
+        const userIds = [...new Set(bets.map((bet) => bet.user_id))];
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('user_id, full_name, username, avatar_url, level')
+          .in('user_id', userIds);
+
+        const profileByUserId = new Map((profiles || []).map((profile) => [profile.user_id, profile]));
+
+        const mappedBets: SocialBetCard[] = bets.map((bet, index) => {
+          const profile = profileByUserId.get(bet.user_id);
+          const selections = Array.isArray(bet.selections) ? bet.selections : [];
+          const firstSelection = (selections[0] as Record<string, unknown> | undefined) || undefined;
+          const username = profile?.username || `user${index + 1}`;
+
+          return {
+            id: bet.id,
+            userName: profile?.full_name || profile?.username || 'Apostador',
+            username: `@${username}`,
+            level: profile?.level || 'Bronze',
+            avatarUrl: profile?.avatar_url,
+            timeAgo: formatTimeAgo(bet.created_at),
+            message: bet.shared_text,
+            match: (firstSelection?.match as string) || 'Aposta múltipla',
+            market: (firstSelection?.market as string) || 'Mercado esportivo',
+            selection: (firstSelection?.selection as string) || 'Seleção',
+            odds: Number(bet.total_odds) || 1,
+            stake: Number(bet.stake) || 0,
+            potentialReturn: Number(bet.potential_return) || 0,
+            status: bet.status,
+          };
+        });
+
+        if (isMounted) setSocialBets(mappedBets);
+      } catch (error) {
+        console.error('Erro ao carregar apostas do social:', error);
+        if (isMounted) setSocialBets([]);
+      } finally {
+        if (isMounted) setSocialLoading(false);
+      }
+    };
+
+    fetchSocialBets();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [activeTab]);
 
   const tabList: { id: Tab; label: string }[] = [
     { id: 'social', label: 'Social' },
@@ -424,10 +522,103 @@ const EsportesPage = () => {
 
         {/* SOCIAL TAB */}
         {activeTab === 'social' && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center justify-center py-16 text-center">
-            <Trophy size={48} className="text-muted-foreground/30 mb-4" />
-            <p className="font-display text-lg font-bold text-foreground">Social</p>
-            <p className="text-sm font-body text-muted-foreground mt-1">Em breve: veja apostas de outros usuários</p>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-3 mt-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Trophy size={18} className="text-primary" />
+                <p className="font-display text-sm font-extrabold uppercase text-foreground">Apostas da Comunidade</p>
+              </div>
+              <p className="text-[0.65rem] font-body text-muted-foreground">{socialBets.length} compartilhadas</p>
+            </div>
+
+            {socialLoading && (
+              <div className="space-y-2">
+                {Array.from({ length: 3 }).map((_, index) => (
+                  <div key={index} className="h-32 rounded-xl bg-surface-card animate-pulse" />
+                ))}
+              </div>
+            )}
+
+            {!socialLoading && socialBets.length === 0 && (
+              <div className="bg-surface-card rounded-xl p-5 text-center">
+                <p className="font-display text-sm font-bold text-foreground">Ainda não tem apostas compartilhadas</p>
+                <p className="text-xs font-body text-muted-foreground mt-1">
+                  Quando alguém compartilhar no histórico, vai aparecer aqui em tempo real.
+                </p>
+              </div>
+            )}
+
+            {!socialLoading && socialBets.map((post) => {
+              const isWon = post.status === 'won';
+              const isLost = post.status === 'lost';
+
+              return (
+                <div key={post.id} className="bg-surface-card rounded-xl p-4 space-y-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      {post.avatarUrl ? (
+                        <img src={post.avatarUrl} alt={post.userName} className="w-9 h-9 rounded-full object-cover" />
+                      ) : (
+                        <div className="w-9 h-9 rounded-full bg-surface-interactive flex items-center justify-center">
+                          <span className="font-display text-sm font-bold text-foreground">
+                            {post.userName.slice(0, 1).toUpperCase()}
+                          </span>
+                        </div>
+                      )}
+
+                      <div className="min-w-0">
+                        <p className="text-sm font-display font-bold text-foreground truncate">{post.userName}</p>
+                        <p className="text-[0.65rem] font-body text-muted-foreground truncate">
+                          {post.username} · {post.level} · {post.timeAgo}
+                        </p>
+                      </div>
+                    </div>
+
+                    <span
+                      className={`text-[0.6rem] font-display font-bold px-2 py-1 rounded-full ${
+                        isWon
+                          ? 'bg-secondary/15 text-secondary'
+                          : isLost
+                            ? 'bg-destructive/15 text-destructive'
+                            : 'bg-primary/15 text-primary'
+                      }`}
+                    >
+                      {isWon ? 'GREEN' : isLost ? 'RED' : 'PENDENTE'}
+                    </span>
+                  </div>
+
+                  {post.message && (
+                    <p className="text-sm font-body text-foreground/85">{post.message}</p>
+                  )}
+
+                  <div className="rounded-lg bg-surface-section p-3 space-y-2">
+                    <p className="text-sm font-display font-bold text-foreground">{post.match}</p>
+                    <p className="text-xs font-body text-muted-foreground">{post.market}</p>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-xs font-body text-foreground/80">{post.selection}</span>
+                      <span className="bg-surface-interactive rounded-md px-2 py-1 text-sm font-display font-extrabold text-foreground">
+                        {post.odds.toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2 text-center">
+                    <div className="rounded-lg bg-surface-section py-2">
+                      <p className="text-[0.6rem] font-body text-muted-foreground">Aposta</p>
+                      <p className="text-xs font-display font-bold text-foreground">R$ {post.stake.toFixed(2)}</p>
+                    </div>
+                    <div className="rounded-lg bg-surface-section py-2">
+                      <p className="text-[0.6rem] font-body text-muted-foreground">Odds</p>
+                      <p className="text-xs font-display font-bold text-foreground">{post.odds.toFixed(2)}</p>
+                    </div>
+                    <div className="rounded-lg bg-surface-section py-2">
+                      <p className="text-[0.6rem] font-body text-muted-foreground">Retorno</p>
+                      <p className="text-xs font-display font-bold text-secondary">R$ {post.potentialReturn.toFixed(2)}</p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </motion.div>
         )}
 
