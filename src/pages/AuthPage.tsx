@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, forwardRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -50,9 +50,28 @@ const maskCPF = (v: string) => {
   return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6, 9)}-${d.slice(9)}`;
 };
 
-// Date mask
+// Date mask with real-time validation (blocks impossible values)
 const maskDate = (v: string) => {
   const d = v.replace(/\D/g, '').slice(0, 8);
+  // Block impossible day values (>31)
+  if (d.length >= 2) {
+    const day = parseInt(d.slice(0, 2));
+    if (day > 31 || day === 0) return d.slice(0, 1);
+  }
+  // Block impossible month values (>12)
+  if (d.length >= 4) {
+    const month = parseInt(d.slice(2, 4));
+    if (month > 12 || month === 0) return `${d.slice(0, 2)}/${d.slice(2, 3)}`;
+  }
+  // Block impossible year values
+  if (d.length >= 5) {
+    const yearStart = parseInt(d.slice(4, 5));
+    if (yearStart !== 1 && yearStart !== 2) return `${d.slice(0, 2)}/${d.slice(2, 4)}/`;
+  }
+  if (d.length >= 8) {
+    const year = parseInt(d.slice(4, 8));
+    if (year < 1900 || year > new Date().getFullYear()) return `${d.slice(0, 2)}/${d.slice(2, 4)}/${d.slice(4, 7)}`;
+  }
   if (d.length <= 2) return d;
   if (d.length <= 4) return `${d.slice(0, 2)}/${d.slice(2)}`;
   return `${d.slice(0, 2)}/${d.slice(2, 4)}/${d.slice(4)}`;
@@ -104,6 +123,26 @@ const AuthPage = () => {
 
   // OTP
   const [otpCode, setOtpCode] = useState(['', '', '', '', '', '']);
+  const [otpTimer, setOtpTimer] = useState(60);
+  const [otpCanResend, setOtpCanResend] = useState(false);
+
+  // OTP countdown timer
+  useEffect(() => {
+    if (step !== 'otp') return;
+    setOtpTimer(60);
+    setOtpCanResend(false);
+    const interval = setInterval(() => {
+      setOtpTimer(prev => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          setOtpCanResend(true);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [step]);
 
   // Taken usernames (simulated)
   const takenUsernames = ['admin', 'joaosilva', 'usuario', 'test', 'bot', 'moderador', 'suporte'];
@@ -180,11 +219,12 @@ const AuthPage = () => {
 
   const signupStepLabels = ['Dados Pessoais', 'Endereço', 'Segurança', 'Termos'];
 
-  const BackButton = ({ to }: { to: AuthStep }) => (
-    <button onClick={() => setStep(to)} className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-foreground/70 hover:text-foreground">
+  const BackButton = forwardRef<HTMLButtonElement, { to: AuthStep }>(({ to }, ref) => (
+    <button ref={ref} onClick={() => setStep(to)} className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-foreground/70 hover:text-foreground">
       <ArrowLeft size={22} />
     </button>
-  );
+  ));
+  BackButton.displayName = 'BackButton';
 
   const ValidationIcon = ({ valid }: { valid: boolean }) => (
     <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${valid ? 'bg-secondary/20' : 'bg-surface-interactive'}`}>
@@ -776,8 +816,11 @@ const AuthPage = () => {
                 Confirmar
               </motion.button>
 
-              <button className="w-full text-center text-xs text-primary font-body font-semibold min-h-[44px]">
-                Reenviar código (00:59)
+              <button
+                disabled={!otpCanResend}
+                onClick={() => { setOtpTimer(60); setOtpCanResend(false); }}
+                className={`w-full text-center text-xs font-body font-semibold min-h-[44px] ${otpCanResend ? 'text-primary' : 'text-muted-foreground'}`}>
+                {otpCanResend ? 'Reenviar código' : `Reenviar código (${String(Math.floor(otpTimer / 60)).padStart(2, '0')}:${String(otpTimer % 60).padStart(2, '0')})`}
               </button>
             </div>
           </motion.div>
