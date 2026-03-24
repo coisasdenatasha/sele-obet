@@ -1,9 +1,9 @@
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Users, TrendingUp, MessageCircle, Crown, Flame, ThumbsUp,
+  Send, Users, TrendingUp, MessageCircle, Crown, Flame, ThumbsUp,
   Plus, Clock, Target, Zap, UserCircle, Star, Copy,
-  MessageSquare, CheckCircle2, Share2, Bookmark,
+  MessageSquare, CheckCircle2, Share2, Bookmark, Link2, X,
   Flag, Radio, BarChart3, CreditCard, Swords, Award, CircleDot
 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
