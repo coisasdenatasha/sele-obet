@@ -73,10 +73,10 @@ const HeroCarousel = () => {
         <AnimatePresence mode="wait">
           <motion.div
             key={heroBanners[current].id}
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -40 }}
-            transition={{ duration: 0.4 }}
+            initial={{ opacity: 0, scale: 1.05, x: 40 }}
+            animate={{ opacity: 1, scale: 1, x: 0 }}
+            exit={{ opacity: 0, scale: 0.95, x: -40 }}
+            transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
             className="absolute inset-0"
           >
             <img
@@ -88,16 +88,36 @@ const HeroCarousel = () => {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
             <div className="absolute bottom-5 left-5 right-5">
-              <span className="text-[0.6rem] font-body font-semibold text-primary uppercase tracking-widest">
+              <motion.span
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="text-[0.6rem] font-body font-semibold text-primary uppercase tracking-widest"
+              >
                 {heroBanners[current].accent}
-              </span>
-              <h1 className="font-display text-2xl font-extrabold leading-tight mt-1">
+              </motion.span>
+              <motion.h1
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="font-display text-2xl font-extrabold leading-tight mt-1"
+              >
                 {heroBanners[current].title}
-              </h1>
-              <p className="text-xs font-body text-foreground/80 mt-1">{heroBanners[current].subtitle}</p>
+              </motion.h1>
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.4 }}
+                className="text-xs font-body text-foreground/80 mt-1"
+              >
+                {heroBanners[current].subtitle}
+              </motion.p>
               <motion.button
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
                 whileTap={{ scale: 0.97 }}
-                className="mt-3 bg-primary text-primary-foreground font-display font-bold text-sm px-5 py-2.5 rounded-lg min-h-[44px] hover:brightness-110 transition-all"
+                className="mt-3 bg-primary text-primary-foreground font-display font-bold text-sm px-5 py-2.5 rounded-lg min-h-[44px] hover:brightness-110 transition-all animate-glow-pulse"
               >
                 {heroBanners[current].cta}
               </motion.button>
@@ -105,13 +125,23 @@ const HeroCarousel = () => {
           </motion.div>
         </AnimatePresence>
       </div>
+      {/* Progress bar */}
+      <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-foreground/10">
+        <motion.div
+          key={current}
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: 1 }}
+          transition={{ duration: 4, ease: 'linear' }}
+          className="h-full bg-primary origin-left"
+        />
+      </div>
       {/* Dots */}
       <div className="absolute bottom-2 right-4 flex gap-1.5">
         {heroBanners.map((_, i) => (
           <button
             key={i}
             onClick={() => setCurrent(i)}
-            className={`w-2 h-2 rounded-full transition-all ${i === current ? 'bg-primary w-5' : 'bg-foreground/30'}`}
+            className={`h-2 rounded-full transition-all duration-300 ${i === current ? 'bg-primary w-5' : 'bg-foreground/30 w-2'}`}
           />
         ))}
       </div>
@@ -141,7 +171,7 @@ const PlayerPropsCarousel = () => {
           onClick={() =>
             addBet({ id: p.id, match: p.team, market: p.market, selection: p.player, odds: p.odds })
           }
-          className={`flex-shrink-0 w-[130px] rounded-xl overflow-hidden bg-gradient-to-b ${cardGradients[i % cardGradients.length]} relative`}
+          className={`flex-shrink-0 w-[130px] rounded-xl overflow-hidden bg-gradient-to-b ${cardGradients[i % cardGradients.length]} relative card-shine`}
         >
           {/* Card top - number & position */}
           <div className="relative pt-2 px-3">
@@ -225,11 +255,19 @@ const HomePage = () => {
           initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="rounded-2xl p-5 relative overflow-hidden"
-          style={{ background: 'linear-gradient(135deg, hsl(43 80% 45%), hsl(35 90% 35%))' }}
+          className="rounded-2xl p-5 relative overflow-hidden animate-gradient-shift"
+          style={{ background: 'linear-gradient(135deg, hsl(43 80% 45%), hsl(35 90% 35%), hsl(43 80% 45%))' }}
         >
           <div className="relative z-10">
-            <h2 className="font-display text-2xl font-extrabold italic text-primary-foreground tracking-tight">SUPER ODDS</h2>
+            <motion.h2
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="font-display text-2xl font-extrabold italic text-primary-foreground tracking-tight"
+            >
+              SUPER ODDS
+            </motion.h2>
             <p className="text-sm font-body text-primary-foreground/80 mt-1">Maximize Ganhos Hoje!</p>
           </div>
           <button
@@ -238,8 +276,6 @@ const HomePage = () => {
           >
             Ver tudo <ChevronRight size={14} />
           </button>
-          {/* Lightning decoration */}
-          <div className="absolute top-2 right-4 text-4xl opacity-80">⚡</div>
         </motion.div>
 
         {/* Boosted match cards - Superbet style */}
@@ -250,7 +286,7 @@ const HomePage = () => {
               variants={staggerItem}
               whileTap={{ scale: 0.98 }}
               onClick={() => navigate(`/evento/${match.id}`)}
-              className="bg-surface-card rounded-2xl overflow-hidden cursor-pointer"
+              className="bg-surface-card rounded-2xl overflow-hidden cursor-pointer card-shine"
             >
               {/* Match header */}
               <div className="px-4 pt-4 pb-2 text-center space-y-1">
@@ -317,7 +353,7 @@ const HomePage = () => {
         </SectionTitle>
         <div className="space-y-3">
           {popularMultiples.map((multi) => (
-            <div key={multi.id} className="bg-surface-card rounded-xl p-4 space-y-3">
+            <div key={multi.id} className="bg-surface-card rounded-xl p-4 space-y-3 card-shine">
               <div className="flex items-center justify-between">
                 <h3 className="font-display text-sm font-bold">{multi.title}</h3>
                 <span className="bg-secondary/20 text-secondary text-[0.65rem] font-display font-bold px-2 py-0.5 rounded-full">
@@ -445,7 +481,7 @@ const HomePage = () => {
         </SectionTitle>
         <motion.div className="space-y-2" variants={staggerContainer} initial="hidden" whileInView="show" viewport={{ once: true }}>
           {competitions.map((comp) => (
-            <motion.div key={comp.id} variants={staggerItem} className="bg-surface-card rounded-xl p-3.5 flex items-center gap-3">
+            <motion.div key={comp.id} variants={staggerItem} whileHover={{ x: 4 }} className="bg-surface-card rounded-xl p-3.5 flex items-center gap-3 card-shine cursor-pointer">
               <img src={comp.flag} alt={comp.country} className="w-8 h-6 object-cover rounded" />
               <div className="flex-1 min-w-0">
                 <p className="font-display text-sm font-bold truncate">{comp.name}</p>
@@ -531,7 +567,7 @@ const HomePage = () => {
                 whileHover={{ scale: 1.03 }}
                 className="bg-surface-card rounded-xl p-4 space-y-2 cursor-pointer"
               >
-                <motion.div className="w-10 h-10 rounded-lg bg-primary/15 flex items-center justify-center" whileHover={{ rotate: 10 }}>
+                <motion.div className="w-10 h-10 rounded-lg bg-primary/15 flex items-center justify-center animate-float" whileHover={{ rotate: 10 }}>
                   {iconMap[cat.icon]}
                 </motion.div>
                 <h3 className="font-display text-sm font-bold">{cat.category}</h3>
