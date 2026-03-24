@@ -224,9 +224,13 @@ const EsportesPage = () => {
   const [selectedDay, setSelectedDay] = useState(calendarDays[0].key);
   const [socialBets, setSocialBets] = useState<SocialBetCard[]>([]);
   const [socialLoading, setSocialLoading] = useState(false);
+  const [selectedLeague, setSelectedLeague] = useState<string | null>(null);
   const addBet = useBetSlipStore((s) => s.addBet);
 
-  const events = popularEvents[selectedSport.id] || [];
+  const allEvents = popularEvents[selectedSport.id] || [];
+  const events = selectedLeague
+    ? allEvents.filter((ev) => ev.league === selectedLeague)
+    : allEvents;
 
   useEffect(() => {
     if (activeTab !== 'social') return;
@@ -386,21 +390,48 @@ const EsportesPage = () => {
         {activeTab === 'calendario' && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
             {/* Date strip */}
-            <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4" style={{ WebkitOverflowScrolling: 'touch' }}>
+            <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-4 px-4 no-scrollbar" style={{ WebkitOverflowScrolling: 'touch' }}>
               {calendarDays.map((d) => (
                 <button
                   key={d.key}
                   onClick={() => setSelectedDay(d.key)}
-                  className={`flex-shrink-0 flex flex-col items-center min-w-[64px] py-2 px-2 rounded-lg transition-all ${
+                  className={`flex-shrink-0 flex flex-col items-center min-w-[52px] py-2 px-1.5 rounded-xl transition-all ${
                     selectedDay === d.key
-                      ? 'bg-surface-interactive text-foreground'
-                      : 'text-muted-foreground'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-surface-card text-muted-foreground'
                   }`}
                 >
-                  <span className="text-xs font-body font-medium capitalize">{d.weekday} {d.dayNum}. {d.month}</span>
+                  <span className="text-[0.55rem] font-body font-medium capitalize leading-tight">{d.weekday}</span>
+                  <span className="text-base font-display font-extrabold leading-tight mt-0.5">{d.dayNum}</span>
+                  <span className="text-[0.5rem] font-body capitalize leading-tight mt-0.5">{d.month}</span>
                 </button>
               ))}
             </div>
+
+            {/* League filter pills */}
+            {allEvents.length > 0 && (
+              <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-4 px-4 pb-1">
+                <button
+                  onClick={() => setSelectedLeague(null)}
+                  className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-display font-bold min-h-[32px] transition-colors ${
+                    !selectedLeague ? 'bg-primary text-primary-foreground' : 'bg-surface-card text-muted-foreground'
+                  }`}
+                >
+                  Todas
+                </button>
+                {[...new Set(allEvents.map((e) => e.league))].map((league) => (
+                  <button
+                    key={league}
+                    onClick={() => setSelectedLeague(selectedLeague === league ? null : league)}
+                    className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-display font-bold min-h-[32px] transition-colors whitespace-nowrap ${
+                      selectedLeague === league ? 'bg-primary text-primary-foreground' : 'bg-surface-card text-muted-foreground'
+                    }`}
+                  >
+                    {league}
+                  </button>
+                ))}
+              </div>
+            )}
 
             {/* Event count banner */}
             <div className="bg-destructive rounded-xl px-4 py-2.5 flex items-center justify-between">
@@ -629,6 +660,10 @@ const EsportesPage = () => {
               <motion.button
                 key={comp.id}
                 whileTap={{ scale: 0.98 }}
+                onClick={() => {
+                  setSelectedLeague(comp.name);
+                  setActiveTab('calendario');
+                }}
                 className="w-full flex items-center gap-3 bg-surface-card rounded-xl px-4 py-3.5 min-h-[52px] hover:bg-surface-interactive transition-colors"
               >
                 <img src={comp.flag} alt={comp.country} className="w-6 h-4 rounded-sm object-cover" />
