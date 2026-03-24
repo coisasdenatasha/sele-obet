@@ -26,6 +26,7 @@ import EsportesPage from "@/pages/EsportesPage";
 import BetHistoryPage from "@/pages/BetHistoryPage";
 import PerformancePage from "@/pages/PerformancePage";
 import ResponsibleGamingPage from "@/pages/ResponsibleGamingPage";
+import PromotionsPage from "@/pages/PromotionsPage";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -70,6 +71,7 @@ const AppLayout = () => {
           <Route path="/historico" element={<BetHistoryPage />} />
           <Route path="/desempenho" element={<PerformancePage />} />
           <Route path="/jogo-responsavel" element={<ResponsibleGamingPage />} />
+          <Route path="/promocoes" element={<PromotionsPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
