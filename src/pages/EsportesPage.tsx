@@ -158,26 +158,39 @@ const EsportesPage = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-background"
+            className="fixed inset-0 z-50 bg-background overflow-y-auto"
           >
-            <div className="flex items-center justify-between px-5 py-4">
+            <div className="flex items-center justify-between px-5 py-4 sticky top-0 bg-background z-10">
               <h2 className="font-display text-xl font-extrabold uppercase">Escolha o esporte</h2>
               <button onClick={() => setSportPickerOpen(false)} className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center">
                 <X size={24} className="text-foreground" />
               </button>
             </div>
-            <div className="px-5">
+            <div className="px-4 pb-8 space-y-1.5">
               {sportsList.map((sport) => {
                 const Icon = sport.icon;
+                const isSelected = selectedSport.id === sport.id;
                 return (
-                  <button
+                  <motion.button
                     key={sport.id}
+                    whileTap={{ scale: 0.98 }}
                     onClick={() => { setSelectedSport(sport); setSportPickerOpen(false); }}
-                    className="w-full flex items-center gap-4 py-4 border-b border-surface-interactive min-h-[52px]"
+                    className={`w-full flex items-center gap-3 rounded-xl px-4 py-3.5 min-h-[52px] transition-colors ${
+                      isSelected ? 'bg-primary/15' : 'bg-surface-card hover:bg-surface-interactive'
+                    }`}
                   >
-                    <Icon size={22} className="text-muted-foreground" />
-                    <span className="text-base font-body font-medium text-foreground">{sport.label}</span>
-                  </button>
+                    <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${
+                      isSelected ? 'bg-primary/25' : 'bg-surface-interactive'
+                    }`}>
+                      <Icon size={18} className={isSelected ? 'text-primary' : 'text-muted-foreground'} />
+                    </div>
+                    <span className={`text-sm font-display font-bold ${isSelected ? 'text-primary' : 'text-foreground'}`}>
+                      {sport.label}
+                    </span>
+                    {isSelected && (
+                      <div className="ml-auto w-2 h-2 rounded-full bg-primary" />
+                    )}
+                  </motion.button>
                 );
               })}
             </div>
