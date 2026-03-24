@@ -215,7 +215,7 @@ const EsportesPage = () => {
           onClick={() => setSportPickerOpen(true)}
           className="w-full flex items-center justify-center gap-2 py-3 min-h-[44px]"
         >
-          <img src={selectedSport.img} alt="" className="w-6 h-6" />
+          <selectedSport.icon size={22} className="text-primary" />
           <span className="font-display text-lg font-extrabold uppercase tracking-wide text-foreground">
             {selectedSport.label}
           </span>
@@ -268,7 +268,7 @@ const EsportesPage = () => {
                       isSelected ? 'bg-primary/15' : 'bg-surface-card hover:bg-surface-interactive'
                     }`}
                   >
-                    <img src={sport.img} alt={sport.label} className="w-7 h-7 flex-shrink-0" />
+                    <sport.icon size={20} className={`flex-shrink-0 ${isSelected ? 'text-primary' : 'text-muted-foreground'}`} />
                     <span className={`text-sm font-display font-bold ${isSelected ? 'text-primary' : 'text-foreground'}`}>
                       {sport.label}
                     </span>
@@ -307,7 +307,7 @@ const EsportesPage = () => {
             {/* Event count banner */}
             <div className="bg-destructive rounded-xl px-4 py-2.5 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <img src={selectedSport.img} alt="" className="w-5 h-5" />
+                <selectedSport.icon size={18} className="text-destructive-foreground" />
                 <span className="text-sm font-display font-bold text-destructive-foreground">
                   {events.length * 3} eventos em {events.length} competições
                 </span>
@@ -333,7 +333,7 @@ const EsportesPage = () => {
                     <div key={ev.id} className="bg-surface-card rounded-xl p-4 space-y-3">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2 text-xs font-body text-muted-foreground">
-                          <img src={selectedSport.img} alt="" className="w-4 h-4" />
+                          <selectedSport.icon size={14} className="text-muted-foreground" />
                           <span>{ev.sport}</span>
                           <span>·</span>
                           <span>{ev.country}</span>
@@ -380,7 +380,7 @@ const EsportesPage = () => {
 
             {events.length === 0 && (
               <div className="flex flex-col items-center justify-center py-12 text-center">
-                <img src={selectedSport.img} alt="" className="w-12 h-12 opacity-30 mb-3" />
+                <selectedSport.icon size={48} className="text-muted-foreground/30 mb-3" />
                 <p className="font-display text-sm font-bold text-muted-foreground">Nenhum evento disponível agora</p>
                 <p className="text-xs font-body text-muted-foreground mt-1">Volte em breve para novos eventos</p>
               </div>
