@@ -33,6 +33,10 @@ const ProfilePage = () => {
   const { isLoggedIn, user, profile, logout, updateProfile, fetchProfile } = useAuthStore();
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [showPhotoMenu, setShowPhotoMenu] = useState(false);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
   const [form, setForm] = useState({
     full_name: '',
     username: '',
@@ -45,6 +49,40 @@ const ProfilePage = () => {
   });
   const [newEmail, setNewEmail] = useState('');
   const [emailEditing, setEmailEditing] = useState(false);
+
+  const handlePhotoUpload = async (file: File) => {
+    if (!user) return;
+    setUploadingPhoto(true);
+    setShowPhotoMenu(false);
+    try {
+      const ext = file.name.split('.').pop() || 'jpg';
+      const path = `${user.id}/avatar.${ext}`;
+
+      // Remove old avatar if exists
+      await supabase.storage.from('avatars').remove([path]);
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(path, file, { upsert: true, contentType: file.type });
+
+      if (uploadError) throw uploadError;
+
+      const { data: urlData } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(path);
+
+      const avatarUrl = `${urlData.publicUrl}?t=${Date.now()}`;
+
+      await updateProfile({ avatar_url: avatarUrl } as any);
+      await fetchProfile();
+      toast.success('Foto atualizada!');
+    } catch (err: any) {
+      console.error(err);
+      toast.error('Erro ao enviar foto');
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
 
   useEffect(() => {
     if (profile) {
