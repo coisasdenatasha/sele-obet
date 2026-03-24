@@ -25,8 +25,8 @@ const promos: Promo[] = [
 {
   id: 'fb-1',
   category: 'freebet',
-  title: 'Aposta Gratis Semanal',
-  description: 'Receba ate R$150 em apostas gratis toda semana ao fazer apostas qualificadas. Apenas os lucros liquidos podem ser sacados.',
+  title: 'Aposta Grátis Semanal',
+  description: 'Receba até R$150 em apostas grátis toda semana ao fazer apostas qualificadas. Apenas os lucros líquidos podem ser sacados.',
   value: 'R$150',
   badge: 'Free Bet',
   conditions: 'Minimo de R$50 em apostas qualificadas na semana. Odds minimas de 1.50. Lucros sacaveis apos 1x rollover.',
@@ -66,8 +66,8 @@ const promos: Promo[] = [
 {
   id: 'odds-1',
   category: 'odds',
-  title: 'Odds Turbinadas - Brasileirao',
-  description: 'Cotacoes acima do mercado para os jogos da rodada do Brasileirao. Potencial de lucro aumentado em ate 40%.',
+  title: 'Odds Turbinadas - Brasileirão',
+  description: 'Cotações acima do mercado para os jogos da rodada do Brasileirão. Potencial de lucro aumentado em ate 40%.',
   value: '+40%',
   badge: 'Turbinada',
   conditions: 'Aposta maxima de R$100 por selecao turbinada. Disponivel ate 2h antes do jogo. Nao combinavel com multiplas.',
@@ -80,7 +80,7 @@ const promos: Promo[] = [
   id: 'odds-2',
   category: 'odds',
   title: 'Super Odds Champions League',
-  description: 'Odds especiais para os jogos da Champions League. Selecoes de goleador, resultado exato e mais.',
+  description: 'Odds especiais para os jogos da Champions League. Seleções de goleador, resultado exato e mais.',
   value: '+35%',
   badge: 'Champions',
   conditions: 'Aposta maxima de R$50. Valido apenas para mercados selecionados. Uma aposta por usuario por jogo.',
@@ -92,8 +92,8 @@ const promos: Promo[] = [
 {
   id: 'odds-3',
   category: 'odds',
-  title: 'Boost Diario',
-  description: 'Todo dia uma selecao de odds com boost especial em futebol, basquete e tenis. Lucre mais nos seus favoritos.',
+  title: 'Boost Diário',
+  description: 'Todo dia uma seleção de odds com boost especial em futebol, basquete e tênis. Lucre mais nos seus favoritos.',
   value: '+25%',
   badge: 'Diario',
   conditions: 'Uma aposta por dia. Odds minima original de 1.40. Aposta maxima de R$75.',
@@ -108,7 +108,7 @@ const promos: Promo[] = [
   id: 'cb-1',
   category: 'cashback',
   title: 'Cashback Semanal 10%',
-  description: 'Receba 10% de cashback sobre suas perdas liquidas da semana, creditado toda segunda-feira.',
+  description: 'Receba 10% de cashback sobre suas perdas líquidas da semana, creditado toda segunda-feira.',
   value: '10%',
   badge: 'Cashback',
   conditions: 'Minimo de R$100 em apostas na semana. Cashback maximo de R$500. Rollover de 1x para saque.',
@@ -121,7 +121,7 @@ const promos: Promo[] = [
   id: 'cb-2',
   category: 'cashback',
   title: 'Cashback Ao Vivo 5%',
-  description: 'Apostas ao vivo com 5% de cashback automatico. Sem necessidade de ativacao, creditado instantaneamente.',
+  description: 'Apostas ao vivo com 5% de cashback automático. Sem necessidade de ativação, creditado instantaneamente.',
   value: '5%',
   badge: 'Ao Vivo',
   conditions: 'Valido apenas para apostas ao vivo. Odds minimas de 1.50. Sem limite de cashback.',
@@ -135,8 +135,8 @@ const promos: Promo[] = [
 {
   id: 'bolao-1',
   category: 'bolao',
-  title: 'Bolao Brasileirao - R$25.000',
-  description: 'De seus palpites nos jogos da rodada do Brasileirao e concorra a premios de ate R$25 mil. Participacao gratuita.',
+  title: 'Bolão Brasileirão - R$25.000',
+  description: 'De seus palpites nos jogos da rodada do Brasileirão e concorra a prêmios de até R$25 mil. Participação gratuita.',
   value: 'R$25.000',
   badge: 'Gratuito',
   conditions: 'Cadastro obrigatorio. Palpites ate 1h antes do primeiro jogo. Premiacao dividida entre acertadores.',
@@ -149,7 +149,7 @@ const promos: Promo[] = [
   id: 'bolao-2',
   category: 'bolao',
   title: 'Torneio Copa do Mundo 2026',
-  description: 'Torneio especial de palpites para a Copa do Mundo. Acumule pontos durante todo o torneio e concorra ao grande premio.',
+  description: 'Torneio especial de palpites para a Copa do Mundo. Acumule pontos durante todo o torneio e concorra ao grande prêmio.',
   value: 'R$100.000',
   badge: 'Especial',
   conditions: 'Taxa de inscricao de R$10. Pontuacao cumulativa. Top 100 premiados. Premio principal para o 1o lugar.',
@@ -312,7 +312,7 @@ const PromotionsPage = () => {
                         onClick={() => toggleExpand(promo.id)}
                         className="flex items-center gap-1 text-[0.65rem] font-body text-muted-foreground hover:text-foreground transition-colors">
                         
-                        {isExpanded ? 'Ocultar condicoes' : 'Ver condicoes'}
+                        {isExpanded ? 'Ocultar condições' : 'Ver condições'}
                         <ChevronRight size={12} className={`transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
                       </button>
 
