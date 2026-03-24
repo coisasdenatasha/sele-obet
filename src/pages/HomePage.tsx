@@ -231,8 +231,9 @@ const HomePage = () => {
           ))}
         </div>
       </section>
+      </SectionReveal>
 
-      {/* 5. Player Props Carousel */}
+      <SectionReveal delay={0.1}>
       <section>
         <div className="px-4">
           <SectionTitle icon={<User size={20} className="text-primary" />} action="Ver Todos">
@@ -241,6 +242,7 @@ const HomePage = () => {
         </div>
         <PlayerPropsCarousel />
       </section>
+      </SectionReveal>
 
       {/* 6. Upcoming Matches */}
       <section className="px-4">
