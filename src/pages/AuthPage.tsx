@@ -324,9 +324,24 @@ const AuthPage = () => {
                 Esqueceu a senha?
               </button>
 
-              <motion.button whileTap={{ scale: 0.97 }} onClick={() => { setStep('otp'); }}
-                className="w-full bg-primary text-primary-foreground font-display font-bold text-base py-3.5 rounded-xl min-h-[44px] hover:brightness-110 transition-all">
-                Entrar
+              {authError && (
+                <p className="text-[0.75rem] text-destructive font-body bg-destructive/10 rounded-lg p-3">{authError}</p>
+              )}
+
+              <motion.button whileTap={{ scale: 0.97 }} disabled={authLoading}
+                onClick={async () => {
+                  setAuthError(null);
+                  setAuthLoading(true);
+                  const { error } = await signIn(loginEmail, loginPassword);
+                  setAuthLoading(false);
+                  if (error) {
+                    setAuthError(error === 'Invalid login credentials' ? 'E-mail ou senha incorretos' : error);
+                  } else {
+                    navigate('/');
+                  }
+                }}
+                className="w-full bg-primary text-primary-foreground font-display font-bold text-base py-3.5 rounded-xl min-h-[44px] hover:brightness-110 transition-all disabled:opacity-50">
+                {authLoading ? 'Entrando...' : 'Entrar'}
               </motion.button>
 
               {/* Biometria */}
