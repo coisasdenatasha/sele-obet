@@ -11,9 +11,16 @@ import { liveMatches, boostedMatches, upcomingMatches, popularMultiples, playerP
 import { useBetSlipStore } from '@/store/betSlipStore';
 import { useAuthStore } from '@/store/authStore';
 import { Flame, ChevronRight, Trophy, Gift, Zap, User, Calendar, Target, Scale, CreditCard, CornerDownRight, Award, Star, LayoutGrid } from 'lucide-react';
+import { PageTransition, SectionReveal, staggerContainer, staggerItem } from '@/components/animations';
 
 const SectionTitle = ({ children, icon, action }: { children: React.ReactNode; icon?: React.ReactNode; action?: string }) => (
-  <div className="flex items-center justify-between mb-3">
+  <motion.div
+    className="flex items-center justify-between mb-3"
+    initial={{ opacity: 0, x: -12 }}
+    whileInView={{ opacity: 1, x: 0 }}
+    viewport={{ once: true }}
+    transition={{ duration: 0.4 }}
+  >
     <h2 className="font-display text-lg font-bold flex items-center gap-2">
       {icon}
       {children}
@@ -23,7 +30,7 @@ const SectionTitle = ({ children, icon, action }: { children: React.ReactNode; i
         {action} <ChevronRight size={14} />
       </button>
     )}
-  </div>
+  </motion.div>
 );
 
 /* ───────── Hero Carousel ───────── */
@@ -133,6 +140,7 @@ const HomePage = () => {
   const { isLoggedIn } = useAuthStore();
 
   return (
+    <PageTransition>
     <div className="space-y-6 pb-20">
       {/* Visitor Banner */}
       {!isLoggedIn && <VisitorBanner />}
@@ -140,32 +148,36 @@ const HomePage = () => {
       {/* 1. Hero Carousel */}
       <HeroCarousel />
 
-
       {/* 2. Live Matches */}
+      <SectionReveal>
       <section className="px-4">
         <SectionTitle icon={<Zap size={20} className="text-secondary" />} action="Ver Todos">
           Ao Vivo
         </SectionTitle>
-        <div className="space-y-3">
+        <motion.div className="space-y-3" variants={staggerContainer} initial="hidden" whileInView="show" viewport={{ once: true }}>
           {liveMatches.map((match) => (
-            <motion.div key={match.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+            <motion.div key={match.id} variants={staggerItem}>
               <MatchCard {...match} />
             </motion.div>
           ))}
-        </div>
+        </motion.div>
       </section>
+      </SectionReveal>
 
-      {/* 3. Boosted Odds */}
+      <SectionReveal delay={0.1}>
       <section className="px-4">
         <SectionTitle icon={<Flame size={20} className="text-primary" />} action="Ver Todas">
           Odds Turbinadas
         </SectionTitle>
-        <div className="space-y-3">
+        <motion.div className="space-y-3" variants={staggerContainer} initial="hidden" whileInView="show" viewport={{ once: true }}>
           {boostedMatches.map((match) => (
-            <MatchCard key={match.id} {...match} />
+            <motion.div key={match.id} variants={staggerItem}>
+              <MatchCard {...match} />
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </section>
+      </SectionReveal>
 
       {/* 4. Popular Multiples */}
       <section className="px-4">
