@@ -1,16 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Trophy, Users, Copy, Check, ChevronRight, Crown, Medal, Award } from 'lucide-react';
-
-const leaderboard = [
-  { pos: 1, name: 'Carlos M.', points: 87, icon: Crown },
-  { pos: 2, name: 'Ana P.', points: 82, icon: Medal },
-  { pos: 3, name: 'Rafael S.', points: 78, icon: Award },
-  { pos: 4, name: 'Juliana F.', points: 71 },
-  { pos: 5, name: 'Pedro L.', points: 65 },
-  { pos: 6, name: 'Mariana R.', points: 60 },
-  { pos: 7, name: 'Você', points: 54 },
-];
+import { Trophy, Users, Copy, Check, ChevronRight, Crown, Medal, Award, Loader2 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuthStore } from '@/store/authStore';
+import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 
 const roundMatches = [
   { id: 'b1', home: 'Flamengo', away: 'Palmeiras', date: 'Dom, 16:00' },
@@ -22,10 +16,151 @@ const roundMatches = [
 
 type BolaoTab = 'lobby' | 'palpites' | 'criar';
 
+interface LeaderboardEntry {
+  pos: number;
+  name: string;
+  points: number;
+  isYou: boolean;
+  icon?: typeof Crown;
+}
+
 const BolaoPage = () => {
   const [tab, setTab] = useState<BolaoTab>('lobby');
   const [scores, setScores] = useState<Record<string, { home: string; away: string }>>({});
   const [copied, setCopied] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [leaderboardLoading, setLeaderboardLoading] = useState(true);
+  const [savedMatches, setSavedMatches] = useState<Set<string>>(new Set());
+  const { isLoggedIn, user } = useAuthStore();
+  const navigate = useNavigate();
+
+  // Load existing predictions & leaderboard
+  useEffect(() => {
+    const loadData = async () => {
+      if (!isLoggedIn || !user) {
+        setLeaderboardLoading(false);
+        return;
+      }
+
+      try {
+        // Load user's existing predictions
+        const { data: myPreds } = await supabase
+          .from('bolao_predictions')
+          .select('match_id, home_score, away_score')
+          .eq('user_id', user.id)
+          .eq('round_number', 28);
+
+        if (myPreds && myPreds.length > 0) {
+          const existing: Record<string, { home: string; away: string }> = {};
+          const saved = new Set<string>();
+          myPreds.forEach((p: any) => {
+            existing[p.match_id] = { home: String(p.home_score), away: String(p.away_score) };
+            saved.add(p.match_id);
+          });
+          setScores(existing);
+          setSavedMatches(saved);
+        }
+
+        // Load leaderboard from all predictions
+        const { data: allPreds } = await supabase
+          .from('bolao_predictions')
+          .select('user_id, points_earned')
+          .eq('round_number', 28);
+
+        if (allPreds && allPreds.length > 0) {
+          // Aggregate points by user
+          const pointsByUser = new Map<string, number>();
+          allPreds.forEach((p: any) => {
+            pointsByUser.set(p.user_id, (pointsByUser.get(p.user_id) || 0) + (p.points_earned || 0));
+          });
+
+          const userIds = [...pointsByUser.keys()];
+          const { data: profiles } = await supabase
+            .from('profiles')
+            .select('user_id, full_name, username')
+            .in('user_id', userIds);
+
+          const profileMap = new Map((profiles || []).map((p: any) => [p.user_id, p]));
+
+          const entries = userIds
+            .map((uid) => {
+              const profile = profileMap.get(uid);
+              return {
+                userId: uid,
+                name: profile?.full_name || profile?.username || 'Jogador',
+                points: pointsByUser.get(uid) || 0,
+                isYou: uid === user.id,
+              };
+            })
+            .sort((a, b) => b.points - a.points)
+            .map((entry, i) => ({
+              pos: i + 1,
+              name: entry.isYou ? 'Você' : entry.name,
+              points: entry.points,
+              isYou: entry.isYou,
+              icon: i === 0 ? Crown : i === 1 ? Medal : i === 2 ? Award : undefined,
+            }));
+
+          setLeaderboard(entries);
+        }
+      } catch (err) {
+        console.error('Erro ao carregar bolão:', err);
+      } finally {
+        setLeaderboardLoading(false);
+      }
+    };
+
+    loadData();
+  }, [isLoggedIn, user]);
+
+  const handleConfirmPalpites = async () => {
+    if (!isLoggedIn || !user) {
+      toast('Faça login para confirmar palpites');
+      navigate('/auth');
+      return;
+    }
+
+    // Validate all matches have scores
+    const incomplete = roundMatches.filter(
+      (m) => !scores[m.id]?.home || !scores[m.id]?.away || scores[m.id].home === '' || scores[m.id].away === ''
+    );
+    if (incomplete.length > 0) {
+      toast.error('Preencha todos os palpites', {
+        description: `Faltam ${incomplete.length} jogo(s) sem palpite.`,
+      });
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const predictions = roundMatches.map((m) => ({
+        user_id: user.id,
+        round_number: 28,
+        match_id: m.id,
+        home_team: m.home,
+        away_team: m.away,
+        home_score: parseInt(scores[m.id].home),
+        away_score: parseInt(scores[m.id].away),
+      }));
+
+      const { error } = await supabase
+        .from('bolao_predictions')
+        .upsert(predictions, { onConflict: 'user_id,round_number,match_id' });
+
+      if (error) throw error;
+
+      setSavedMatches(new Set(roundMatches.map((m) => m.id)));
+      toast.success('Palpites confirmados!', {
+        description: 'Seus palpites da rodada 28 foram salvos com sucesso.',
+      });
+    } catch (err: any) {
+      console.error(err);
+      toast.error('Erro ao salvar palpites', { description: err.message });
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const setScore = (id: string, side: 'home' | 'away', val: string) => {
     setScores((prev) => ({
@@ -101,12 +236,22 @@ const BolaoPage = () => {
           </div>
 
           {/* Leaderboard */}
+          {leaderboardLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 size={24} className="animate-spin text-primary" />
+            </div>
+          ) : leaderboard.length === 0 ? (
+            <div className="bg-surface-card rounded-xl p-5 text-center">
+              <p className="font-display text-sm font-bold text-foreground">Nenhum participante ainda</p>
+              <p className="text-xs font-body text-muted-foreground mt-1">Confirme seus palpites para aparecer na classificação!</p>
+            </div>
+          ) : (
           <div className="space-y-1">
             {leaderboard.map((entry) => (
               <div
                 key={entry.pos}
                 className={`flex items-center gap-3 rounded-xl p-3 ${
-                  entry.name === 'Você' ? 'bg-primary/10' : 'bg-surface-card'
+                  entry.isYou ? 'bg-primary/10' : 'bg-surface-card'
                 }`}
               >
                 <span className={`w-7 text-center font-display font-bold text-sm ${
@@ -115,13 +260,14 @@ const BolaoPage = () => {
                   {entry.pos}
                 </span>
                 {entry.icon && <entry.icon size={16} className="text-primary" />}
-                <span className={`flex-1 font-body text-sm font-medium ${entry.name === 'Você' ? 'text-primary font-bold' : ''}`}>
+                <span className={`flex-1 font-body text-sm font-medium ${entry.isYou ? 'text-primary font-bold' : ''}`}>
                   {entry.name}
                 </span>
                 <span className="font-display font-bold text-sm">{entry.points} pts</span>
               </div>
             ))}
           </div>
+          )}
         </div>
       )}
 
@@ -130,11 +276,16 @@ const BolaoPage = () => {
           <p className="text-sm font-body text-muted-foreground">Rodada 28 — Brasileirão Série A</p>
           <div className="space-y-3">
             {roundMatches.map((match) => (
-              <div key={match.id} className="bg-surface-card rounded-xl p-4 space-y-3">
+              <div key={match.id} className={`rounded-xl p-4 space-y-3 ${savedMatches.has(match.id) ? 'bg-secondary/10 ring-1 ring-secondary/30' : 'bg-surface-card'}`}>
                 <div className="flex items-center justify-between">
                   <span className="text-[0.65rem] text-muted-foreground font-body uppercase tracking-wider">
                     {match.date}
                   </span>
+                  {savedMatches.has(match.id) && (
+                    <span className="text-[0.6rem] font-display font-bold text-secondary flex items-center gap-1">
+                      <Check size={12} /> Salvo
+                    </span>
+                  )}
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="flex-1 text-right">
@@ -170,9 +321,11 @@ const BolaoPage = () => {
           </div>
           <motion.button
             whileTap={{ scale: 0.97 }}
-            className="w-full bg-primary text-primary-foreground font-display font-bold text-base py-3.5 rounded-xl min-h-[44px] hover:brightness-110 transition-all"
+            onClick={handleConfirmPalpites}
+            disabled={saving}
+            className="w-full bg-primary text-primary-foreground font-display font-bold text-base py-3.5 rounded-xl min-h-[44px] hover:brightness-110 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
           >
-            Confirmar Palpites
+            {saving ? <><Loader2 size={18} className="animate-spin" /> Salvando...</> : 'Confirmar Palpites'}
           </motion.button>
         </div>
       )}
