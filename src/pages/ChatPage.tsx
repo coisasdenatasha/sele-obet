@@ -676,47 +676,100 @@ const ChatPage = () => {
                 </button>
               </div>
 
-              <div className="grid grid-cols-4 gap-3 mb-4">
-                {[
-                  { label: 'WhatsApp', bg: 'bg-[#25D366]/20', color: 'text-[#25D366]', icon: MessageCircle },
-                  { label: 'Telegram', bg: 'bg-[#0088cc]/20', color: 'text-[#0088cc]', icon: Send },
-                  { label: 'Twitter/X', bg: 'bg-foreground/10', color: 'text-foreground', icon: Share2 },
-                  { label: 'Instagram', bg: 'bg-[#E4405F]/20', color: 'text-[#E4405F]', icon: MessageSquare },
-                ].map((item) => {
-                  const Icon = item.icon;
-                  return (
-                    <button
-                      key={item.label}
-                      onClick={() => setSharePost(null)}
-                      className="flex flex-col items-center gap-2 min-h-[44px]"
-                    >
-                      <div className={`w-12 h-12 rounded-full ${item.bg} flex items-center justify-center`}>
-                        <Icon size={20} className={item.color} />
-                      </div>
-                      <span className="text-[0.6rem] font-body text-muted-foreground">{item.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
+              {(() => {
+                const post = allPosts.find(p => p.id === sharePost);
+                const shareText = post
+                  ? `🎯 ${post.bet.match}\n📊 ${post.bet.market} | Odd: ${post.bet.odd.toFixed(2)}${post.bet.stake ? `\n💰 Aposta: R$ ${post.bet.stake}` : ''}${post.bet.result === 'green' ? '\n✅ GREEN!' : post.bet.result === 'red' ? '\n❌ RED' : '\n⏳ Pendente'}\n\n🔥 SeleçãoBet - Apostas Esportivas`
+                  : '🔥 Confira essa aposta na SeleçãoBet!';
+                const encodedText = encodeURIComponent(shareText);
 
-              <div className="flex gap-2">
-                <motion.button
-                  whileTap={{ scale: 0.97 }}
-                  onClick={() => setSharePost(null)}
-                  className="flex-1 flex items-center justify-center gap-2 bg-surface-interactive text-foreground font-body font-semibold text-sm py-3 rounded-xl min-h-[44px]"
-                >
-                  <Link2 size={16} />
-                  Copiar Link
-                </motion.button>
-                <motion.button
-                  whileTap={{ scale: 0.97 }}
-                  onClick={() => setSharePost(null)}
-                  className="flex-1 flex items-center justify-center gap-2 bg-primary text-primary-foreground font-display font-bold text-sm py-3 rounded-xl min-h-[44px]"
-                >
-                  <Copy size={16} />
-                  Copiar Bilhete
-                </motion.button>
-              </div>
+                const shareActions = [
+                  {
+                    label: 'WhatsApp',
+                    bg: 'bg-[#25D366]/20',
+                    color: 'text-[#25D366]',
+                    icon: MessageCircle,
+                    action: () => window.open(`https://wa.me/?text=${encodedText}`, '_blank'),
+                  },
+                  {
+                    label: 'Telegram',
+                    bg: 'bg-[#0088cc]/20',
+                    color: 'text-[#0088cc]',
+                    icon: Send,
+                    action: () => window.open(`https://t.me/share/url?text=${encodedText}`, '_blank'),
+                  },
+                  {
+                    label: 'Twitter/X',
+                    bg: 'bg-foreground/10',
+                    color: 'text-foreground',
+                    icon: Share2,
+                    action: () => window.open(`https://x.com/intent/tweet?text=${encodedText}`, '_blank'),
+                  },
+                  {
+                    label: 'Mais',
+                    bg: 'bg-[#E4405F]/20',
+                    color: 'text-[#E4405F]',
+                    icon: Share2,
+                    action: () => {
+                      if (navigator.share) {
+                        navigator.share({ text: shareText }).catch(() => {});
+                      } else {
+                        navigator.clipboard.writeText(shareText);
+                        toast.success('Texto copiado!');
+                      }
+                    },
+                  },
+                ];
+
+                return (
+                  <>
+                    <div className="grid grid-cols-4 gap-3 mb-4">
+                      {shareActions.map((item) => {
+                        const Icon = item.icon;
+                        return (
+                          <button
+                            key={item.label}
+                            onClick={() => { item.action(); setSharePost(null); }}
+                            className="flex flex-col items-center gap-2 min-h-[44px]"
+                          >
+                            <div className={`w-12 h-12 rounded-full ${item.bg} flex items-center justify-center`}>
+                              <Icon size={20} className={item.color} />
+                            </div>
+                            <span className="text-[0.6rem] font-body text-muted-foreground">{item.label}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    <div className="flex gap-2">
+                      <motion.button
+                        whileTap={{ scale: 0.97 }}
+                        onClick={() => {
+                          navigator.clipboard.writeText(shareText);
+                          toast.success('Texto da aposta copiado!');
+                          setSharePost(null);
+                        }}
+                        className="flex-1 flex items-center justify-center gap-2 bg-surface-interactive text-foreground font-body font-semibold text-sm py-3 rounded-xl min-h-[44px]"
+                      >
+                        <Link2 size={16} />
+                        Copiar Texto
+                      </motion.button>
+                      <motion.button
+                        whileTap={{ scale: 0.97 }}
+                        onClick={() => {
+                          navigator.clipboard.writeText(shareText);
+                          toast.success('Bilhete copiado!');
+                          setSharePost(null);
+                        }}
+                        className="flex-1 flex items-center justify-center gap-2 bg-primary text-primary-foreground font-display font-bold text-sm py-3 rounded-xl min-h-[44px]"
+                      >
+                        <Copy size={16} />
+                        Copiar Bilhete
+                      </motion.button>
+                    </div>
+                  </>
+                );
+              })()}
             </motion.div>
           </>
         )}
