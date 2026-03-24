@@ -78,6 +78,9 @@ const AuthPage = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [over18, setOver18] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
+  const [notExcluded, setNotExcluded] = useState(false);
+  const [acceptRegulation, setAcceptRegulation] = useState(false);
+  const [promoCode, setPromoCode] = useState('');
 
   // Login form
   const [loginEmail, setLoginEmail] = useState('');
@@ -116,7 +119,9 @@ const AuthPage = () => {
     password.length >= 8 &&
     passwordsMatch &&
     over18 &&
-    acceptTerms;
+    acceptTerms &&
+    notExcluded &&
+    acceptRegulation;
 
   const BackButton = ({ to }: { to: AuthStep }) => (
     <button onClick={() => setStep(to)} className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-foreground/70 hover:text-foreground">
@@ -434,20 +439,51 @@ const AuthPage = () => {
                 </div>
               </div>
 
-              {/* Checkboxes */}
+              {/* Código promocional */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-body font-medium text-muted-foreground">Código promocional (opcional)</label>
+                <div className="relative">
+                  <Gift size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                  <input type="text" value={promoCode} onChange={(e) => setPromoCode(e.target.value.toUpperCase())} placeholder="Ex: SELECAO500"
+                    className="w-full bg-surface-interactive rounded-xl py-3 pl-11 pr-4 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]" />
+                </div>
+              </div>
+
+              {/* Termos e Declarações */}
               <div className="space-y-3">
                 <button onClick={() => setOver18(!over18)} className="flex items-start gap-3 min-h-[44px] w-full text-left">
                   <div className={`w-5 h-5 rounded flex-shrink-0 mt-0.5 flex items-center justify-center transition-colors ${over18 ? 'bg-primary' : 'bg-surface-interactive'}`}>
                     {over18 && <Check size={12} className="text-primary-foreground" />}
                   </div>
-                  <span className="text-sm font-body text-foreground/80">Declaro que tenho mais de 18 anos</span>
+                  <span className="text-xs font-body text-foreground/80">
+                    Declaro que tenho 18 (dezoito) anos ou mais e que possuo capacidade civil plena para realizar apostas, conforme o Art. 26 da Lei Nº 14.790/2023.
+                  </span>
                 </button>
+
                 <button onClick={() => setAcceptTerms(!acceptTerms)} className="flex items-start gap-3 min-h-[44px] w-full text-left">
                   <div className={`w-5 h-5 rounded flex-shrink-0 mt-0.5 flex items-center justify-center transition-colors ${acceptTerms ? 'bg-primary' : 'bg-surface-interactive'}`}>
                     {acceptTerms && <Check size={12} className="text-primary-foreground" />}
                   </div>
-                  <span className="text-sm font-body text-foreground/80">
-                    Aceito os <span className="text-primary font-semibold">Termos e Condições</span> e a <span className="text-primary font-semibold">Política de Privacidade</span>
+                  <span className="text-xs font-body text-foreground/80">
+                    Li e aceito os <span className="text-primary font-semibold">Termos e Condições de Uso</span>, a <span className="text-primary font-semibold">Política de Privacidade</span> e as <span className="text-primary font-semibold">Regras de Apostas</span> da SeleçãoBet. Estou ciente de que esta plataforma é regulamentada e monitorada pela Secretaria de Prêmios e Apostas do Ministério da Fazenda (SPA/MF).
+                  </span>
+                </button>
+
+                <button onClick={() => setNotExcluded(!notExcluded)} className="flex items-start gap-3 min-h-[44px] w-full text-left">
+                  <div className={`w-5 h-5 rounded flex-shrink-0 mt-0.5 flex items-center justify-center transition-colors ${notExcluded ? 'bg-primary' : 'bg-surface-interactive'}`}>
+                    {notExcluded && <Check size={12} className="text-primary-foreground" />}
+                  </div>
+                  <span className="text-xs font-body text-foreground/80">
+                    Confirmo e garanto que não estou incluído em nenhuma lista de autoexclusão, lista de sanções nacionais ou internacionais, e que meus recursos não são provenientes de atividades ilícitas, nos termos da Lei Nº 9.613/1998 (Lei de Lavagem de Dinheiro).
+                  </span>
+                </button>
+
+                <button onClick={() => setAcceptRegulation(!acceptRegulation)} className="flex items-start gap-3 min-h-[44px] w-full text-left">
+                  <div className={`w-5 h-5 rounded flex-shrink-0 mt-0.5 flex items-center justify-center transition-colors ${acceptRegulation ? 'bg-primary' : 'bg-surface-interactive'}`}>
+                    {acceptRegulation && <Check size={12} className="text-primary-foreground" />}
+                  </div>
+                  <span className="text-xs font-body text-foreground/80">
+                    Autorizo a SeleçãoBet a realizar a verificação de minha identidade (KYC) e a compartilhar meus dados cadastrais com a Secretaria de Prêmios e Apostas (SPA/MF) e demais órgãos reguladores, conforme exigido pela Lei Nº 14.790/2023 e regulamentações vigentes.
                   </span>
                 </button>
               </div>
