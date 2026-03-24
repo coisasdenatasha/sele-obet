@@ -124,8 +124,9 @@ const GoalReplaysSection = () => {
               </motion.span>
               Replays - Eliminatórias
             </h2>
-            <p className="text-[0.55rem] font-body text-muted-foreground mt-0.5">
-              Copa do Mundo FIFA 26 · CAF
+            <p className="text-[0.55rem] font-body text-muted-foreground mt-0.5 flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse" />
+              Ao vivo · Copa do Mundo FIFA 26 · CAF
             </p>
           </div>
           <motion.a
