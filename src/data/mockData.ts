@@ -195,7 +195,7 @@ export const heroBanners = [
   {
     id: 'banner-1',
     title: 'Rumo ao Hexa',
-    subtitle: 'A contagem regressiva para a Copa do Mundo 2026 está a todo vapor!',
+    subtitle: 'Jogue junto com a Amarelinha',
     cta: 'Apostar Agora',
     accent: 'Brasil',
   },
@@ -223,7 +223,7 @@ export const heroBanners = [
   {
     id: 'banner-5',
     title: 'Brasil vs Marrocos',
-    subtitle: 'A contagem regressiva para a Copa do Mundo 2026 está a todo vapor',
+    subtitle: 'Jogue junto com a Amarelinha',
     cta: 'Apostar Agora',
     accent: 'Brasil',
   },
