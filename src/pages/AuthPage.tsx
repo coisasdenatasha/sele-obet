@@ -698,7 +698,14 @@ const AuthPage = () => {
                       });
                       setAuthLoading(false);
                       if (error) {
-                        setAuthError(error);
+                        const errMap: Record<string, string> = {
+                          'User already registered': 'Este e-mail já está cadastrado',
+                          'Signup requires a valid password': 'A senha informada é inválida',
+                          'Password should be at least 6 characters': 'A senha deve ter pelo menos 6 caracteres',
+                          'Too many requests': 'Muitas tentativas. Aguarde um momento.',
+                          'For security purposes, you can only request this once every 60 seconds': 'Por segurança, aguarde 60 segundos antes de tentar novamente',
+                        };
+                        setAuthError(errMap[error] || error);
                       } else {
                         setStep('success');
                       }
