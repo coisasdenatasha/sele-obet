@@ -1,7 +1,10 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Trash2, Sparkles, Check } from 'lucide-react';
 import { useBetSlipStore } from '@/store/betSlipStore';
+import { useAuthStore } from '@/store/authStore';
+import { toast } from 'sonner';
 
 interface BetSlipPanelProps {
   isOpen: boolean;
@@ -9,17 +12,29 @@ interface BetSlipPanelProps {
 }
 
 const BetSlipPanel = ({ isOpen, onClose }: BetSlipPanelProps) => {
-  const { bets, stake, setStake, removeBet, clearBets, totalOdds, potentialReturn } = useBetSlipStore();
-  const [confirming, setConfirming] = useState(false);
+  const { bets, stake, setStake, removeBet, clearBets, totalOdds, potentialReturn, placeBet, placing } = useBetSlipStore();
+  const { isLoggedIn } = useAuthStore();
+  const navigate = useNavigate();
   const [confirmed, setConfirmed] = useState(false);
 
-  const handleConfirm = () => {
-    setConfirming(true);
-    setTimeout(() => {
-      setConfirming(false);
+  const handleConfirm = async () => {
+    if (!isLoggedIn) {
+      toast.error('Faça login para apostar');
+      navigate('/auth');
+      return;
+    }
+
+    const result = await placeBet();
+
+    if (result.success) {
       setConfirmed(true);
-      setTimeout(() => setConfirmed(false), 2400);
-    }, 800);
+      toast.success('Aposta confirmada!');
+      setTimeout(() => {
+        setConfirmed(false);
+      }, 2400);
+    } else {
+      toast.error(result.error || 'Erro ao confirmar aposta');
+    }
   };
 
   return (
@@ -41,7 +56,6 @@ const BetSlipPanel = ({ isOpen, onClose }: BetSlipPanelProps) => {
             className="fixed bottom-0 left-0 right-0 z-50 glass rounded-t-2xl max-h-[80vh] overflow-y-auto lg:static lg:w-80 lg:rounded-xl lg:max-h-none"
           >
             <div className="p-4 space-y-4">
-              {/* Handle bar */}
               <div className="flex justify-center lg:hidden">
                 <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
               </div>
@@ -62,7 +76,7 @@ const BetSlipPanel = ({ isOpen, onClose }: BetSlipPanelProps) => {
 
               {bets.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground font-body text-sm">
-                  Selecione odds para adicionar apostas
+                  {confirmed ? '' : 'Selecione odds para adicionar apostas'}
                 </div>
               ) : (
                 <>
@@ -86,7 +100,6 @@ const BetSlipPanel = ({ isOpen, onClose }: BetSlipPanelProps) => {
                     ))}
                   </div>
 
-                  {/* AI Suggestion */}
                   <div className="bg-accent/30 rounded-xl p-3 flex items-start gap-2">
                     <Sparkles size={16} className="text-primary mt-0.5 shrink-0" />
                     <p className="text-xs font-body text-foreground/80">
@@ -137,9 +150,7 @@ const BetSlipPanel = ({ isOpen, onClose }: BetSlipPanelProps) => {
                               animate={{ scale: [0, 1.3, 1] }}
                               transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
                               className="w-14 h-14 rounded-full bg-secondary flex items-center justify-center"
-                              style={{
-                                boxShadow: '0 0 30px hsl(145 100% 30% / 0.6), 0 0 60px hsl(145 100% 30% / 0.3)',
-                              }}
+                              style={{ boxShadow: '0 0 30px hsl(145 100% 30% / 0.6), 0 0 60px hsl(145 100% 30% / 0.3)' }}
                             >
                               <Check size={28} className="text-secondary-foreground" strokeWidth={3} />
                             </motion.div>
@@ -156,14 +167,14 @@ const BetSlipPanel = ({ isOpen, onClose }: BetSlipPanelProps) => {
                           <motion.button
                             key="button"
                             onClick={handleConfirm}
-                            disabled={confirming}
+                            disabled={placing}
                             whileTap={{ scale: 0.95 }}
-                            className="confirm-bet-btn w-full relative overflow-hidden font-display font-bold text-base py-3.5 rounded-xl min-h-[44px] text-primary-foreground disabled:opacity-80"
+                            className="w-full relative overflow-hidden font-display font-bold text-base py-3.5 rounded-xl min-h-[44px] text-primary-foreground disabled:opacity-80"
                             style={{
                               background: 'linear-gradient(135deg, hsl(51 100% 50%), hsl(40 100% 55%), hsl(51 100% 50%))',
                               backgroundSize: '200% 200%',
                             }}
-                            animate={confirming ? {
+                            animate={placing ? {
                               backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
                               boxShadow: [
                                 '0 0 15px hsl(51 100% 50% / 0.4)',
@@ -177,28 +188,16 @@ const BetSlipPanel = ({ isOpen, onClose }: BetSlipPanelProps) => {
                                 '0 0 8px hsl(51 100% 50% / 0.3)',
                               ],
                             }}
-                            transition={confirming ? {
-                              duration: 0.6,
-                              repeat: Infinity,
-                              ease: 'easeInOut',
-                            } : {
-                              duration: 2,
-                              repeat: Infinity,
-                              ease: 'easeInOut',
-                            }}
+                            transition={placing ? { duration: 0.6, repeat: Infinity, ease: 'easeInOut' } : { duration: 2, repeat: Infinity, ease: 'easeInOut' }}
                           >
-                            {/* Shine sweep effect */}
                             <motion.div
                               className="absolute inset-0 pointer-events-none"
-                              style={{
-                                background: 'linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.3) 50%, transparent 60%)',
-                              }}
+                              style={{ background: 'linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.3) 50%, transparent 60%)' }}
                               animate={{ x: ['-100%', '200%'] }}
                               transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut', repeatDelay: 1 }}
                             />
-                            {/* Button content */}
                             <span className="relative z-10 flex items-center justify-center gap-2">
-                              {confirming ? (
+                              {placing ? (
                                 <motion.span
                                   className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full"
                                   animate={{ rotate: 360 }}
