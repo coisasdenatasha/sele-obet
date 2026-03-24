@@ -679,7 +679,7 @@ const AuthPage = () => {
                 ))}
               </div>
 
-              <motion.button whileTap={{ scale: 0.97 }} onClick={() => navigate('/')}
+              <motion.button whileTap={{ scale: 0.97 }} onClick={() => { useAuthStore.getState().login({ name: 'João Silva', username: 'joaosilva', level: 'Ouro' }); navigate('/'); }}
                 className="w-full bg-primary text-primary-foreground font-display font-bold text-base py-3.5 rounded-xl min-h-[44px] hover:brightness-110 transition-all">
                 Confirmar
               </motion.button>
