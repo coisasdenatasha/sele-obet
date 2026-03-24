@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Eye, EyeOff, Upload } from 'lucide-react';
+import { ArrowLeft, Eye, EyeOff, Upload, Gift } from 'lucide-react';
 import heroBanner from '@/assets/hero-banner.jpg';
 
 type AuthStep = 'welcome' | 'login' | 'signup' | 'recovery' | 'kyc';

@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { User, TrendingUp, History, Shield, Settings, LogOut, ChevronRight, Award, Trophy, CreditCard } from 'lucide-react';
+import { User, TrendingUp, History, Shield, Settings, LogOut, ChevronRight, Award, Trophy, CreditCard, Star } from 'lucide-react';
 
 const stats = [
   { label: 'Apostas', value: '142' },
