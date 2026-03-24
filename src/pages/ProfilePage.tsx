@@ -22,7 +22,7 @@ const menuItems = [
 
 const ProfilePage = () => {
   const navigate = useNavigate();
-  const { isLoggedIn, user, logout } = useAuthStore();
+  const { isLoggedIn, profile, logout } = useAuthStore();
 
   if (!isLoggedIn) {
     return (
