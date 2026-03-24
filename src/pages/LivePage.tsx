@@ -1,8 +1,10 @@
+import { motion } from 'framer-motion';
 import MatchCard from '@/components/MatchCard';
 import SportFilter from '@/components/SportFilter';
 import LiveBadge from '@/components/LiveBadge';
 import { liveMatches } from '@/data/mockData';
 import { Video } from 'lucide-react';
+import { PageTransition, staggerContainer, staggerItem } from '@/components/animations';
 
 const extraLive = [
   {
@@ -37,6 +39,7 @@ const LivePage = () => {
   const allLive = [...liveMatches, ...extraLive];
 
   return (
+    <PageTransition>
     <div className="space-y-4 pb-20 px-4">
       <div className="flex items-center gap-2 pt-2">
         <LiveBadge />
@@ -45,17 +48,18 @@ const LivePage = () => {
 
       <SportFilter />
 
-      <div className="space-y-3">
+      <motion.div className="space-y-3" variants={staggerContainer} initial="hidden" animate="show">
         {allLive.map((match) => (
-          <div key={match.id} className="relative">
+          <motion.div key={match.id} variants={staggerItem} className="relative">
             <MatchCard {...match} />
             <button className="absolute top-3 right-3 p-2 min-w-[44px] min-h-[44px] flex items-center justify-center bg-surface-interactive rounded-lg text-muted-foreground hover:text-foreground transition-colors">
               <Video size={16} />
             </button>
-          </div>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
     </div>
+    </PageTransition>
   );
 };
 
