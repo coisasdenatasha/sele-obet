@@ -569,6 +569,77 @@ const ChatPage = () => {
           )}
         </AnimatePresence>
       </div>
+
+      {/* Share Bottom Sheet */}
+      <AnimatePresence>
+        {sharePost && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/60 z-40"
+              onClick={() => setSharePost(null)}
+            />
+            <motion.div
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="fixed bottom-0 left-0 right-0 z-50 bg-surface-section rounded-t-2xl p-4 pb-8"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-display font-bold text-base">Compartilhar</h3>
+                <button onClick={() => setSharePost(null)} className="min-w-[44px] min-h-[44px] flex items-center justify-center text-muted-foreground">
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="grid grid-cols-4 gap-3 mb-4">
+                {[
+                  { label: 'WhatsApp', bg: 'bg-[#25D366]/20', color: 'text-[#25D366]', icon: MessageCircle },
+                  { label: 'Telegram', bg: 'bg-[#0088cc]/20', color: 'text-[#0088cc]', icon: Send },
+                  { label: 'Twitter/X', bg: 'bg-foreground/10', color: 'text-foreground', icon: Share2 },
+                  { label: 'Instagram', bg: 'bg-[#E4405F]/20', color: 'text-[#E4405F]', icon: MessageSquare },
+                ].map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <button
+                      key={item.label}
+                      onClick={() => setSharePost(null)}
+                      className="flex flex-col items-center gap-2 min-h-[44px]"
+                    >
+                      <div className={`w-12 h-12 rounded-full ${item.bg} flex items-center justify-center`}>
+                        <Icon size={20} className={item.color} />
+                      </div>
+                      <span className="text-[0.6rem] font-body text-muted-foreground">{item.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="flex gap-2">
+                <motion.button
+                  whileTap={{ scale: 0.97 }}
+                  onClick={() => setSharePost(null)}
+                  className="flex-1 flex items-center justify-center gap-2 bg-surface-interactive text-foreground font-body font-semibold text-sm py-3 rounded-xl min-h-[44px]"
+                >
+                  <Link2 size={16} />
+                  Copiar Link
+                </motion.button>
+                <motion.button
+                  whileTap={{ scale: 0.97 }}
+                  onClick={() => setSharePost(null)}
+                  className="flex-1 flex items-center justify-center gap-2 bg-primary text-primary-foreground font-display font-bold text-sm py-3 rounded-xl min-h-[44px]"
+                >
+                  <Copy size={16} />
+                  Copiar Bilhete
+                </motion.button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
