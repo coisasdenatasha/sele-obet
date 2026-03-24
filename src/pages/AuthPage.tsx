@@ -70,6 +70,7 @@ const AuthPage = () => {
   const [email, setEmail] = useState('');
   const [cpf, setCpf] = useState('');
   const [cep, setCep] = useState('');
+  const [cepLoading, setCepLoading] = useState(false);
   const [estado, setEstado] = useState('');
   const [cidade, setCidade] = useState('');
   const [pais, setPais] = useState('Brasil');
