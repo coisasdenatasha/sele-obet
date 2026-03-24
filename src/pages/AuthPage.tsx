@@ -5,7 +5,7 @@ import {
   ArrowLeft, Eye, EyeOff, Upload, Gift, Check, X,
   ShieldCheck, Camera, FileText, Mail, Lock, User,
   AtSign, Calendar, CreditCard, Fingerprint, CheckCircle2,
-  Smartphone
+  Smartphone, MapPin
 } from 'lucide-react';
 import heroBanner from '@/assets/hero-banner.jpg';
 
@@ -68,6 +68,9 @@ const AuthPage = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [cpf, setCpf] = useState('');
+  const [cep, setCep] = useState('');
+  const [estado, setEstado] = useState('');
+  const [cidade, setCidade] = useState('');
   const [dob, setDob] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -325,7 +328,37 @@ const AuthPage = () => {
                   </div>
                 </div>
 
-                {/* Senha */}
+                {/* Endereço */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-body font-medium text-muted-foreground">CEP</label>
+                  <div className="relative">
+                    <MapPin size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    <input type="text" value={cep} onChange={(e) => {
+                      const v = e.target.value.replace(/\D/g, '').slice(0, 8);
+                      setCep(v.length > 5 ? `${v.slice(0, 5)}-${v.slice(5)}` : v);
+                    }} placeholder="00000-000"
+                      className="w-full bg-surface-interactive rounded-xl py-3 pl-11 pr-4 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]" />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-body font-medium text-muted-foreground">Estado</label>
+                    <select value={estado} onChange={(e) => setEstado(e.target.value)}
+                      className="w-full bg-surface-interactive rounded-xl py-3 px-4 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary min-h-[44px] appearance-none">
+                      <option value="" className="bg-background">UF</option>
+                      {['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'].map(uf => (
+                        <option key={uf} value={uf} className="bg-background">{uf}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-body font-medium text-muted-foreground">Cidade</label>
+                    <input type="text" value={cidade} onChange={(e) => setCidade(e.target.value)} placeholder="Sua cidade"
+                      className="w-full bg-surface-interactive rounded-xl py-3 px-4 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]" />
+                  </div>
+                </div>
+
                 <div className="space-y-1.5">
                   <label className="text-xs font-body font-medium text-muted-foreground">Senha</label>
                   <div className="relative">
