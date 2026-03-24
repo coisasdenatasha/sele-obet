@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Eye, EyeOff, Upload, Gift, Check, X,
-  ShieldCheck, Camera, FileText, Mail, Lock, User,
+  ShieldCheck, Camera, FileText, Mail, Lock, User, UserCircle,
   AtSign, Calendar, CreditCard, Fingerprint, CheckCircle2,
   Smartphone, MapPin
 } from 'lucide-react';
