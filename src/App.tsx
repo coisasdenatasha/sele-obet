@@ -7,6 +7,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
 import BetSlipPanel from "@/components/BetSlipPanel";
+import BetSlipFab from "@/components/BetSlipFab";
+import DrawerMenu from "@/components/DrawerMenu";
 import HomePage from "@/pages/HomePage";
 import LivePage from "@/pages/LivePage";
 import SearchPage from "@/pages/SearchPage";
@@ -18,12 +20,15 @@ import EventDetailPage from "@/pages/EventDetailPage";
 import BolaoPage from "@/pages/BolaoPage";
 import PlansPage from "@/pages/PlansPage";
 import SettingsPage from "@/pages/SettingsPage";
+import CasinoPage from "@/pages/CasinoPage";
+import CrashPage from "@/pages/CrashPage";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
 
 const AppLayout = () => {
   const [betSlipOpen, setBetSlipOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const location = useLocation();
   const isAuthPage = location.pathname === '/auth';
 
@@ -37,11 +42,13 @@ const AppLayout = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
+      <Header onMenuToggle={() => setDrawerOpen(true)} />
       <main className="max-w-7xl mx-auto pt-2">
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/ao-vivo" element={<LivePage />} />
+          <Route path="/cassino" element={<CasinoPage />} />
+          <Route path="/crash" element={<CrashPage />} />
           <Route path="/chat" element={<ChatPage />} />
           <Route path="/busca" element={<SearchPage />} />
           <Route path="/carteira" element={<WalletPage />} />
@@ -53,8 +60,10 @@ const AppLayout = () => {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
-      <BottomNav onBetSlipToggle={() => setBetSlipOpen(!betSlipOpen)} />
+      <BetSlipFab onClick={() => setBetSlipOpen(true)} />
+      <BottomNav />
       <BetSlipPanel isOpen={betSlipOpen} onClose={() => setBetSlipOpen(false)} />
+      <DrawerMenu isOpen={drawerOpen} onClose={() => setDrawerOpen(false)} />
     </div>
   );
 };
