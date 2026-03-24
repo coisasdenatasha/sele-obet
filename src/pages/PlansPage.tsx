@@ -60,10 +60,8 @@ const streamingPlatforms: StreamingPlatform[] = [
   { name: 'HBO Max', type: 'paid', color: 'hsl(var(--primary))', description: 'Filmes, séries e esportes ao vivo', url: 'https://www.hbomax.com/br/pt/sports' },
   { name: 'Amazon Prime', type: 'paid', color: 'hsl(var(--primary))', description: 'Premier League e mais', url: 'https://www.primevideo.com/offers/nonprimehomepage/ref=dv_web_force_root' },
   { name: 'Globoplay', type: 'paid', color: 'hsl(var(--primary))', description: 'Brasileirão e Copa do Brasil', url: 'https://premiere.globo.com/' },
-  { name: 'Netflix', type: 'paid', color: 'hsl(var(--primary))', description: 'Documentários esportivos', url: 'https://www.netflix.com/br/' },
   { name: 'CazéTV', type: 'free', color: 'hsl(var(--secondary))', description: 'Transmissões ao vivo gratuitas', url: 'https://www.youtube.com/watch?v=FlWKYeWAi-M' },
   { name: 'GoatTV', type: 'free', color: 'hsl(var(--secondary))', description: 'Futebol e esportes grátis', url: 'https://www.youtube.com/watch?v=NsXdU5YQ-i0' },
-  { name: 'YouTube', type: 'free', color: 'hsl(var(--secondary))', description: 'Canais esportivos gratuitos', url: 'https://www.youtube.com/' },
 ];
 
 const PlansPage = () => {
