@@ -544,41 +544,6 @@ const HomePage = () => {
       </section>
       </SectionReveal>
 
-      <SectionReveal>
-      <section className="px-4">
-        <SectionTitle icon={<LayoutGrid size={20} className="text-primary" />} action="Ver Todas">
-          Odds por Categoria
-        </SectionTitle>
-        <motion.div className="grid grid-cols-2 gap-3" variants={staggerContainer} initial="hidden" whileInView="show" viewport={{ once: true }}>
-          {oddsByCategory.map((cat) => {
-            const iconMap: Record<string, React.ReactNode> = {
-              trophy: <Trophy size={20} className="text-primary" />,
-              target: <Target size={20} className="text-primary" />,
-              scale: <Scale size={20} className="text-primary" />,
-              card: <CreditCard size={20} className="text-primary" />,
-              corner: <CornerDownRight size={20} className="text-primary" />,
-              user: <User size={20} className="text-primary" />,
-            };
-            return (
-              <motion.div
-                key={cat.id}
-                variants={staggerItem}
-                whileTap={{ scale: 0.97 }}
-                whileHover={{ scale: 1.03 }}
-                className="bg-surface-card rounded-xl p-4 space-y-2 cursor-pointer"
-              >
-                <motion.div className="w-10 h-10 rounded-lg bg-primary/15 flex items-center justify-center animate-float" whileHover={{ rotate: 10 }}>
-                  {iconMap[cat.icon]}
-                </motion.div>
-                <h3 className="font-display text-sm font-bold">{cat.category}</h3>
-                <p className="text-[0.6rem] font-body text-muted-foreground">{cat.description}</p>
-                <span className="text-xs font-display font-bold text-secondary">{cat.matches} mercados</span>
-              </motion.div>
-            );
-          })}
-        </motion.div>
-      </section>
-      </SectionReveal>
 
       {/* Notícias */}
       <NewsSection />
