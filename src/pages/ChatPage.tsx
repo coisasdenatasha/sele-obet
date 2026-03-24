@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Send, Users, TrendingUp, MessageCircle, Crown, Flame, ThumbsUp,
@@ -8,6 +8,8 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface FeedPost {
   id: string;
@@ -202,6 +204,76 @@ const ChatPage = () => {
   const [createName, setCreateName] = useState('');
   const [openComments, setOpenComments] = useState<string | null>(null);
   const [sharePost, setSharePost] = useState<string | null>(null);
+  const [realBets, setRealBets] = useState<FeedPost[]>([]);
+  const [loadingReal, setLoadingReal] = useState(true);
+
+  // Fetch real shared bets from database
+  useEffect(() => {
+    const fetchSharedBets = async () => {
+      setLoadingReal(true);
+      try {
+        const { data: bets, error } = await supabase
+          .from('bets')
+          .select('*')
+          .eq('shared', true)
+          .order('created_at', { ascending: false })
+          .limit(50);
+
+        if (error) throw error;
+
+        if (bets && bets.length > 0) {
+          // Fetch profiles for these users
+          const userIds = [...new Set(bets.map(b => b.user_id))];
+          const { data: profiles } = await supabase
+            .from('profiles')
+            .select('user_id, username, full_name, avatar_url, level')
+            .in('user_id', userIds);
+
+          const profileMap = new Map(profiles?.map(p => [p.user_id, p]) || []);
+
+          const realPosts: FeedPost[] = bets.map((bet, idx) => {
+            const profile = profileMap.get(bet.user_id);
+            const selections = Array.isArray(bet.selections) ? bet.selections : [];
+            const firstSel = selections[0] as Record<string, unknown> | undefined;
+            const timeDiff = Math.floor((Date.now() - new Date(bet.created_at).getTime()) / 60000);
+            const timeAgo = timeDiff < 60 ? `${timeDiff} min` : `${Math.floor(timeDiff / 60)}h`;
+
+            return {
+              id: `real-${bet.id}`,
+              user: {
+                name: profile?.full_name || profile?.username || 'Apostador',
+                username: `@${profile?.username || 'user'}`,
+                avatar: profile?.avatar_url || `https://i.pravatar.cc/80?img=${30 + idx}`,
+                level: profile?.level || 'Bronze',
+                verified: false,
+              },
+              timeAgo,
+              text: (bet as Record<string, unknown>).shared_text as string || undefined,
+              bet: {
+                match: (firstSel?.match as string) || 'Aposta',
+                league: (firstSel?.market as string) || 'Esportes',
+                market: (firstSel?.selection as string) || 'Resultado',
+                odd: bet.total_odds,
+                stake: bet.stake,
+                result: bet.status === 'won' ? 'green' as const : bet.status === 'lost' ? 'red' as const : 'pending' as const,
+              },
+              likes: Math.floor(Math.random() * 50),
+              comments: [],
+              copies: Math.floor(Math.random() * 10),
+            };
+          });
+
+          setRealBets(realPosts);
+        }
+      } catch (err) {
+        console.error('Error fetching shared bets:', err);
+      } finally {
+        setLoadingReal(false);
+      }
+    };
+
+    fetchSharedBets();
+  }, []);
 
   const toggleLike = (postId: string) => {
     setLikedPosts(prev => {
@@ -219,15 +291,17 @@ const ChatPage = () => {
     });
   };
 
+  const allPosts = [...realBets, ...feedPosts];
+
   const getFilteredPosts = () => {
     switch (activeTab) {
-      case 'popular': return feedPosts.sort((a, b) => b.likes - a.likes);
-      case 'apostas': return feedPosts.filter(p => p.bet.result === 'pending');
-      case 'recentes': return [...feedPosts].reverse();
-      case 'odds100': return feedPosts.filter(p => p.bet.odd >= 100);
-      case 'gols': return feedPosts.filter(p => p.bet.market.toLowerCase().includes('gol') || p.bet.market.toLowerCase().includes('marca') || p.bet.market.toLowerCase().includes('over'));
-      case 'jogadores': return feedPosts.filter(p => p.bet.market.includes('Vini') || p.bet.market.includes('Jr') || p.user.verified);
-      default: return feedPosts;
+      case 'popular': return [...allPosts].sort((a, b) => b.likes - a.likes);
+      case 'apostas': return allPosts.filter(p => p.bet.result === 'pending');
+      case 'recentes': return [...allPosts].reverse();
+      case 'odds100': return allPosts.filter(p => p.bet.odd >= 100);
+      case 'gols': return allPosts.filter(p => p.bet.market.toLowerCase().includes('gol') || p.bet.market.toLowerCase().includes('marca') || p.bet.market.toLowerCase().includes('over'));
+      case 'jogadores': return allPosts.filter(p => p.bet.market.includes('Vini') || p.bet.market.includes('Jr') || p.user.verified);
+      default: return allPosts;
     }
   };
 
@@ -520,18 +594,21 @@ const ChatPage = () => {
               <div className="bg-surface-card rounded-xl p-4 space-y-3">
                 <h3 className="font-display font-bold text-sm flex items-center gap-2">
                   <Plus size={16} className="text-primary" />
-                  Criar Publicacao
+                  Compartilhar sua Aposta
                 </h3>
+                <p className="text-xs font-body text-muted-foreground">
+                  Suas apostas confirmadas aparecem automaticamente no feed quando você compartilha. Vá em Histórico de Apostas para compartilhar!
+                </p>
                 <input
                   value={createName}
                   onChange={(e) => setCreateName(e.target.value)}
-                  placeholder="O que voce esta apostando?"
+                  placeholder="Adicione um comentário à sua aposta..."
                   className="w-full bg-surface-interactive rounded-xl py-3 px-4 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]"
                 />
                 <div className="space-y-2">
                   <p className="text-xs font-body text-muted-foreground">Tipo</p>
                   <div className="flex flex-wrap gap-1.5">
-                    {['Simples', 'Multipla', 'Tip', 'Analise', 'Resultado'].map(cat => (
+                    {['Simples', 'Múltipla', 'Tip', 'Análise', 'Resultado'].map(cat => (
                       <button key={cat} className="px-3 py-1.5 bg-surface-interactive rounded-full text-xs font-body text-foreground/70 hover:bg-primary hover:text-primary-foreground transition-colors min-h-[32px]">
                         {cat}
                       </button>
@@ -540,10 +617,14 @@ const ChatPage = () => {
                 </div>
                 <motion.button
                   whileTap={{ scale: 0.97 }}
-                  onClick={() => { if (!isLoggedIn) navigate('/auth'); }}
+                  onClick={() => {
+                    if (!isLoggedIn) { navigate('/auth'); return; }
+                    navigate('/historico');
+                    toast('Vá ao Histórico de Apostas', { description: 'Clique em "Compartilhar" em qualquer aposta para publicar no Social' });
+                  }}
                   className="w-full bg-primary text-primary-foreground font-display font-bold text-sm py-3 rounded-xl min-h-[44px]"
                 >
-                  Publicar
+                  Ver minhas Apostas
                 </motion.button>
               </div>
             </motion.div>

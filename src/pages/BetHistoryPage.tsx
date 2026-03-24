@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Check, X, Clock, ChevronDown, ChevronUp, Trophy, Calendar, Loader2 } from 'lucide-react';
+import { ArrowLeft, Check, X, Clock, ChevronDown, ChevronUp, Trophy, Calendar, Loader2, Share2 } from 'lucide-react';
 import { PageTransition, staggerContainer, staggerItem } from '@/components/animations';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStore } from '@/store/authStore';
+import { toast } from 'sonner';
 
 type BetStatus = 'won' | 'lost' | 'pending' | 'cashout';
 
@@ -25,6 +26,7 @@ interface Bet {
   status: BetStatus;
   payout: number;
   settled_at: string | null;
+  shared?: boolean;
 }
 
 const statusConfig: Record<BetStatus, { label: string; color: string; icon: typeof Check }> = {
@@ -246,6 +248,31 @@ const BetHistoryPage = () => {
                                 {config.label}
                               </span>
                             </div>
+
+                            {/* Share to Social */}
+                            <motion.button
+                              whileTap={{ scale: 0.97 }}
+                              onClick={async () => {
+                                const { error } = await supabase
+                                  .from('bets')
+                                  .update({ shared: !(bet as any).shared })
+                                  .eq('id', bet.id);
+                                if (!error) {
+                                  setBets(prev => prev.map(b => b.id === bet.id ? { ...b, shared: !(bet as any).shared } : b));
+                                  toast((bet as any).shared ? 'Aposta removida do Social' : 'Aposta compartilhada no Social!', {
+                                    description: (bet as any).shared ? 'Sua aposta não aparece mais no feed' : 'Outros usuários podem ver sua aposta agora'
+                                  });
+                                }
+                              }}
+                              className={`w-full py-2.5 rounded-xl font-display font-bold text-xs min-h-[44px] flex items-center justify-center gap-2 transition-all ${
+                                (bet as any).shared
+                                  ? 'bg-secondary/15 text-secondary'
+                                  : 'bg-primary/15 text-primary'
+                              }`}
+                            >
+                              <Share2 size={14} />
+                              {(bet as any).shared ? 'Compartilhado no Social' : 'Compartilhar no Social'}
+                            </motion.button>
                           </div>
                         </motion.div>
                       )}
