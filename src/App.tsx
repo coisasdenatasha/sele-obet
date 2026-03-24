@@ -10,6 +10,7 @@ import BetSlipPanel from "@/components/BetSlipPanel";
 import HomePage from "@/pages/HomePage";
 import LivePage from "@/pages/LivePage";
 import SearchPage from "@/pages/SearchPage";
+import ChatPage from "@/pages/ChatPage";
 import WalletPage from "@/pages/WalletPage";
 import ProfilePage from "@/pages/ProfilePage";
 import AuthPage from "@/pages/AuthPage";
@@ -41,6 +42,7 @@ const AppLayout = () => {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/ao-vivo" element={<LivePage />} />
+          <Route path="/chat" element={<ChatPage />} />
           <Route path="/busca" element={<SearchPage />} />
           <Route path="/carteira" element={<WalletPage />} />
           <Route path="/perfil" element={<ProfilePage />} />
