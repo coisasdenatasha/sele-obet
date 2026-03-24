@@ -112,18 +112,15 @@ const AuthPage = () => {
   const pwStrength = getPasswordStrength(password);
   const passwordsMatch = password === confirmPassword && confirmPassword.length > 0;
 
-  const signupValid =
-    fullName.trim().length >= 3 &&
-    username.trim().length >= 3 &&
-    isEmailValid(email) &&
-    cpfValid &&
-    dobValid &&
-    password.length >= 8 &&
-    passwordsMatch &&
-    over18 &&
-    acceptTerms &&
-    notExcluded &&
-    acceptRegulation;
+  // Step validations
+  const step1Valid = fullName.trim().length >= 3 && username.trim().length >= 3 && isEmailValid(email) && cpfValid && dobValid;
+  const step2Valid = telefone.replace(/\D/g, '').length >= 10;
+  const step3Valid = password.length >= 8 && passwordsMatch;
+  const step4Valid = over18 && acceptTerms && notExcluded && acceptRegulation;
+  const signupValid = step1Valid && step2Valid && step3Valid && step4Valid;
+  const currentStepValid = signupStep === 1 ? step1Valid : signupStep === 2 ? step2Valid : signupStep === 3 ? step3Valid : step4Valid;
+
+  const signupStepLabels = ['Dados Pessoais', 'Endereço', 'Segurança', 'Termos'];
 
   const BackButton = ({ to }: { to: AuthStep }) => (
     <button onClick={() => setStep(to)} className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-foreground/70 hover:text-foreground">
