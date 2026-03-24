@@ -227,7 +227,7 @@ const PlansPage = () => {
                     </span>
                   )}
                 </div>
-                <p className="text-xs font-body text-muted-foreground truncate">{platform.description}</p>
+                
               </div>
               <ExternalLink size={16} className="text-muted-foreground shrink-0" />
             </a>
