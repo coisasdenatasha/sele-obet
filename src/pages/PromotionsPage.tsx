@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Gift, Zap, RotateCcw, Trophy, ChevronRight, Clock, Bell, BellOff } from 'lucide-react';
 import { PageTransition, SectionReveal, staggerContainer, staggerItem } from '@/components/animations';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '@/store/authStore';
 
 type PromoCategory = 'all' | 'freebet' | 'odds' | 'cashback' | 'bolao';
 
@@ -185,6 +187,8 @@ const PromotionsPage = () => {
   const [active, setActive] = useState<PromoCategory>('all');
   const [reminders, setReminders] = useState<Set<string>>(new Set());
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const navigate = useNavigate();
+  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
 
   const filtered = active === 'all' ? promos : promos.filter((p) => p.category === active);
 
@@ -209,6 +213,99 @@ const PromotionsPage = () => {
       next.add(id);
       return next;
     });
+  };
+
+  const requireLogin = () => {
+    toast('Faça login para continuar', {
+      description: 'Entre na sua conta para usar promoções, participar e convidar amigos.'
+    });
+    navigate('/auth');
+  };
+
+  const shareInvite = async (title: string) => {
+    const text = `Estou usando a SeleçãoBet! Bora participar comigo da promoção "${title}".`;
+    const url = window.location.origin;
+
+    try {
+      if (navigator.share) {
+        await navigator.share({ title, text, url });
+        toast('Convite aberto para compartilhar', {
+          description: 'Escolha WhatsApp, Telegram, X ou outro app disponível no seu celular.'
+        });
+        return;
+      }
+
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(`${text} ${url}`);
+        toast('Convite copiado', {
+          description: 'Cole no WhatsApp, Telegram, X ou Instagram para enviar.'
+        });
+        return;
+      }
+
+      toast('Não foi possível compartilhar agora', {
+        description: 'Tente novamente em um navegador com suporte a compartilhamento.'
+      });
+    } catch {
+      toast('Compartilhamento cancelado');
+    }
+  };
+
+  const handlePromoCta = async (promo: Promo) => {
+    if (!isLoggedIn) {
+      requireLogin();
+      return;
+    }
+
+    switch (promo.id) {
+      case 'fb-1':
+        toast('Como participar', {
+          description: 'Faça R$50+ em apostas qualificadas na semana (odds mínimas 1.50) para liberar sua free bet.'
+        });
+        navigate('/esportes');
+        return;
+      case 'fb-2':
+        toast('Como usar', {
+          description: 'Faça sua 1ª aposta com odds mínimas 1.80; se perder, o crédito de volta cai em até 24h.'
+        });
+        navigate('/esportes');
+        return;
+      case 'fb-3':
+        await shareInvite(promo.title);
+        return;
+      case 'odds-1':
+      case 'odds-2':
+      case 'odds-3':
+        toast('Odds turbinadas abertas', {
+          description: 'Escolha o mercado destacado e confirme sua aposta para usar as cotações especiais.'
+        });
+        navigate('/ao-vivo');
+        return;
+      case 'cb-1':
+        toast('Cashback semanal ativo', {
+          description: 'Acompanhe na carteira. O crédito é calculado e lançado na segunda-feira.'
+        });
+        navigate('/carteira');
+        return;
+      case 'cb-2':
+        toast('Cashback ao vivo pronto', {
+          description: 'Entre em Ao Vivo, aposte com odds mínimas de 1.50 e receba o cashback automático.'
+        });
+        navigate('/ao-vivo');
+        return;
+      case 'bolao-1':
+      case 'bolao-2':
+      case 'bolao-3':
+        toast('Bolão liberado', {
+          description: 'Abra o bolão, confirme seus palpites e finalize para entrar na rodada.'
+        });
+        navigate('/bolao');
+        return;
+      default:
+        toast('Promoção selecionada', {
+          description: 'Siga as regras da oferta e confirme sua participação.'
+        });
+    }
   };
 
   return (
@@ -335,6 +432,7 @@ const PromotionsPage = () => {
                       <div className="flex gap-2">
                         <motion.button
                           whileTap={{ scale: 0.97 }}
+                          onClick={() => void handlePromoCta(promo)}
                           className="flex-1 bg-primary text-primary-foreground font-display font-bold text-sm py-2.5 rounded-xl min-h-[44px] hover:brightness-110 transition-all">
                           
                           {promo.cta}
