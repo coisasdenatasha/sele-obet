@@ -816,8 +816,11 @@ const AuthPage = () => {
                 Confirmar
               </motion.button>
 
-              <button className="w-full text-center text-xs text-primary font-body font-semibold min-h-[44px]">
-                Reenviar código (00:59)
+              <button
+                disabled={!otpCanResend}
+                onClick={() => { setOtpTimer(60); setOtpCanResend(false); }}
+                className={`w-full text-center text-xs font-body font-semibold min-h-[44px] ${otpCanResend ? 'text-primary' : 'text-muted-foreground'}`}>
+                {otpCanResend ? 'Reenviar código' : `Reenviar código (${String(Math.floor(otpTimer / 60)).padStart(2, '0')}:${String(otpTimer % 60).padStart(2, '0')})`}
               </button>
             </div>
           </motion.div>
