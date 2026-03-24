@@ -4,6 +4,7 @@ import { Radio, Video, ChevronDown, Star } from 'lucide-react';
 import MatchCard from '@/components/MatchCard';
 import { liveMatches } from '@/data/mockData';
 import { PageTransition, staggerContainer, staggerItem } from '@/components/animations';
+import StreamingSection from '@/components/home/StreamingSection';
 
 const extraLive = [
   {
@@ -207,6 +208,9 @@ const LivePage = () => {
             </motion.div>
           )}
         </div>
+
+        {/* Streaming Esportivo */}
+        <StreamingSection />
       </div>
     </PageTransition>
   );
