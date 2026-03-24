@@ -1,5 +1,7 @@
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import OddsChip from './OddsChip';
+import LiveBadge from './LiveBadge';
 import LiveBadge from './LiveBadge';
 
 interface MatchCardProps {
@@ -29,7 +31,10 @@ const MatchCard = ({
   const matchName = `${homeTeam} vs ${awayTeam}`;
 
   return (
-    <div className="bg-surface-card rounded-xl p-4 space-y-3" onClick={() => navigate(`/evento/${id}`)} role="button">
+    <motion.div
+      whileHover={{ scale: 1.01 }}
+      whileTap={{ scale: 0.98 }}
+      className="bg-surface-card rounded-xl p-4 space-y-3 cursor-pointer" onClick={() => navigate(`/evento/${id}`)} role="button">
       <div className="flex items-center justify-between">
         <span className="text-[0.65rem] font-body text-muted-foreground uppercase tracking-wider">
           {league}
@@ -88,7 +93,7 @@ const MatchCard = ({
           originalOdds={originalOddsAway}
         />
       </div>
-    </div>
+    </motion.div>
   );
 };
 
