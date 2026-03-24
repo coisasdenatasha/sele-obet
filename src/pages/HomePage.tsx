@@ -2,8 +2,10 @@ import { motion } from 'framer-motion';
 import heroBanner from '@/assets/hero-banner.jpg';
 import MatchCard from '@/components/MatchCard';
 import SportFilter from '@/components/SportFilter';
+import VisitorBanner from '@/components/VisitorBanner';
 import { liveMatches, boostedMatches, upcomingMatches, popularMultiples } from '@/data/mockData';
 import { useBetSlipStore } from '@/store/betSlipStore';
+import { useAuthStore } from '@/store/authStore';
 import { Flame, ChevronRight, Trophy, Gift } from 'lucide-react';
 
 const SectionTitle = ({ children, icon, action }: { children: React.ReactNode; icon?: React.ReactNode; action?: string }) => (
@@ -22,9 +24,12 @@ const SectionTitle = ({ children, icon, action }: { children: React.ReactNode; i
 
 const HomePage = () => {
   const addBet = useBetSlipStore((s) => s.addBet);
+  const { isLoggedIn } = useAuthStore();
 
   return (
     <div className="space-y-6 pb-20">
+      {/* Visitor Banner */}
+      {!isLoggedIn && <VisitorBanner />}
       {/* Hero Banner */}
       <div className="relative rounded-xl overflow-hidden mx-1">
         <img src={heroBanner} alt="SeleçãoBet" className="w-full h-48 sm:h-64 object-cover" width={1920} height={800} />
