@@ -32,7 +32,7 @@ const HomePage = () => {
         <div className="absolute bottom-4 left-4 right-4">
           <span className="text-[0.65rem] font-body font-semibold text-primary uppercase tracking-widest">Promoção</span>
           <h1 className="font-display text-2xl sm:text-3xl font-extrabold leading-tight mt-1">
-            Rumo ao Hexa 🇧🇷
+            Rumo ao Hexa
           </h1>
           <p className="text-sm font-body text-foreground/80 mt-1">
             Ganhe até <span className="text-primary font-bold">R$ 500</span> no primeiro depósito

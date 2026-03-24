@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { Flame } from 'lucide-react';
 import { useBetSlipStore } from '@/store/betSlipStore';
 import { cn } from '@/lib/utils';
 
@@ -45,7 +46,7 @@ const OddsChip = ({ odds, label, betId, match, market, selection, boosted, origi
         <span className={cn("text-base font-bold", boosted && "text-primary")}>
           {odds.toFixed(2)}
         </span>
-        {boosted && <span className="text-xs">🔥</span>}
+        {boosted && <Flame size={14} className="text-primary" />}
       </div>
     </motion.button>
   );

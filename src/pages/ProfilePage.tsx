@@ -32,7 +32,7 @@ const ProfilePage = () => {
           <h2 className="font-display text-xl font-bold">João Silva</h2>
           <div className="flex items-center gap-2 mt-0.5">
             <span className="bg-primary/20 text-primary text-[0.65rem] font-display font-bold px-2 py-0.5 rounded-full">
-              ⭐ Nível Ouro
+              <Star size={12} className="inline mr-0.5" /> Nível Ouro
             </span>
             <span className="text-xs text-muted-foreground font-body">Membro desde Jan 2025</span>
           </div>
