@@ -76,6 +76,8 @@ const AuthPage = () => {
 
   // Login form
   const [loginEmail, setLoginEmail] = useState('');
+  const [loginUsername, setLoginUsername] = useState('');
+  const [loginCpf, setLoginCpf] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
 
   // Recovery
