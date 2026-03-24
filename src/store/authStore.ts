@@ -98,6 +98,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   // Legacy compat for mock flows
-  login: (user) => set({ isLoggedIn: true, profile: { full_name: user.name, username: user.username, level: user.level, avatar_url: null } }),
+  login: (user) => set({ isLoggedIn: true, profile: { full_name: user.name, username: user.username, level: user.level, avatar_url: null, phone: null, cpf: null, dob: null, country: null, state: null, city: null } }),
   logout: () => { get().signOut(); },
 }));
