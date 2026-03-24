@@ -140,10 +140,6 @@ const HomePage = () => {
       {/* 1. Hero Carousel */}
       <HeroCarousel />
 
-      {/* Sport Filter */}
-      <div className="px-4">
-        <SportFilter />
-      </div>
 
       {/* 2. Live Matches */}
       <section className="px-4">
