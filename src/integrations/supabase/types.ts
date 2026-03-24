@@ -22,6 +22,8 @@ export type Database = {
           potential_return: number
           selections: Json
           settled_at: string | null
+          shared: boolean
+          shared_text: string | null
           stake: number
           status: string
           total_odds: number
@@ -34,6 +36,8 @@ export type Database = {
           potential_return: number
           selections?: Json
           settled_at?: string | null
+          shared?: boolean
+          shared_text?: string | null
           stake: number
           status?: string
           total_odds: number
@@ -46,6 +50,8 @@ export type Database = {
           potential_return?: number
           selections?: Json
           settled_at?: string | null
+          shared?: boolean
+          shared_text?: string | null
           stake?: number
           status?: string
           total_odds?: number
