@@ -185,21 +185,11 @@ const AuthPage = () => {
 
               <div className="space-y-4">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-body font-medium text-muted-foreground">E-mail ou nome de usuário</label>
+                  <label className="text-xs font-body font-medium text-muted-foreground">E-mail, usuário ou CPF</label>
                   <div className="relative">
-                    <Mail size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    <User size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
                     <input type="text" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)}
-                      placeholder="seu@email.com ou @usuario"
-                      className="w-full bg-surface-interactive rounded-xl py-3 pl-11 pr-4 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]" />
-                  </div>
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-body font-medium text-muted-foreground">CPF</label>
-                  <div className="relative">
-                    <CreditCard size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                    <input type="text" value={loginCpf} onChange={(e) => setLoginCpf(maskCPF(e.target.value))}
-                      placeholder="000.000.000-00"
+                      placeholder="E-mail, @usuario ou CPF"
                       className="w-full bg-surface-interactive rounded-xl py-3 pl-11 pr-4 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]" />
                   </div>
                 </div>
