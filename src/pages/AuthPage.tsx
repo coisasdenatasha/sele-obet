@@ -8,6 +8,7 @@ import {
   Smartphone, MapPin
 } from 'lucide-react';
 import heroBanner from '@/assets/hero-banner.jpg';
+import { useAuthStore } from '@/store/authStore';
 
 type AuthStep = 'welcome' | 'login' | 'signup' | 'recovery' | 'kyc' | 'otp' | 'success';
 
