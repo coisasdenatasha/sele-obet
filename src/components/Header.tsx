@@ -10,6 +10,7 @@ const Header = () => {
   return (
     <>
       <header className="sticky top-0 z-30 bg-accent px-4 py-3">
+        <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-b from-accent to-transparent pointer-events-none translate-y-full z-20" />
         <div className="flex items-center justify-between max-w-7xl mx-auto">
           {/* Perfil à esquerda */}
           <button
