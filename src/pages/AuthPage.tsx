@@ -123,6 +123,26 @@ const AuthPage = () => {
 
   // OTP
   const [otpCode, setOtpCode] = useState(['', '', '', '', '', '']);
+  const [otpTimer, setOtpTimer] = useState(60);
+  const [otpCanResend, setOtpCanResend] = useState(false);
+
+  // OTP countdown timer
+  useEffect(() => {
+    if (step !== 'otp') return;
+    setOtpTimer(60);
+    setOtpCanResend(false);
+    const interval = setInterval(() => {
+      setOtpTimer(prev => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          setOtpCanResend(true);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [step]);
 
   // Taken usernames (simulated)
   const takenUsernames = ['admin', 'joaosilva', 'usuario', 'test', 'bot', 'moderador', 'suporte'];
