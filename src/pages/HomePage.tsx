@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, Radio, Flame, Trophy, Gift, Zap, LogIn, Play } from 'lucide-react';
+import { ChevronRight, Radio, Flame, Trophy, Gift, Zap, LogIn, Play, Receipt } from 'lucide-react';
 import bannerHexa from '@/assets/banner-hexa.jpg';
 import bannerOdds from '@/assets/banner-odds.jpg';
 import bannerBonus from '@/assets/banner-bonus.jpg';
