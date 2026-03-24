@@ -1,15 +1,115 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Eye, EyeOff, Upload, Gift } from 'lucide-react';
+import {
+  ArrowLeft, Eye, EyeOff, Upload, Gift, Check, X,
+  ShieldCheck, Camera, FileText, Mail, Lock, User,
+  AtSign, Calendar, CreditCard, Fingerprint, CheckCircle2,
+  Smartphone
+} from 'lucide-react';
 import heroBanner from '@/assets/hero-banner.jpg';
 
-type AuthStep = 'welcome' | 'login' | 'signup' | 'recovery' | 'kyc';
+type AuthStep = 'welcome' | 'login' | 'signup' | 'recovery' | 'kyc' | 'otp' | 'success';
+
+// CPF validation
+const isValidCPF = (cpf: string): boolean => {
+  const cleaned = cpf.replace(/\D/g, '');
+  if (cleaned.length !== 11 || /^(\d)\1+$/.test(cleaned)) return false;
+  let sum = 0;
+  for (let i = 0; i < 9; i++) sum += parseInt(cleaned[i]) * (10 - i);
+  let rem = (sum * 10) % 11;
+  if (rem === 10) rem = 0;
+  if (rem !== parseInt(cleaned[9])) return false;
+  sum = 0;
+  for (let i = 0; i < 10; i++) sum += parseInt(cleaned[i]) * (11 - i);
+  rem = (sum * 10) % 11;
+  if (rem === 10) rem = 0;
+  return rem === parseInt(cleaned[10]);
+};
+
+// Password strength
+const getPasswordStrength = (pw: string): { level: number; label: string; color: string } => {
+  let score = 0;
+  if (pw.length >= 8) score++;
+  if (/[A-Z]/.test(pw)) score++;
+  if (/[0-9]/.test(pw)) score++;
+  if (/[^A-Za-z0-9]/.test(pw)) score++;
+  if (pw.length >= 12) score++;
+  if (score <= 1) return { level: score, label: 'Fraca', color: 'bg-destructive' };
+  if (score <= 3) return { level: score, label: 'Média', color: 'bg-primary' };
+  return { level: score, label: 'Forte', color: 'bg-secondary' };
+};
+
+// CPF mask
+const maskCPF = (v: string) => {
+  const d = v.replace(/\D/g, '').slice(0, 11);
+  if (d.length <= 3) return d;
+  if (d.length <= 6) return `${d.slice(0, 3)}.${d.slice(3)}`;
+  if (d.length <= 9) return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6)}`;
+  return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6, 9)}-${d.slice(9)}`;
+};
+
+// Date mask
+const maskDate = (v: string) => {
+  const d = v.replace(/\D/g, '').slice(0, 8);
+  if (d.length <= 2) return d;
+  if (d.length <= 4) return `${d.slice(0, 2)}/${d.slice(2)}`;
+  return `${d.slice(0, 2)}/${d.slice(2, 4)}/${d.slice(4)}`;
+};
 
 const AuthPage = () => {
   const [step, setStep] = useState<AuthStep>('welcome');
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
+
+  // Signup form
+  const [fullName, setFullName] = useState('');
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [cpf, setCpf] = useState('');
+  const [dob, setDob] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [over18, setOver18] = useState(false);
+  const [acceptTerms, setAcceptTerms] = useState(false);
+
+  // Login form
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+
+  // Recovery
+  const [recoveryEmail, setRecoveryEmail] = useState('');
+  const [recoverySent, setRecoverySent] = useState(false);
+
+  // KYC
+  const [kycStatus, setKycStatus] = useState<'pending' | 'analyzing' | 'approved' | 'rejected'>('pending');
+  const [docFront, setDocFront] = useState<string | null>(null);
+  const [docBack, setDocBack] = useState<string | null>(null);
+  const [selfie, setSelfie] = useState<string | null>(null);
+
+  // OTP
+  const [otpCode, setOtpCode] = useState(['', '', '', '', '', '']);
+
+  // Validation helpers
+  const isEmailValid = (e: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+  const cpfClean = cpf.replace(/\D/g, '');
+  const cpfValid = cpfClean.length === 11 && isValidCPF(cpf);
+  const dobClean = dob.replace(/\D/g, '');
+  const dobValid = dobClean.length === 8;
+  const pwStrength = getPasswordStrength(password);
+  const passwordsMatch = password === confirmPassword && confirmPassword.length > 0;
+
+  const signupValid =
+    fullName.trim().length >= 3 &&
+    username.trim().length >= 3 &&
+    isEmailValid(email) &&
+    cpfValid &&
+    dobValid &&
+    password.length >= 8 &&
+    passwordsMatch &&
+    over18 &&
+    acceptTerms;
 
   const BackButton = ({ to }: { to: AuthStep }) => (
     <button onClick={() => setStep(to)} className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-foreground/70 hover:text-foreground">
@@ -17,32 +117,27 @@ const AuthPage = () => {
     </button>
   );
 
-  const InputField = ({ label, type = 'text', placeholder, icon }: { label: string; type?: string; placeholder: string; icon?: React.ReactNode }) => (
-    <div className="space-y-1.5">
-      <label className="text-xs font-body font-medium text-muted-foreground">{label}</label>
-      <div className="relative">
-        <input
-          type={type === 'password' && showPassword ? 'text' : type}
-          placeholder={placeholder}
-          className="w-full bg-surface-interactive rounded-xl py-3 px-4 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]"
-        />
-        {type === 'password' && (
-          <button
-            type="button"
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 p-1 min-w-[44px] min-h-[44px] flex items-center justify-center text-muted-foreground"
-          >
-            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-          </button>
-        )}
-        {icon && <div className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">{icon}</div>}
-      </div>
+  const ValidationIcon = ({ valid }: { valid: boolean }) => (
+    <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${valid ? 'bg-secondary/20' : 'bg-surface-interactive'}`}>
+      {valid ? <Check size={12} className="text-secondary" /> : <X size={12} className="text-muted-foreground/40" />}
     </div>
   );
+
+  const handleOtpInput = useCallback((index: number, value: string) => {
+    if (!/^\d*$/.test(value)) return;
+    const newCode = [...otpCode];
+    newCode[index] = value.slice(-1);
+    setOtpCode(newCode);
+    if (value && index < 5) {
+      const next = document.getElementById(`otp-${index + 1}`);
+      next?.focus();
+    }
+  }, [otpCode]);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <AnimatePresence mode="wait">
+        {/* WELCOME */}
         {step === 'welcome' && (
           <motion.div key="welcome" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex-1 flex flex-col">
             <div className="relative h-[45vh]">
@@ -56,25 +151,19 @@ const AuthPage = () => {
             <div className="flex-1 px-6 pt-6 pb-8 flex flex-col justify-between">
               <div className="space-y-3">
                 <h1 className="font-display text-2xl font-extrabold leading-tight">
-                  A emoção do jogo<br />na palma da mão 🇧🇷
+                  A emoção do jogo<br />na palma da mão
                 </h1>
                 <p className="text-sm font-body text-muted-foreground">
                   Odds turbinadas, apostas ao vivo e os melhores mercados. Ganhe até <span className="text-primary font-bold">R$ 500</span> no primeiro depósito!
                 </p>
               </div>
               <div className="space-y-3 mt-8">
-                <motion.button
-                  whileTap={{ scale: 0.97 }}
-                  onClick={() => setStep('signup')}
-                  className="w-full bg-primary text-primary-foreground font-display font-bold text-base py-3.5 rounded-xl min-h-[44px] hover:brightness-110 transition-all"
-                >
+                <motion.button whileTap={{ scale: 0.97 }} onClick={() => setStep('signup')}
+                  className="w-full bg-primary text-primary-foreground font-display font-bold text-base py-3.5 rounded-xl min-h-[44px] hover:brightness-110 transition-all">
                   Criar Conta Grátis
                 </motion.button>
-                <motion.button
-                  whileTap={{ scale: 0.97 }}
-                  onClick={() => setStep('login')}
-                  className="w-full bg-surface-interactive text-foreground font-display font-bold text-base py-3.5 rounded-xl min-h-[44px] hover:bg-muted transition-colors"
-                >
+                <motion.button whileTap={{ scale: 0.97 }} onClick={() => setStep('login')}
+                  className="w-full bg-surface-interactive text-foreground font-display font-bold text-base py-3.5 rounded-xl min-h-[44px] hover:bg-muted transition-colors">
                   Já tenho conta
                 </motion.button>
               </div>
@@ -82,6 +171,7 @@ const AuthPage = () => {
           </motion.div>
         )}
 
+        {/* LOGIN */}
         {step === 'login' && (
           <motion.div key="login" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} className="flex-1 px-6 pt-4 pb-8">
             <BackButton to="welcome" />
@@ -90,20 +180,48 @@ const AuthPage = () => {
                 <h2 className="font-display text-2xl font-extrabold">Entrar</h2>
                 <p className="text-sm font-body text-muted-foreground mt-1">Bem-vindo de volta!</p>
               </div>
+
               <div className="space-y-4">
-                <InputField label="E-mail" type="email" placeholder="seu@email.com" />
-                <InputField label="Senha" type="password" placeholder="Sua senha" />
+                <div className="space-y-1.5">
+                  <label className="text-xs font-body font-medium text-muted-foreground">E-mail</label>
+                  <div className="relative">
+                    <Mail size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    <input type="email" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)}
+                      placeholder="seu@email.com"
+                      className="w-full bg-surface-interactive rounded-xl py-3 pl-11 pr-4 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]" />
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-body font-medium text-muted-foreground">Senha</label>
+                  <div className="relative">
+                    <Lock size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    <input type={showPassword ? 'text' : 'password'} value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)}
+                      placeholder="Sua senha"
+                      className="w-full bg-surface-interactive rounded-xl py-3 pl-11 pr-12 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]" />
+                    <button type="button" onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 min-w-[44px] min-h-[44px] flex items-center justify-center text-muted-foreground">
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
+                </div>
               </div>
+
               <button onClick={() => setStep('recovery')} className="text-xs font-body text-primary font-semibold min-h-[44px]">
                 Esqueceu a senha?
               </button>
-              <motion.button
-                whileTap={{ scale: 0.97 }}
-                onClick={() => navigate('/')}
-                className="w-full bg-primary text-primary-foreground font-display font-bold text-base py-3.5 rounded-xl min-h-[44px] hover:brightness-110 transition-all"
-              >
+
+              <motion.button whileTap={{ scale: 0.97 }} onClick={() => { setStep('otp'); }}
+                className="w-full bg-primary text-primary-foreground font-display font-bold text-base py-3.5 rounded-xl min-h-[44px] hover:brightness-110 transition-all">
                 Entrar
               </motion.button>
+
+              {/* Biometria */}
+              <button className="w-full bg-surface-card text-foreground font-body font-semibold text-sm py-3 rounded-xl min-h-[44px] flex items-center justify-center gap-2 hover:bg-surface-interactive transition-colors">
+                <Fingerprint size={20} className="text-primary" />
+                Entrar com Face ID / Biometria
+              </button>
+
               <div className="relative my-4">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full bg-surface-interactive h-px" />
@@ -112,6 +230,7 @@ const AuthPage = () => {
                   <span className="bg-background px-3 text-xs text-muted-foreground font-body">ou</span>
                 </div>
               </div>
+
               <button className="w-full bg-surface-card text-foreground font-body font-semibold text-sm py-3 rounded-xl min-h-[44px] flex items-center justify-center gap-2 hover:bg-surface-interactive transition-colors">
                 <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
                 Entrar com Google
@@ -120,21 +239,153 @@ const AuthPage = () => {
           </motion.div>
         )}
 
+        {/* SIGNUP */}
         {step === 'signup' && (
           <motion.div key="signup" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} className="flex-1 px-6 pt-4 pb-8 overflow-y-auto">
             <BackButton to="welcome" />
-            <div className="mt-4 space-y-6">
+            <div className="mt-4 space-y-5">
               <div>
                 <h2 className="font-display text-2xl font-extrabold">Criar Conta</h2>
                 <p className="text-sm font-body text-muted-foreground mt-1">Preencha seus dados para começar</p>
               </div>
+
               <div className="space-y-4">
-                <InputField label="Nome completo" placeholder="João da Silva" />
-                <InputField label="E-mail" type="email" placeholder="seu@email.com" />
-                <InputField label="CPF" placeholder="000.000.000-00" />
-                <InputField label="Data de nascimento" placeholder="DD/MM/AAAA" />
-                <InputField label="Senha" type="password" placeholder="Mínimo 8 caracteres" />
+                {/* Nome completo */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-body font-medium text-muted-foreground">Nome completo</label>
+                  <div className="relative">
+                    <User size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="João da Silva"
+                      className="w-full bg-surface-interactive rounded-xl py-3 pl-11 pr-10 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]" />
+                    {fullName.length > 0 && (
+                      <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                        <ValidationIcon valid={fullName.trim().length >= 3} />
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Username */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-body font-medium text-muted-foreground">Nome de usuário</label>
+                  <div className="relative">
+                    <AtSign size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    <input type="text" value={username} onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))} placeholder="joaosilva"
+                      className="w-full bg-surface-interactive rounded-xl py-3 pl-11 pr-10 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]" />
+                    {username.length > 0 && (
+                      <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                        <ValidationIcon valid={username.trim().length >= 3} />
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Email */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-body font-medium text-muted-foreground">E-mail</label>
+                  <div className="relative">
+                    <Mail size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="seu@email.com"
+                      className="w-full bg-surface-interactive rounded-xl py-3 pl-11 pr-10 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]" />
+                    {email.length > 0 && (
+                      <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                        <ValidationIcon valid={isEmailValid(email)} />
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* CPF */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-body font-medium text-muted-foreground">CPF</label>
+                  <div className="relative">
+                    <CreditCard size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    <input type="text" value={cpf} onChange={(e) => setCpf(maskCPF(e.target.value))} placeholder="000.000.000-00"
+                      className="w-full bg-surface-interactive rounded-xl py-3 pl-11 pr-10 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]" />
+                    {cpfClean.length === 11 && (
+                      <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                        <ValidationIcon valid={cpfValid} />
+                      </div>
+                    )}
+                  </div>
+                  {cpfClean.length === 11 && !cpfValid && (
+                    <p className="text-[0.65rem] text-destructive font-body">CPF inválido</p>
+                  )}
+                </div>
+
+                {/* Data de nascimento */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-body font-medium text-muted-foreground">Data de nascimento</label>
+                  <div className="relative">
+                    <Calendar size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    <input type="text" value={dob} onChange={(e) => setDob(maskDate(e.target.value))} placeholder="DD/MM/AAAA"
+                      className="w-full bg-surface-interactive rounded-xl py-3 pl-11 pr-4 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]" />
+                  </div>
+                </div>
+
+                {/* Senha */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-body font-medium text-muted-foreground">Senha</label>
+                  <div className="relative">
+                    <Lock size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    <input type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Mínimo 8 caracteres"
+                      className="w-full bg-surface-interactive rounded-xl py-3 pl-11 pr-12 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]" />
+                    <button type="button" onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 min-w-[44px] min-h-[44px] flex items-center justify-center text-muted-foreground">
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
+                  {password.length > 0 && (
+                    <div className="space-y-1.5">
+                      <div className="flex gap-1">
+                        {[1, 2, 3, 4, 5].map((i) => (
+                          <div key={i} className={`h-1 flex-1 rounded-full transition-colors ${i <= pwStrength.level ? pwStrength.color : 'bg-surface-interactive'}`} />
+                        ))}
+                      </div>
+                      <p className={`text-[0.65rem] font-body ${pwStrength.level <= 1 ? 'text-destructive' : pwStrength.level <= 3 ? 'text-primary' : 'text-secondary'}`}>
+                        Senha {pwStrength.label}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Confirmar Senha */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-body font-medium text-muted-foreground">Confirmar senha</label>
+                  <div className="relative">
+                    <Lock size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    <input type={showConfirmPassword ? 'text' : 'password'} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Repita a senha"
+                      className="w-full bg-surface-interactive rounded-xl py-3 pl-11 pr-12 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]" />
+                    <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 min-w-[44px] min-h-[44px] flex items-center justify-center text-muted-foreground">
+                      {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
+                  {confirmPassword.length > 0 && !passwordsMatch && (
+                    <p className="text-[0.65rem] text-destructive font-body">As senhas não conferem</p>
+                  )}
+                </div>
               </div>
+
+              {/* Checkboxes */}
+              <div className="space-y-3">
+                <button onClick={() => setOver18(!over18)} className="flex items-start gap-3 min-h-[44px] w-full text-left">
+                  <div className={`w-5 h-5 rounded flex-shrink-0 mt-0.5 flex items-center justify-center transition-colors ${over18 ? 'bg-primary' : 'bg-surface-interactive'}`}>
+                    {over18 && <Check size={12} className="text-primary-foreground" />}
+                  </div>
+                  <span className="text-sm font-body text-foreground/80">Declaro que tenho mais de 18 anos</span>
+                </button>
+                <button onClick={() => setAcceptTerms(!acceptTerms)} className="flex items-start gap-3 min-h-[44px] w-full text-left">
+                  <div className={`w-5 h-5 rounded flex-shrink-0 mt-0.5 flex items-center justify-center transition-colors ${acceptTerms ? 'bg-primary' : 'bg-surface-interactive'}`}>
+                    {acceptTerms && <Check size={12} className="text-primary-foreground" />}
+                  </div>
+                  <span className="text-sm font-body text-foreground/80">
+                    Aceito os <span className="text-primary font-semibold">Termos e Condições</span> e a <span className="text-primary font-semibold">Política de Privacidade</span>
+                  </span>
+                </button>
+              </div>
+
+              {/* Bônus */}
               <div className="bg-surface-card rounded-xl p-4 flex items-start gap-3">
                 <Gift size={24} className="text-primary flex-shrink-0" />
                 <div>
@@ -144,79 +395,247 @@ const AuthPage = () => {
                   </p>
                 </div>
               </div>
-              <motion.button
-                whileTap={{ scale: 0.97 }}
-                onClick={() => setStep('kyc')}
-                className="w-full bg-primary text-primary-foreground font-display font-bold text-base py-3.5 rounded-xl min-h-[44px] hover:brightness-110 transition-all"
-              >
-                Continuar
+
+              <motion.button whileTap={{ scale: 0.97 }} onClick={() => setStep('kyc')}
+                disabled={!signupValid}
+                className={`w-full font-display font-bold text-base py-3.5 rounded-xl min-h-[44px] transition-all ${
+                  signupValid
+                    ? 'bg-primary text-primary-foreground hover:brightness-110'
+                    : 'bg-surface-interactive text-muted-foreground cursor-not-allowed'
+                }`}>
+                Cadastrar
               </motion.button>
-              <p className="text-[0.6rem] text-muted-foreground font-body text-center">
-                Ao criar sua conta, você concorda com os Termos de Uso e Política de Privacidade. Jogue com responsabilidade. 18+
-              </p>
             </div>
           </motion.div>
         )}
 
+        {/* KYC */}
+        {step === 'kyc' && (
+          <motion.div key="kyc" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} className="flex-1 px-6 pt-4 pb-8 overflow-y-auto">
+            <BackButton to="signup" />
+            <div className="mt-4 space-y-6">
+              <div className="flex items-start gap-3">
+                <ShieldCheck size={28} className="text-primary flex-shrink-0 mt-0.5" />
+                <div>
+                  <h2 className="font-display text-2xl font-extrabold">Verificação de Identidade</h2>
+                  <p className="text-sm font-body text-muted-foreground mt-1">
+                    Precisamos verificar sua identidade para sua segurança.
+                  </p>
+                </div>
+              </div>
+
+              {/* Status badges */}
+              {kycStatus !== 'pending' && (
+                <div className={`rounded-xl p-4 flex items-center gap-3 ${
+                  kycStatus === 'analyzing' ? 'bg-primary/10' :
+                  kycStatus === 'approved' ? 'bg-secondary/10' :
+                  'bg-destructive/10'
+                }`}>
+                  {kycStatus === 'analyzing' && <ShieldCheck size={20} className="text-primary" />}
+                  {kycStatus === 'approved' && <CheckCircle2 size={20} className="text-secondary" />}
+                  {kycStatus === 'rejected' && <X size={20} className="text-destructive" />}
+                  <span className={`text-sm font-body font-semibold ${
+                    kycStatus === 'analyzing' ? 'text-primary' :
+                    kycStatus === 'approved' ? 'text-secondary' :
+                    'text-destructive'
+                  }`}>
+                    {kycStatus === 'analyzing' && 'Em análise'}
+                    {kycStatus === 'approved' && 'Aprovado'}
+                    {kycStatus === 'rejected' && 'Rejeitado — Envie novamente'}
+                  </span>
+                </div>
+              )}
+
+              <div className="space-y-4">
+                {/* Doc front */}
+                <div className={`bg-surface-card rounded-xl p-5 flex flex-col items-center justify-center gap-3 min-h-[140px] transition-all ${docFront ? 'ring-1 ring-secondary' : ''}`}>
+                  <div className="w-12 h-12 rounded-full bg-surface-interactive flex items-center justify-center">
+                    {docFront ? <Check size={22} className="text-secondary" /> : <FileText size={22} className="text-primary" />}
+                  </div>
+                  <p className="text-sm font-body font-medium">{docFront ? 'Documento (frente) enviado' : 'Frente do documento'}</p>
+                  <p className="text-[0.65rem] text-muted-foreground font-body">RG, CNH ou Passaporte</p>
+                  <button onClick={() => setDocFront('doc-front.jpg')}
+                    className="bg-surface-interactive text-foreground font-body font-semibold text-xs px-4 py-2 rounded-lg min-h-[44px] flex items-center gap-2">
+                    <Upload size={14} />
+                    {docFront ? 'Trocar Arquivo' : 'Escolher Arquivo'}
+                  </button>
+                </div>
+
+                {/* Doc back */}
+                <div className={`bg-surface-card rounded-xl p-5 flex flex-col items-center justify-center gap-3 min-h-[140px] transition-all ${docBack ? 'ring-1 ring-secondary' : ''}`}>
+                  <div className="w-12 h-12 rounded-full bg-surface-interactive flex items-center justify-center">
+                    {docBack ? <Check size={22} className="text-secondary" /> : <FileText size={22} className="text-primary" />}
+                  </div>
+                  <p className="text-sm font-body font-medium">{docBack ? 'Documento (verso) enviado' : 'Verso do documento'}</p>
+                  <button onClick={() => setDocBack('doc-back.jpg')}
+                    className="bg-surface-interactive text-foreground font-body font-semibold text-xs px-4 py-2 rounded-lg min-h-[44px] flex items-center gap-2">
+                    <Upload size={14} />
+                    {docBack ? 'Trocar Arquivo' : 'Escolher Arquivo'}
+                  </button>
+                </div>
+
+                {/* Selfie */}
+                <div className={`bg-surface-card rounded-xl p-5 flex flex-col items-center justify-center gap-3 min-h-[140px] transition-all ${selfie ? 'ring-1 ring-secondary' : ''}`}>
+                  <div className="w-12 h-12 rounded-full bg-surface-interactive flex items-center justify-center">
+                    {selfie ? <Check size={22} className="text-secondary" /> : <Camera size={22} className="text-primary" />}
+                  </div>
+                  <p className="text-sm font-body font-medium">{selfie ? 'Selfie enviada' : 'Selfie com documento'}</p>
+                  <p className="text-[0.65rem] text-muted-foreground font-body">Opcional, mas acelera a aprovação</p>
+                  <button onClick={() => setSelfie('selfie.jpg')}
+                    className="bg-surface-interactive text-foreground font-body font-semibold text-xs px-4 py-2 rounded-lg min-h-[44px] flex items-center gap-2">
+                    <Camera size={14} />
+                    {selfie ? 'Tirar Novamente' : 'Tirar Selfie'}
+                  </button>
+                </div>
+              </div>
+
+              <motion.button whileTap={{ scale: 0.97 }}
+                onClick={() => { setKycStatus('analyzing'); setTimeout(() => { setKycStatus('approved'); setTimeout(() => setStep('success'), 800); }, 2000); }}
+                disabled={!docFront || !docBack}
+                className={`w-full font-display font-bold text-base py-3.5 rounded-xl min-h-[44px] transition-all ${
+                  docFront && docBack
+                    ? 'bg-primary text-primary-foreground hover:brightness-110'
+                    : 'bg-surface-interactive text-muted-foreground cursor-not-allowed'
+                }`}>
+                Enviar Documentos
+              </motion.button>
+
+              <button onClick={() => setStep('success')} className="w-full text-center text-xs text-muted-foreground font-body min-h-[44px]">
+                Pular por agora
+              </button>
+            </div>
+          </motion.div>
+        )}
+
+        {/* OTP */}
+        {step === 'otp' && (
+          <motion.div key="otp" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} className="flex-1 px-6 pt-4 pb-8">
+            <BackButton to="login" />
+            <div className="mt-4 space-y-6">
+              <div className="flex items-start gap-3">
+                <ShieldCheck size={28} className="text-primary flex-shrink-0 mt-0.5" />
+                <div>
+                  <h2 className="font-display text-2xl font-extrabold">Verificação</h2>
+                  <p className="text-sm font-body text-muted-foreground mt-1">
+                    Digite o código enviado para seu e-mail
+                  </p>
+                </div>
+              </div>
+
+              {/* Method selector */}
+              <div className="flex gap-2">
+                <button className="flex-1 bg-primary text-primary-foreground text-xs font-body font-semibold py-2.5 rounded-xl min-h-[44px] flex items-center justify-center gap-1.5">
+                  <Mail size={14} /> E-mail
+                </button>
+                <button className="flex-1 bg-surface-interactive text-muted-foreground text-xs font-body font-semibold py-2.5 rounded-xl min-h-[44px] flex items-center justify-center gap-1.5">
+                  <Smartphone size={14} /> SMS
+                </button>
+                <button className="flex-1 bg-surface-interactive text-muted-foreground text-xs font-body font-semibold py-2.5 rounded-xl min-h-[44px] flex items-center justify-center gap-1.5">
+                  <Fingerprint size={14} /> Biometria
+                </button>
+              </div>
+
+              {/* OTP input */}
+              <div className="flex gap-2 justify-center">
+                {otpCode.map((digit, i) => (
+                  <input
+                    key={i}
+                    id={`otp-${i}`}
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={1}
+                    value={digit}
+                    onChange={(e) => handleOtpInput(i, e.target.value)}
+                    className="w-12 h-14 bg-surface-interactive rounded-xl text-center text-xl font-display font-bold text-foreground outline-none focus:ring-1 focus:ring-primary"
+                  />
+                ))}
+              </div>
+
+              <motion.button whileTap={{ scale: 0.97 }} onClick={() => navigate('/')}
+                className="w-full bg-primary text-primary-foreground font-display font-bold text-base py-3.5 rounded-xl min-h-[44px] hover:brightness-110 transition-all">
+                Confirmar
+              </motion.button>
+
+              <button className="w-full text-center text-xs text-primary font-body font-semibold min-h-[44px]">
+                Reenviar código (00:59)
+              </button>
+            </div>
+          </motion.div>
+        )}
+
+        {/* RECOVERY */}
         {step === 'recovery' && (
           <motion.div key="recovery" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} className="flex-1 px-6 pt-4 pb-8">
             <BackButton to="login" />
             <div className="mt-4 space-y-6">
               <div>
                 <h2 className="font-display text-2xl font-extrabold">Recuperar Senha</h2>
-                <p className="text-sm font-body text-muted-foreground mt-1">Digite seu e-mail e enviaremos um link para redefinir sua senha.</p>
+                <p className="text-sm font-body text-muted-foreground mt-1">
+                  {recoverySent
+                    ? 'Enviamos um link de recuperação para seu e-mail. Verifique sua caixa de entrada.'
+                    : 'Digite seu e-mail e enviaremos um link para redefinir sua senha.'
+                  }
+                </p>
               </div>
-              <InputField label="E-mail" type="email" placeholder="seu@email.com" />
-              <motion.button
-                whileTap={{ scale: 0.97 }}
-                className="w-full bg-primary text-primary-foreground font-display font-bold text-base py-3.5 rounded-xl min-h-[44px] hover:brightness-110 transition-all"
-              >
-                Enviar Link
-              </motion.button>
+
+              {!recoverySent ? (
+                <>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-body font-medium text-muted-foreground">E-mail</label>
+                    <div className="relative">
+                      <Mail size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                      <input type="email" value={recoveryEmail} onChange={(e) => setRecoveryEmail(e.target.value)} placeholder="seu@email.com"
+                        className="w-full bg-surface-interactive rounded-xl py-3 pl-11 pr-4 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]" />
+                    </div>
+                  </div>
+                  <motion.button whileTap={{ scale: 0.97 }} onClick={() => setRecoverySent(true)}
+                    disabled={!isEmailValid(recoveryEmail)}
+                    className={`w-full font-display font-bold text-base py-3.5 rounded-xl min-h-[44px] transition-all ${
+                      isEmailValid(recoveryEmail)
+                        ? 'bg-primary text-primary-foreground hover:brightness-110'
+                        : 'bg-surface-interactive text-muted-foreground cursor-not-allowed'
+                    }`}>
+                    Enviar Link de Recuperação
+                  </motion.button>
+                </>
+              ) : (
+                <div className="flex flex-col items-center gap-4 pt-4">
+                  <div className="w-16 h-16 rounded-full bg-secondary/20 flex items-center justify-center">
+                    <Mail size={28} className="text-secondary" />
+                  </div>
+                  <p className="text-sm font-body text-foreground text-center">
+                    Verifique <span className="font-semibold text-primary">{recoveryEmail}</span>
+                  </p>
+                  <button onClick={() => setStep('login')}
+                    className="text-xs text-primary font-body font-semibold min-h-[44px]">
+                    Voltar ao Login
+                  </button>
+                </div>
+              )}
             </div>
           </motion.div>
         )}
 
-        {step === 'kyc' && (
-          <motion.div key="kyc" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} className="flex-1 px-6 pt-4 pb-8">
-            <BackButton to="signup" />
-            <div className="mt-4 space-y-6">
-              <div>
-                <h2 className="font-display text-2xl font-extrabold">Verificação de Identidade</h2>
-                <p className="text-sm font-body text-muted-foreground mt-1">Envie um documento com foto para ativar sua conta.</p>
-              </div>
-              <div className="space-y-4">
-                <div className="bg-surface-card rounded-xl p-6 flex flex-col items-center justify-center gap-3 min-h-[160px]">
-                  <div className="w-14 h-14 rounded-full bg-surface-interactive flex items-center justify-center">
-                    <Upload size={24} className="text-primary" />
-                  </div>
-                  <p className="text-sm font-body font-medium">Frente do documento</p>
-                  <p className="text-[0.65rem] text-muted-foreground font-body">RG, CNH ou Passaporte</p>
-                  <button className="bg-surface-interactive text-foreground font-body font-semibold text-xs px-4 py-2 rounded-lg min-h-[44px]">
-                    Escolher Arquivo
-                  </button>
-                </div>
-                <div className="bg-surface-card rounded-xl p-6 flex flex-col items-center justify-center gap-3 min-h-[160px]">
-                  <div className="w-14 h-14 rounded-full bg-surface-interactive flex items-center justify-center">
-                    <Upload size={24} className="text-primary" />
-                  </div>
-                  <p className="text-sm font-body font-medium">Verso do documento</p>
-                  <button className="bg-surface-interactive text-foreground font-body font-semibold text-xs px-4 py-2 rounded-lg min-h-[44px]">
-                    Escolher Arquivo
-                  </button>
-                </div>
-              </div>
-              <motion.button
-                whileTap={{ scale: 0.97 }}
-                onClick={() => navigate('/')}
-                className="w-full bg-primary text-primary-foreground font-display font-bold text-base py-3.5 rounded-xl min-h-[44px] hover:brightness-110 transition-all"
-              >
-                Enviar e Finalizar
-              </motion.button>
-              <button onClick={() => navigate('/')} className="w-full text-center text-xs text-muted-foreground font-body min-h-[44px]">
-                Pular por agora
-              </button>
-            </div>
+        {/* SUCCESS */}
+        {step === 'success' && (
+          <motion.div key="success" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
+            className="flex-1 flex flex-col items-center justify-center px-6 pb-8 text-center">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: 'spring', damping: 12, stiffness: 200, delay: 0.2 }}
+              className="w-24 h-24 rounded-full bg-secondary/20 flex items-center justify-center mb-6"
+            >
+              <CheckCircle2 size={48} className="text-secondary" />
+            </motion.div>
+            <h2 className="font-display text-2xl font-extrabold">Conta criada com sucesso!</h2>
+            <p className="text-sm font-body text-muted-foreground mt-2 max-w-[280px]">
+              Tudo pronto! Comece a explorar os melhores mercados e odds turbinadas.
+            </p>
+            <motion.button whileTap={{ scale: 0.97 }} onClick={() => navigate('/')}
+              className="mt-8 w-full bg-primary text-primary-foreground font-display font-bold text-base py-3.5 rounded-xl min-h-[44px] hover:brightness-110 transition-all">
+              Começar a Apostar
+            </motion.button>
           </motion.div>
         )}
       </AnimatePresence>
