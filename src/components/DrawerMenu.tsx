@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Calendar, Trophy, Sparkles, BarChart3, Target, Users, MessageCircle, Settings, HelpCircle } from 'lucide-react';
+import { X, Calendar, Trophy, Sparkles, BarChart3, Target, Users, MessageCircle, Settings, HelpCircle, Dice5, Rocket } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface DrawerMenuProps {
@@ -9,12 +9,19 @@ interface DrawerMenuProps {
 
 const menuSections = [
   {
-    title: 'Navegação',
+    title: 'Apostas',
     items: [
       { icon: Calendar, label: 'Próximos Jogos', route: '/' },
       { icon: Trophy, label: 'Competições', route: '/' },
       { icon: Sparkles, label: 'Especiais', route: '/' },
       { icon: BarChart3, label: 'Odds por Categoria', route: '/' },
+    ],
+  },
+  {
+    title: 'Jogos',
+    items: [
+      { icon: Dice5, label: 'Cassino', route: '/cassino' },
+      { icon: Rocket, label: 'Jogos Crash', route: '/crash' },
     ],
   },
   {

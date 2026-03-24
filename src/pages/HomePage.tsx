@@ -1,6 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import heroBanner from '@/assets/hero-banner.jpg';
+import bannerHexa from '@/assets/banner-hexa.jpg';
+import bannerOdds from '@/assets/banner-odds.jpg';
+import bannerBonus from '@/assets/banner-bonus.jpg';
+import bannerLiga from '@/assets/banner-liga.jpg';
 import MatchCard from '@/components/MatchCard';
 import SportFilter from '@/components/SportFilter';
 import VisitorBanner from '@/components/VisitorBanner';
@@ -35,17 +38,16 @@ const HeroCarousel = () => {
     return () => clearInterval(timerRef.current);
   }, []);
 
-  const accentColors: Record<string, string> = {
-    Brasil: 'from-secondary/40 to-accent/60',
-    Fogo: 'from-primary/40 to-destructive/40',
-    Promo: 'from-primary/30 to-secondary/30',
-    Liga: 'from-accent/50 to-secondary/40',
+  const bannerImages: Record<string, string> = {
+    Brasil: bannerHexa,
+    Fogo: bannerOdds,
+    Promo: bannerBonus,
+    Liga: bannerLiga,
   };
 
   return (
     <div className="relative overflow-hidden rounded-2xl mx-4">
       <div className="relative h-48 sm:h-56">
-        <img src={heroBanner} alt="SeleçãoBet" className="w-full h-full object-cover" />
         <AnimatePresence mode="wait">
           <motion.div
             key={heroBanners[current].id}
@@ -53,8 +55,16 @@ const HeroCarousel = () => {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -40 }}
             transition={{ duration: 0.4 }}
-            className={`absolute inset-0 bg-gradient-to-r ${accentColors[heroBanners[current].accent] || 'from-accent/50 to-background/80'}`}
+            className="absolute inset-0"
           >
+            <img
+              src={bannerImages[heroBanners[current].accent] || bannerHexa}
+              alt={heroBanners[current].title}
+              className="w-full h-full object-cover"
+              width={960}
+              height={512}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
             <div className="absolute bottom-5 left-5 right-5">
               <span className="text-[0.6rem] font-body font-semibold text-primary uppercase tracking-widest">
                 {heroBanners[current].accent}
