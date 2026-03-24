@@ -28,7 +28,6 @@ const queryClient = new QueryClient();
 
 const AppLayout = () => {
   const [betSlipOpen, setBetSlipOpen] = useState(false);
-  const [drawerOpen, setDrawerOpen] = useState(false);
   const location = useLocation();
   const isAuthPage = location.pathname === '/auth';
 
@@ -42,7 +41,7 @@ const AppLayout = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header onMenuToggle={() => setDrawerOpen(true)} />
+      <Header />
       <main className="max-w-7xl mx-auto pt-2">
         <Routes>
           <Route path="/" element={<HomePage />} />
@@ -63,7 +62,6 @@ const AppLayout = () => {
       <BetSlipFab onClick={() => setBetSlipOpen(true)} />
       <BottomNav />
       <BetSlipPanel isOpen={betSlipOpen} onClose={() => setBetSlipOpen(false)} />
-      <DrawerMenu isOpen={drawerOpen} onClose={() => setDrawerOpen(false)} />
     </div>
   );
 };

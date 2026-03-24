@@ -1,27 +1,18 @@
-import { Search, Bell, Wallet, UserCircle, Menu } from 'lucide-react';
+import { Search, Bell, Wallet, UserCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
 
-interface HeaderProps {
-  onMenuToggle?: () => void;
-}
-
-const Header = ({ onMenuToggle }: HeaderProps) => {
+const Header = () => {
   const navigate = useNavigate();
   const { isLoggedIn } = useAuthStore();
 
   return (
     <header className="sticky top-0 z-30 bg-accent px-4 py-3">
       <div className="flex items-center justify-between max-w-7xl mx-auto">
-        <div className="flex items-center gap-2">
-          <button onClick={onMenuToggle} className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-foreground/70 hover:text-foreground transition-colors lg:hidden">
-            <Menu size={22} />
-          </button>
-          <button onClick={() => navigate('/')} className="flex items-center gap-1.5">
-            <span className="font-display text-xl text-primary font-extrabold tracking-tight">Seleção</span>
-            <span className="font-display text-xl text-foreground font-extrabold tracking-tight">Bet</span>
-          </button>
-        </div>
+        <button onClick={() => navigate('/')} className="flex items-center gap-1.5">
+          <span className="font-display text-xl text-primary font-extrabold tracking-tight">Seleção</span>
+          <span className="font-display text-xl text-foreground font-extrabold tracking-tight">Bet</span>
+        </button>
 
         <nav className="hidden lg:flex items-center gap-6">
           {['Esportes', 'Ao Vivo', 'Cassino', 'Jogos Crash', 'Virtuais'].map((item) => (
