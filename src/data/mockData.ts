@@ -198,6 +198,7 @@ export const heroBanners = [
     subtitle: 'A contagem regressiva para o Hexa faltam 83 dias!',
     cta: 'Apostar Agora',
     accent: 'Brasil',
+    route: '/esportes',
   },
   {
     id: 'banner-2',
@@ -205,6 +206,7 @@ export const heroBanners = [
     subtitle: 'Aposte com a nossa camisa.',
     cta: 'Apostar Agora',
     accent: 'Brasil',
+    route: '/esportes',
   },
   {
     id: 'banner-3',
@@ -212,6 +214,7 @@ export const heroBanners = [
     subtitle: 'Onde o coração bate forte. Aposte no seu time!',
     cta: 'Ver Jogos',
     accent: 'Liga',
+    route: '/ao-vivo',
   },
   {
     id: 'banner-4',
@@ -219,6 +222,7 @@ export const heroBanners = [
     subtitle: 'Lucro máximo nos jogos da Amarelinha.',
     cta: 'Ver Ofertas',
     accent: 'Fogo',
+    route: '/promocoes',
   },
   {
     id: 'banner-5',
@@ -226,6 +230,7 @@ export const heroBanners = [
     subtitle: 'Deposite e ganhe 100% de bônus imediato.',
     cta: 'Cadastre-se',
     accent: 'Promo',
+    route: '/auth',
   },
 ];
 
