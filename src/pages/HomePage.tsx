@@ -12,6 +12,14 @@ import { useBetSlipStore } from '@/store/betSlipStore';
 import { useAuthStore } from '@/store/authStore';
 import { Flame, ChevronRight, Trophy, Gift, Zap, User, Calendar, Target, Scale, CreditCard, CornerDownRight, Award, Star, LayoutGrid } from 'lucide-react';
 import { PageTransition, SectionReveal, staggerContainer, staggerItem } from '@/components/animations';
+import QuickAccessRow from '@/components/home/QuickAccessRow';
+import BettingTipsSection from '@/components/home/BettingTipsSection';
+import PopularTournamentsSection from '@/components/home/PopularTournamentsSection';
+import GoalReplaysSection from '@/components/home/GoalReplaysSection';
+import MultiCreatorBanner from '@/components/home/MultiCreatorBanner';
+import LiveInPlaySection from '@/components/home/LiveInPlaySection';
+import NewsSection from '@/components/home/NewsSection';
+import SuperSocialCTA from '@/components/home/SuperSocialCTA';
 
 const SectionTitle = ({ children, icon, action }: { children: React.ReactNode; icon?: React.ReactNode; action?: string }) => (
   <motion.div
