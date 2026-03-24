@@ -463,28 +463,6 @@ const HomePage = () => {
 
       <SectionReveal>
       <section className="px-4">
-        <SectionTitle icon={<Trophy size={20} className="text-secondary" />} action="Ver Todas">
-          Competições
-        </SectionTitle>
-        <motion.div className="space-y-2" variants={staggerContainer} initial="hidden" whileInView="show" viewport={{ once: true }}>
-          {competitions.map((comp) => (
-            <motion.div key={comp.id} variants={staggerItem} whileHover={{ x: 4 }} className="bg-surface-card rounded-xl p-3.5 flex items-center gap-3 card-shine cursor-pointer">
-              <img src={comp.flag} alt={comp.country} className="w-8 h-6 object-cover rounded" />
-              <div className="flex-1 min-w-0">
-                <p className="font-display text-sm font-bold truncate">{comp.name}</p>
-                <p className="text-[0.65rem] font-body text-muted-foreground">{comp.country}</p>
-              </div>
-              <span className="text-xs font-display font-bold text-primary bg-primary/15 px-2 py-1 rounded-lg">
-                {comp.matchCount} jogos
-              </span>
-            </motion.div>
-          ))}
-        </motion.div>
-      </section>
-      </SectionReveal>
-
-      <SectionReveal>
-      <section className="px-4">
         <SectionTitle icon={<Star size={20} className="text-primary" />} action="Ver Todos" actionRoute="/esportes">
           Especiais
         </SectionTitle>
