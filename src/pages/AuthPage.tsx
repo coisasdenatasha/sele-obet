@@ -363,10 +363,22 @@ const AuthPage = () => {
                       <label className="text-xs font-body font-medium text-muted-foreground">Nome de usuário</label>
                       <div className="relative">
                         <AtSign size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                        <input type="text" value={username} onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))} placeholder="joaosilva"
+                        <input type="text" value={username} onChange={(e) => { const v = e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''); setUsername(v); checkUsername(v); }} placeholder="joaosilva"
                           className="w-full bg-surface-interactive rounded-xl py-3 pl-11 pr-10 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]" />
-                        {username.length > 0 && <div className="absolute right-3 top-1/2 -translate-y-1/2"><ValidationIcon valid={username.trim().length >= 3} /></div>}
+                        {username.length >= 3 && <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                          {usernameChecking ? (
+                            <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                          ) : (
+                            <ValidationIcon valid={usernameAvailable === true} />
+                          )}
+                        </div>}
                       </div>
+                      {username.length >= 3 && !usernameChecking && usernameAvailable === false && (
+                        <p className="text-[0.65rem] text-destructive font-body">Nome de usuário já está em uso</p>
+                      )}
+                      {username.length >= 3 && !usernameChecking && usernameAvailable === true && (
+                        <p className="text-[0.65rem] text-secondary font-body">Disponível ✓</p>
+                      )}
                     </div>
 
                     <div className="space-y-1.5">
@@ -377,6 +389,7 @@ const AuthPage = () => {
                           className="w-full bg-surface-interactive rounded-xl py-3 pl-11 pr-10 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]" />
                         {email.length > 0 && <div className="absolute right-3 top-1/2 -translate-y-1/2"><ValidationIcon valid={isEmailValid(email)} /></div>}
                       </div>
+                      {emailError && <p className="text-[0.65rem] text-destructive font-body">{emailError}</p>}
                     </div>
 
                     <div className="space-y-1.5">
@@ -395,8 +408,10 @@ const AuthPage = () => {
                       <div className="relative">
                         <Calendar size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
                         <input type="text" value={dob} onChange={(e) => setDob(maskDate(e.target.value))} placeholder="DD/MM/AAAA"
-                          className="w-full bg-surface-interactive rounded-xl py-3 pl-11 pr-4 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]" />
+                          className="w-full bg-surface-interactive rounded-xl py-3 pl-11 pr-10 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]" />
+                        {dobClean.length === 8 && <div className="absolute right-3 top-1/2 -translate-y-1/2"><ValidationIcon valid={dobValid} /></div>}
                       </div>
+                      {dobError && <p className="text-[0.65rem] text-destructive font-body">{dobError}</p>}
                     </div>
                   </motion.div>
                 )}
