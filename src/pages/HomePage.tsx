@@ -7,10 +7,10 @@ import bannerLiga from '@/assets/banner-liga.jpg';
 import MatchCard from '@/components/MatchCard';
 import SportFilter from '@/components/SportFilter';
 import VisitorBanner from '@/components/VisitorBanner';
-import { liveMatches, boostedMatches, upcomingMatches, popularMultiples, playerProps, heroBanners } from '@/data/mockData';
+import { liveMatches, boostedMatches, upcomingMatches, popularMultiples, playerProps, heroBanners, competitions, specials, oddsByCategory } from '@/data/mockData';
 import { useBetSlipStore } from '@/store/betSlipStore';
 import { useAuthStore } from '@/store/authStore';
-import { Flame, ChevronRight, Trophy, Gift, Zap, User, Calendar } from 'lucide-react';
+import { Flame, ChevronRight, Trophy, Gift, Zap, User, Calendar, Target, Scale, CreditCard, CornerDownRight, Award, Star, LayoutGrid } from 'lucide-react';
 
 const SectionTitle = ({ children, icon, action }: { children: React.ReactNode; icon?: React.ReactNode; action?: string }) => (
   <div className="flex items-center justify-between mb-3">
