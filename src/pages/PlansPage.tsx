@@ -53,16 +53,17 @@ interface StreamingPlatform {
   type: 'paid' | 'free';
   color: string;
   description: string;
+  url: string;
 }
 
 const streamingPlatforms: StreamingPlatform[] = [
-  { name: 'HBO Max', type: 'paid', color: 'hsl(var(--primary))', description: 'Filmes, séries e esportes ao vivo' },
-  { name: 'Amazon Prime', type: 'paid', color: 'hsl(var(--primary))', description: 'Premier League e mais' },
-  { name: 'Globoplay', type: 'paid', color: 'hsl(var(--primary))', description: 'Brasileirão e Copa do Brasil' },
-  { name: 'Netflix', type: 'paid', color: 'hsl(var(--primary))', description: 'Documentários esportivos' },
-  { name: 'CazéTV', type: 'free', color: 'hsl(var(--secondary))', description: 'Transmissões ao vivo gratuitas' },
-  { name: 'GoatTV', type: 'free', color: 'hsl(var(--secondary))', description: 'Futebol e esportes grátis' },
-  { name: 'YouTube', type: 'free', color: 'hsl(var(--secondary))', description: 'Canais esportivos gratuitos' },
+  { name: 'HBO Max', type: 'paid', color: 'hsl(var(--primary))', description: 'Filmes, séries e esportes ao vivo', url: 'https://www.hbomax.com/br/pt/sports' },
+  { name: 'Amazon Prime', type: 'paid', color: 'hsl(var(--primary))', description: 'Premier League e mais', url: 'https://www.primevideo.com/offers/nonprimehomepage/ref=dv_web_force_root' },
+  { name: 'Globoplay', type: 'paid', color: 'hsl(var(--primary))', description: 'Brasileirão e Copa do Brasil', url: 'https://premiere.globo.com/' },
+  { name: 'Netflix', type: 'paid', color: 'hsl(var(--primary))', description: 'Documentários esportivos', url: 'https://www.netflix.com/br/' },
+  { name: 'CazéTV', type: 'free', color: 'hsl(var(--secondary))', description: 'Transmissões ao vivo gratuitas', url: 'https://www.youtube.com/watch?v=FlWKYeWAi-M' },
+  { name: 'GoatTV', type: 'free', color: 'hsl(var(--secondary))', description: 'Futebol e esportes grátis', url: 'https://www.youtube.com/watch?v=NsXdU5YQ-i0' },
+  { name: 'YouTube', type: 'free', color: 'hsl(var(--secondary))', description: 'Canais esportivos gratuitos', url: 'https://www.youtube.com/' },
 ];
 
 const PlansPage = () => {
@@ -207,7 +208,7 @@ const PlansPage = () => {
 
         <div className="space-y-2">
           {streamingPlatforms.map((platform) => (
-            <div key={platform.name} className="bg-surface-card rounded-xl p-4 flex items-center gap-3">
+            <a key={platform.name} href={platform.url} target="_blank" rel="noopener noreferrer" className="bg-surface-card rounded-xl p-4 flex items-center gap-3 active:opacity-80 transition-opacity">
               <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
                 platform.type === 'free' ? 'bg-secondary/15' : 'bg-primary/15'
               }`}>
@@ -231,7 +232,7 @@ const PlansPage = () => {
                 <p className="text-xs font-body text-muted-foreground truncate">{platform.description}</p>
               </div>
               <ExternalLink size={16} className="text-muted-foreground shrink-0" />
-            </div>
+            </a>
           ))}
         </div>
       </div>
