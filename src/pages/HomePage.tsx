@@ -244,13 +244,12 @@ const HomePage = () => {
       </section>
       </SectionReveal>
 
-      {/* 6. Upcoming Matches */}
+      <SectionReveal>
       <section className="px-4">
         <SectionTitle icon={<Calendar size={20} className="text-primary" />} action="Ver Todos">
           Próximos Jogos
         </SectionTitle>
-        {/* Compact table */}
-        <div className="bg-surface-card rounded-xl overflow-hidden">
+        <motion.div className="bg-surface-card rounded-xl overflow-hidden" initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
           <div className="grid grid-cols-[1fr_auto_auto_auto] gap-x-2 items-center px-4 py-2 text-[0.6rem] font-body text-muted-foreground uppercase tracking-wider">
             <span>Partida</span>
             <span className="w-12 text-center">1</span>
@@ -270,6 +269,7 @@ const HomePage = () => {
                 <motion.button
                   key={j}
                   whileTap={{ scale: 0.95 }}
+                  whileHover={{ scale: 1.05 }}
                   onClick={() =>
                     addBet({
                       id: `${m.id}-${j}`,
@@ -286,17 +286,18 @@ const HomePage = () => {
               ))}
             </div>
           ))}
-        </div>
+        </motion.div>
       </section>
+      </SectionReveal>
 
-      {/* 7. Competições */}
+      <SectionReveal>
       <section className="px-4">
         <SectionTitle icon={<Trophy size={20} className="text-secondary" />} action="Ver Todas">
           Competições
         </SectionTitle>
-        <div className="space-y-2">
+        <motion.div className="space-y-2" variants={staggerContainer} initial="hidden" whileInView="show" viewport={{ once: true }}>
           {competitions.map((comp) => (
-            <div key={comp.id} className="bg-surface-card rounded-xl p-3.5 flex items-center gap-3">
+            <motion.div key={comp.id} variants={staggerItem} className="bg-surface-card rounded-xl p-3.5 flex items-center gap-3">
               <img src={comp.flag} alt={comp.country} className="w-8 h-6 object-cover rounded" />
               <div className="flex-1 min-w-0">
                 <p className="font-display text-sm font-bold truncate">{comp.name}</p>
@@ -305,10 +306,11 @@ const HomePage = () => {
               <span className="text-xs font-display font-bold text-primary bg-primary/15 px-2 py-1 rounded-lg">
                 {comp.matchCount} jogos
               </span>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </section>
+      </SectionReveal>
 
       {/* 8. Especiais */}
       <section className="px-4">
