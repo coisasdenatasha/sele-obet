@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Video } from 'lucide-react';
 import OddsChip from './OddsChip';
 import LiveBadge from './LiveBadge';
 
@@ -61,28 +60,6 @@ const MatchCard = ({
           </div>
         </div>
 
-        {/* Live video thumbnail */}
-        {isLive && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="relative w-20 h-14 rounded-lg bg-gradient-to-br from-surface-interactive to-accent overflow-hidden flex items-center justify-center shrink-0"
-          >
-            {/* Fake field pattern */}
-            <div className="absolute inset-0 opacity-20">
-              <div className="absolute inset-x-0 top-1/2 h-px bg-secondary" />
-              <div className="absolute inset-y-0 left-1/2 w-px bg-secondary" />
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full border border-secondary" />
-            </div>
-            {/* Play icon */}
-            <Video size={16} className="text-secondary relative z-10" />
-            {/* Live dot */}
-            <span className="absolute top-1 right-1 flex items-center gap-0.5 bg-destructive/90 text-destructive-foreground text-[0.45rem] font-bold px-1 py-px rounded">
-              <span className="w-1 h-1 rounded-full bg-destructive-foreground animate-pulse" />
-              LIVE
-            </span>
-          </motion.div>
-        )}
       </div>
 
       <div className="flex gap-2">
