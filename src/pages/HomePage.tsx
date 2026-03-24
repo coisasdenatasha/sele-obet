@@ -113,29 +113,64 @@ const HeroCarousel = () => {
 };
 
 /* ───────── Player Props Carousel ───────── */
+const cardGradients = [
+  'from-[hsl(345,40%,25%)] to-[hsl(345,50%,15%)]',
+  'from-[hsl(220,50%,30%)] to-[hsl(220,60%,18%)]',
+  'from-[hsl(280,40%,25%)] to-[hsl(280,50%,15%)]',
+  'from-[hsl(30,50%,25%)] to-[hsl(30,60%,15%)]',
+  'from-[hsl(160,40%,22%)] to-[hsl(160,50%,12%)]',
+];
+
 const PlayerPropsCarousel = () => {
   const addBet = useBetSlipStore((s) => s.addBet);
 
   return (
     <div className="flex gap-3 overflow-x-auto no-scrollbar px-4 pb-1">
-      {playerProps.map((p) => (
+      {playerProps.map((p, i) => (
         <motion.button
           key={p.id}
-          whileTap={{ scale: 0.97 }}
+          whileTap={{ scale: 0.95 }}
+          whileHover={{ y: -4 }}
           onClick={() =>
             addBet({ id: p.id, match: p.team, market: p.market, selection: p.player, odds: p.odds })
           }
-          className="flex-shrink-0 w-[140px] bg-surface-card rounded-xl p-3 space-y-2 text-left"
+          className={`flex-shrink-0 w-[130px] rounded-xl overflow-hidden bg-gradient-to-b ${cardGradients[i % cardGradients.length]} relative`}
         >
-          <div className="w-12 h-12 rounded-full bg-surface-interactive flex items-center justify-center mx-auto">
-            <User size={20} className="text-muted-foreground" />
+          {/* Card top - number & position */}
+          <div className="relative pt-2 px-3">
+            <div className="flex justify-between items-start">
+              <div className="text-left">
+                <p className="font-display text-2xl font-extrabold text-primary leading-none">{p.number}</p>
+                <p className="text-[0.55rem] font-display font-bold text-foreground/60 uppercase">{p.position}</p>
+              </div>
+              <p className="text-[0.5rem] font-body text-foreground/40 uppercase text-right leading-tight mt-1">{p.team}</p>
+            </div>
           </div>
-          <p className="font-display text-sm font-bold text-center truncate">{p.player}</p>
-          <p className="text-[0.6rem] font-body text-muted-foreground text-center">{p.team}</p>
-          <p className="text-[0.55rem] font-body text-foreground/60 text-center">{p.market}</p>
-          <div className="bg-surface-interactive rounded-lg py-1.5 text-center">
-            <span className="font-display text-primary font-bold text-lg">{p.odds.toFixed(2)}</span>
+
+          {/* Player silhouette */}
+          <div className="flex items-center justify-center py-3">
+            <div className="w-16 h-16 rounded-full bg-foreground/5 flex items-center justify-center">
+              <User size={28} className="text-foreground/20" />
+            </div>
           </div>
+
+          {/* Player name bar */}
+          <div className="bg-background/40 px-2 py-1.5">
+            <p className="font-display text-[0.65rem] font-bold text-foreground truncate text-center uppercase tracking-wide">
+              {p.player}
+            </p>
+          </div>
+
+          {/* Market + Odds */}
+          <div className="px-2 pt-1.5 pb-2 space-y-1.5">
+            <p className="text-[0.5rem] font-body text-foreground/50 text-center leading-tight">{p.market}</p>
+            <div className="bg-primary/15 rounded-lg py-1.5 text-center">
+              <span className="font-display text-primary font-extrabold text-base">{p.odds.toFixed(2)}</span>
+            </div>
+          </div>
+
+          {/* Shield border effect */}
+          <div className="absolute inset-0 rounded-xl border border-foreground/10 pointer-events-none" />
         </motion.button>
       ))}
     </div>
