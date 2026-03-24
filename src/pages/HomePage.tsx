@@ -21,25 +21,31 @@ import LiveInPlaySection from '@/components/home/LiveInPlaySection';
 import NewsSection from '@/components/home/NewsSection';
 import SuperSocialCTA from '@/components/home/SuperSocialCTA';
 
-const SectionTitle = ({ children, icon, action }: { children: React.ReactNode; icon?: React.ReactNode; action?: string }) => (
-  <motion.div
-    className="flex items-center justify-between mb-3"
-    initial={{ opacity: 0, x: -12 }}
-    whileInView={{ opacity: 1, x: 0 }}
-    viewport={{ once: true }}
-    transition={{ duration: 0.4 }}
-  >
-    <h2 className="font-display text-lg font-bold flex items-center gap-2">
-      {icon}
-      {children}
-    </h2>
-    {action && (
-      <button className="text-xs text-primary font-body font-semibold flex items-center gap-0.5 min-h-[44px]">
-        {action} <ChevronRight size={14} />
-      </button>
-    )}
-  </motion.div>
-);
+const SectionTitle = ({ children, icon, action, actionRoute }: { children: React.ReactNode; icon?: React.ReactNode; action?: string; actionRoute?: string }) => {
+  const navigate = useNavigate();
+  return (
+    <motion.div
+      className="flex items-center justify-between mb-3"
+      initial={{ opacity: 0, x: -12 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.4 }}
+    >
+      <h2 className="font-display text-lg font-bold flex items-center gap-2">
+        {icon}
+        {children}
+      </h2>
+      {action && (
+        <button
+          onClick={() => actionRoute && navigate(actionRoute)}
+          className="text-xs text-primary font-body font-semibold flex items-center gap-0.5 min-h-[44px]"
+        >
+          {action} <ChevronRight size={14} />
+        </button>
+      )}
+    </motion.div>
+  );
+};
 
 /* ───────── Hero Carousel ───────── */
 const HeroCarousel = () => {
