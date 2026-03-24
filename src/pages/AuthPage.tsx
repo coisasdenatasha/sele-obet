@@ -438,9 +438,24 @@ const AuthPage = () => {
                         <MapPin size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
                         <input type="text" value={cep} onChange={(e) => {
                           const v = e.target.value.replace(/\D/g, '').slice(0, 8);
-                          setCep(v.length > 5 ? `${v.slice(0, 5)}-${v.slice(5)}` : v);
+                          const masked = v.length > 5 ? `${v.slice(0, 5)}-${v.slice(5)}` : v;
+                          setCep(masked);
+                          if (v.length === 8) {
+                            setCepLoading(true);
+                            fetch(`https://viacep.com.br/ws/${v}/json/`)
+                              .then(r => r.json())
+                              .then(data => {
+                                if (!data.erro) {
+                                  setEstado(data.uf || '');
+                                  setCidade(data.localidade || '');
+                                }
+                              })
+                              .catch(() => {})
+                              .finally(() => setCepLoading(false));
+                          }
                         }} placeholder="00000-000"
-                          className="w-full bg-surface-interactive rounded-xl py-3 pl-11 pr-4 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]" />
+                          className="w-full bg-surface-interactive rounded-xl py-3 pl-11 pr-10 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]" />
+                        {cepLoading && <div className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />}
                       </div>
                     </div>
 
