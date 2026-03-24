@@ -330,7 +330,21 @@ const AuthPage = () => {
                   </div>
                 </div>
 
-                {/* Endereço */}
+                {/* País */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-body font-medium text-muted-foreground">País</label>
+                  <div className="relative">
+                    <MapPin size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    <select value={pais} onChange={(e) => setPais(e.target.value)}
+                      className="w-full bg-surface-interactive rounded-xl py-3 pl-11 pr-4 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary min-h-[44px] appearance-none">
+                      {['Brasil','Portugal','Angola','Moçambique','Cabo Verde','Guiné-Bissau','São Tomé e Príncipe','Timor-Leste'].map(p => (
+                        <option key={p} value={p} className="bg-background">{p}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* CEP */}
                 <div className="space-y-1.5">
                   <label className="text-xs font-body font-medium text-muted-foreground">CEP</label>
                   <div className="relative">
