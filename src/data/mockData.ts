@@ -146,6 +146,8 @@ export const playerProps = [
     market: 'Marcar a qualquer momento',
     odds: 2.80,
     photo: null,
+    number: 10,
+    position: 'CF',
   },
   {
     id: 'pp-2',
@@ -154,6 +156,8 @@ export const playerProps = [
     market: 'Marcar gol',
     odds: 3.50,
     photo: null,
+    number: 9,
+    position: 'ST',
   },
   {
     id: 'pp-3',
@@ -162,6 +166,8 @@ export const playerProps = [
     market: 'Dar assistência',
     odds: 4.20,
     photo: null,
+    number: 11,
+    position: 'LW',
   },
   {
     id: 'pp-4',
@@ -170,6 +176,8 @@ export const playerProps = [
     market: 'Marcar gol',
     odds: 3.10,
     photo: null,
+    number: 99,
+    position: 'CF',
   },
   {
     id: 'pp-5',
@@ -178,6 +186,8 @@ export const playerProps = [
     market: 'Chutar no gol',
     odds: 1.85,
     photo: null,
+    number: 7,
+    position: 'RW',
   },
 ];
 
