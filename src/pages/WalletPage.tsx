@@ -126,7 +126,7 @@ const WalletPage = () => {
             <Clock size={16} className="text-muted-foreground" />
             Histórico de Transações
           </h3>
-          <button className="text-xs text-primary font-body font-semibold flex items-center gap-0.5 min-h-[44px]">
+          <button onClick={() => navigate('/historico')} className="text-xs text-primary font-body font-semibold flex items-center gap-0.5 min-h-[44px]">
             Ver tudo <ChevronRight size={14} />
           </button>
         </div>
