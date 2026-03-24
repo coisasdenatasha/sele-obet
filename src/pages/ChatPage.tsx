@@ -356,11 +356,17 @@ const ChatPage = () => {
                 {formatNumber(post.likes + (isLiked ? 1 : 0))}
               </span>
             </button>
-            <button className="flex items-center gap-1.5 min-h-[36px] text-muted-foreground hover:text-foreground transition-colors">
+            <button
+              onClick={() => setOpenComments(isCommentsOpen ? null : post.id)}
+              className={`flex items-center gap-1.5 min-h-[36px] transition-colors ${isCommentsOpen ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+            >
               <MessageSquare size={16} />
-              <span className="text-xs font-body">{formatNumber(post.comments)}</span>
+              <span className="text-xs font-body">{formatNumber(localComments.length)}</span>
             </button>
-            <button className="flex items-center gap-1.5 min-h-[36px] text-muted-foreground hover:text-foreground transition-colors">
+            <button
+              onClick={() => setSharePost(post.id)}
+              className="flex items-center gap-1.5 min-h-[36px] text-muted-foreground hover:text-foreground transition-colors"
+            >
               <Share2 size={16} />
             </button>
           </div>
@@ -381,6 +387,89 @@ const ChatPage = () => {
             </motion.button>
           </div>
         </div>
+
+        {/* Comments section */}
+        <AnimatePresence>
+          {isCommentsOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="overflow-hidden"
+            >
+              <div className="px-3 pb-3 space-y-2">
+                <div className="h-px bg-surface-interactive" />
+
+                {/* Comment list */}
+                <div className="space-y-2 max-h-[240px] overflow-y-auto">
+                  {localComments.map((c) => (
+                    <div key={c.id} className="flex gap-2">
+                      <img src={c.avatar} alt={c.user} className="w-7 h-7 rounded-full object-cover flex-shrink-0 mt-0.5" />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-xs font-display font-bold text-foreground">{c.user}</span>
+                          {c.verified && <CheckCircle2 size={10} className="text-primary flex-shrink-0" fill="currentColor" strokeWidth={0} />}
+                          <span className="text-[0.55rem] text-muted-foreground font-body">{c.timeAgo}</span>
+                        </div>
+                        <p className="text-xs font-body text-foreground/80 mt-0.5">{c.text}</p>
+                        <button className="flex items-center gap-1 mt-1 text-muted-foreground hover:text-primary transition-colors">
+                          <ThumbsUp size={10} />
+                          <span className="text-[0.55rem] font-body">{c.likes}</span>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Add comment */}
+                <div className="flex gap-2 pt-1">
+                  <input
+                    ref={commentInputRef}
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && newComment.trim()) {
+                        if (!isLoggedIn) { navigate('/auth'); return; }
+                        setLocalComments([...localComments, {
+                          id: `new-${Date.now()}`,
+                          user: 'Voce',
+                          avatar: 'https://i.pravatar.cc/40?img=50',
+                          verified: false,
+                          text: newComment,
+                          timeAgo: 'agora',
+                          likes: 0,
+                        }]);
+                        setNewComment('');
+                      }
+                    }}
+                    placeholder="Escreva um comentario..."
+                    className="flex-1 bg-surface-interactive rounded-lg py-2 px-3 text-xs font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[36px]"
+                  />
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                      if (!newComment.trim()) return;
+                      if (!isLoggedIn) { navigate('/auth'); return; }
+                      setLocalComments([...localComments, {
+                        id: `new-${Date.now()}`,
+                        user: 'Voce',
+                        avatar: 'https://i.pravatar.cc/40?img=50',
+                        verified: false,
+                        text: newComment,
+                        timeAgo: 'agora',
+                        likes: 0,
+                      }]);
+                      setNewComment('');
+                    }}
+                    className="bg-primary text-primary-foreground w-9 h-9 rounded-lg flex items-center justify-center min-w-[36px]"
+                  >
+                    <Send size={14} />
+                  </motion.button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
     );
   };
