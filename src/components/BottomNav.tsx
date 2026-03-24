@@ -9,12 +9,12 @@ interface BottomNavProps {
 }
 
 const tabs = [
-  { id: '/', icon: Home, label: 'Página ...' },
-  { id: '/ao-vivo', icon: Radio, label: 'Ao vivo' },
-  { id: '/esportes', icon: Trophy, label: 'Esportes' },
-  { id: 'betslip', icon: Receipt, label: 'Apostas' },
-  { id: '/perfil', icon: User, label: 'Perfil' },
-];
+{ id: '/', icon: Home, label: 'Página ...' },
+{ id: '/ao-vivo', icon: Radio, label: 'Ao vivo' },
+{ id: '/esportes', icon: Trophy, label: 'Esportes' },
+{ id: 'betslip', icon: Receipt, label: 'Apostas' },
+{ id: '/perfil', icon: User, label: 'Perfil' }];
+
 
 const BottomNav = ({ onBetSlipToggle }: BottomNavProps) => {
   const location = useLocation();
@@ -34,8 +34,8 @@ const BottomNav = ({ onBetSlipToggle }: BottomNavProps) => {
       initial={{ y: 80 }}
       animate={{ y: 0 }}
       transition={{ type: 'spring', damping: 20, stiffness: 300, delay: 0.3 }}
-      className="fixed bottom-0 left-0 right-0 z-30 glass lg:hidden safe-area-bottom"
-    >
+      className="fixed bottom-0 left-0 right-0 z-30 glass lg:hidden safe-area-bottom">
+      
       <div className="flex items-center justify-around h-16">
         {tabs.map((tab) => {
           const isActive = tab.id !== 'betslip' && location.pathname === tab.id;
@@ -48,40 +48,40 @@ const BottomNav = ({ onBetSlipToggle }: BottomNavProps) => {
               className={cn(
                 "flex flex-col items-center justify-center gap-0.5 min-w-[44px] min-h-[44px] transition-colors relative",
                 isActive ? "text-primary" : "text-muted-foreground"
-              )}
-            >
+              )}>
+              
               <motion.div
                 animate={isActive ? { y: -2 } : { y: 0 }}
                 transition={{ type: 'spring', stiffness: 400 }}
-                className="relative"
-              >
+                className="relative">
+                
                 <Icon size={22} />
-                {tab.id === '/ao-vivo' && (
-                  <span className="absolute -top-1 -right-2.5 flex items-center justify-center">
+                {tab.id === '/ao-vivo' &&
+                <span className="absolute -top-1 -right-2.5 flex items-center justify-center">
                     <span className="absolute w-4 h-4 rounded-full bg-destructive/40 animate-ping" />
                     <span className="relative bg-destructive text-destructive-foreground text-[0.5rem] font-display font-bold min-w-[16px] h-4 px-0.5 rounded-full flex items-center justify-center">
-                      3
+                      8
                     </span>
                   </span>
-                )}
+                }
               </motion.div>
               <span className="text-[0.6rem] font-body font-medium">{tab.label}</span>
-              {tab.id === 'betslip' && betCount > 0 && (
-                <motion.span
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: 'spring', stiffness: 500 }}
-                  className="absolute top-0.5 right-0.5 bg-primary text-primary-foreground text-[0.55rem] font-display font-bold w-4 h-4 rounded-full flex items-center justify-center"
-                >
+              {tab.id === 'betslip' && betCount > 0 &&
+              <motion.span
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: 'spring', stiffness: 500 }}
+                className="absolute top-0.5 right-0.5 bg-primary text-primary-foreground text-[0.55rem] font-display font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                
                   {betCount}
                 </motion.span>
-              )}
-            </motion.button>
-          );
+              }
+            </motion.button>);
+
         })}
       </div>
-    </motion.nav>
-  );
+    </motion.nav>);
+
 };
 
 export default BottomNav;
