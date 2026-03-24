@@ -53,25 +53,6 @@ const SportFilter = ({ onFilterChange }: SportFilterProps) => {
 
   return (
     <div className="space-y-2">
-      {/* Quick horizontal scroll for top sports */}
-      <div className="flex gap-2 overflow-x-auto no-scrollbar py-1">
-        {sports.slice(0, 10).map((sport) => (
-          <button
-            key={sport.id}
-            onClick={() => handleClick(sport.id)}
-            className={cn(
-              "flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-body font-medium whitespace-nowrap transition-colors min-h-[36px]",
-              active === sport.id
-                ? "bg-primary text-primary-foreground"
-                : "bg-surface-interactive text-muted-foreground hover:text-foreground"
-            )}
-          >
-            <sport.icon size={14} />
-            {sport.label}
-          </button>
-        ))}
-      </div>
-
       {/* Vertical grid list */}
       <div className="grid grid-cols-2 gap-1.5">
         {visibleSports.map((sport) => (
