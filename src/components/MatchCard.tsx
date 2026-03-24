@@ -25,10 +25,11 @@ const MatchCard = ({
   oddsHome, oddsDraw, oddsAway, boosted,
   originalOddsHome, originalOddsDraw, originalOddsAway,
 }: MatchCardProps) => {
+  const navigate = useNavigate();
   const matchName = `${homeTeam} vs ${awayTeam}`;
 
   return (
-    <div className="bg-surface-card rounded-xl p-4 space-y-3">
+    <div className="bg-surface-card rounded-xl p-4 space-y-3" onClick={() => navigate(`/evento/${id}`)} role="button">
       <div className="flex items-center justify-between">
         <span className="text-[0.65rem] font-body text-muted-foreground uppercase tracking-wider">
           {league}
