@@ -186,6 +186,7 @@ const PlayerPropsCarousel = () => {
 
 /* ───────── Main Home ───────── */
 const HomePage = () => {
+  const navigate = useNavigate();
   const addBet = useBetSlipStore((s) => s.addBet);
   const { isLoggedIn } = useAuthStore();
 
