@@ -200,6 +200,8 @@ const ChatPage = () => {
   const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
   const [savedPosts, setSavedPosts] = useState<Set<string>>(new Set());
   const [createName, setCreateName] = useState('');
+  const [openComments, setOpenComments] = useState<string | null>(null);
+  const [sharePost, setSharePost] = useState<string | null>(null);
 
   const toggleLike = (postId: string) => {
     setLikedPosts(prev => {
