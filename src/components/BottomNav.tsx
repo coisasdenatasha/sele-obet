@@ -53,8 +53,17 @@ const BottomNav = ({ onBetSlipToggle }: BottomNavProps) => {
               <motion.div
                 animate={isActive ? { y: -2 } : { y: 0 }}
                 transition={{ type: 'spring', stiffness: 400 }}
+                className="relative"
               >
                 <Icon size={22} />
+                {tab.id === '/ao-vivo' && (
+                  <span className="absolute -top-1 -right-2.5 flex items-center justify-center">
+                    <span className="absolute w-4 h-4 rounded-full bg-destructive/40 animate-ping" />
+                    <span className="relative bg-destructive text-destructive-foreground text-[0.5rem] font-display font-bold min-w-[16px] h-4 px-0.5 rounded-full flex items-center justify-center">
+                      3
+                    </span>
+                  </span>
+                )}
               </motion.div>
               <span className="text-[0.6rem] font-body font-medium">{tab.label}</span>
               {tab.id === 'betslip' && betCount > 0 && (
