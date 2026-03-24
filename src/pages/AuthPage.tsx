@@ -10,6 +10,7 @@ import {
 import heroBanner from '@/assets/hero-banner.jpg';
 import { useAuthStore } from '@/store/authStore';
 import { supabase } from '@/integrations/supabase/client';
+import { lovable } from '@/integrations/lovable';
 
 type AuthStep = 'welcome' | 'login' | 'signup' | 'recovery' | 'kyc' | 'otp' | 'success';
 
