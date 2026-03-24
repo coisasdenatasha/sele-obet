@@ -71,7 +71,7 @@ const BolaoPage = () => {
         <div className="space-y-4">
           {/* Grand Prize */}
           <div className="bg-accent rounded-2xl p-5 text-center space-y-2">
-            <span className="text-3xl">🏆</span>
+            <Trophy size={32} className="text-primary" />
             <h3 className="font-display text-lg font-bold">Grande Prêmio</h3>
             <p className="font-display text-2xl font-extrabold text-gradient-gold">SUV 0km</p>
             <p className="text-xs font-body text-muted-foreground">Para o 1º lugar da classificação geral</p>

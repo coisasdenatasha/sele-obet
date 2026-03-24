@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Eye, EyeOff, Upload } from 'lucide-react';
+import { ArrowLeft, Eye, EyeOff, Upload, Gift } from 'lucide-react';
 import heroBanner from '@/assets/hero-banner.jpg';
 
 type AuthStep = 'welcome' | 'login' | 'signup' | 'recovery' | 'kyc';
@@ -136,7 +136,7 @@ const AuthPage = () => {
                 <InputField label="Senha" type="password" placeholder="Mínimo 8 caracteres" />
               </div>
               <div className="bg-surface-card rounded-xl p-4 flex items-start gap-3">
-                <span className="text-2xl">🎁</span>
+                <Gift size={24} className="text-primary flex-shrink-0" />
                 <div>
                   <p className="text-sm font-display font-bold text-primary">Bônus de Boas-Vindas</p>
                   <p className="text-xs font-body text-muted-foreground mt-0.5">

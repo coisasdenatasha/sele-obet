@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { CircleDot, Dribbble, Target, Gamepad2, Swords, Circle, type LucideIcon } from 'lucide-react';
 
-const sports = [
-  { id: 'futebol', label: '⚽ Futebol', emoji: '⚽' },
-  { id: 'basquete', label: '🏀 Basquete', emoji: '🏀' },
-  { id: 'tenis', label: '🎾 Tênis', emoji: '🎾' },
-  { id: 'esports', label: '🎮 Esports', emoji: '🎮' },
-  { id: 'mma', label: '🥊 MMA', emoji: '🥊' },
-  { id: 'volei', label: '🏐 Vôlei', emoji: '🏐' },
+const sports: { id: string; label: string; icon: LucideIcon }[] = [
+  { id: 'futebol', label: 'Futebol', icon: CircleDot },
+  { id: 'basquete', label: 'Basquete', icon: Dribbble },
+  { id: 'tenis', label: 'Tênis', icon: Target },
+  { id: 'esports', label: 'Esports', icon: Gamepad2 },
+  { id: 'mma', label: 'MMA', icon: Swords },
+  { id: 'volei', label: 'Vôlei', icon: Circle },
 ];
 
 interface SportFilterProps {
@@ -35,6 +36,7 @@ const SportFilter = ({ onFilterChange }: SportFilterProps) => {
               : "bg-surface-interactive text-muted-foreground hover:text-foreground"
           )}
         >
+          <sport.icon size={16} />
           {sport.label}
         </button>
       ))}
