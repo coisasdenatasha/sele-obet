@@ -73,6 +73,11 @@ const ProfilePage = () => {
   const [saving, setSaving] = useState(false);
   const [showPhotoMenu, setShowPhotoMenu] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [cropImage, setCropImage] = useState<string | null>(null);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [rotation, setRotation] = useState(0);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const [form, setForm] = useState({
@@ -88,20 +93,29 @@ const ProfilePage = () => {
   const [newEmail, setNewEmail] = useState('');
   const [emailEditing, setEmailEditing] = useState(false);
 
-  const handlePhotoUpload = async (file: File) => {
-    if (!user) return;
-    setUploadingPhoto(true);
-    setShowPhotoMenu(false);
-    try {
-      const ext = file.name.split('.').pop() || 'jpg';
-      const path = `${user.id}/avatar.${ext}`;
+  const onCropComplete = useCallback((_: Area, croppedPixels: Area) => {
+    setCroppedAreaPixels(croppedPixels);
+  }, []);
 
-      // Remove old avatar if exists
+  const handleFileSelected = (file: File) => {
+    setShowPhotoMenu(false);
+    const reader = new FileReader();
+    reader.onload = () => setCropImage(reader.result as string);
+    reader.readAsDataURL(file);
+  };
+
+  const handleCropConfirm = async () => {
+    if (!cropImage || !croppedAreaPixels || !user) return;
+    setUploadingPhoto(true);
+    try {
+      const croppedBlob = await createCroppedImage(cropImage, croppedAreaPixels, rotation);
+      const path = `${user.id}/avatar.jpg`;
+
       await supabase.storage.from('avatars').remove([path]);
 
       const { error: uploadError } = await supabase.storage
         .from('avatars')
-        .upload(path, file, { upsert: true, contentType: file.type });
+        .upload(path, croppedBlob, { upsert: true, contentType: 'image/jpeg' });
 
       if (uploadError) throw uploadError;
 
@@ -114,12 +128,20 @@ const ProfilePage = () => {
       await updateProfile({ avatar_url: avatarUrl } as any);
       if (user) await fetchProfile(user.id);
       toast.success('Foto atualizada!');
+      setCropImage(null);
+      setCrop({ x: 0, y: 0 });
+      setZoom(1);
+      setRotation(0);
     } catch (err: any) {
       console.error(err);
       toast.error('Erro ao enviar foto');
     } finally {
       setUploadingPhoto(false);
     }
+  };
+
+  const handlePhotoUpload = async (file: File) => {
+    handleFileSelected(file);
   };
 
   useEffect(() => {
