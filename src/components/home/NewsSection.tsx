@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Newspaper, Loader2, ExternalLink } from 'lucide-react';
 import { SectionReveal } from '@/components/animations';
@@ -15,7 +15,6 @@ const NewsSection = () => {
   const [articles, setArticles] = useState<FifaArticle[]>([]);
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
-  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchNews = async () => {
@@ -36,45 +35,7 @@ const NewsSection = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Auto-scroll card by card
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el || articles.length === 0) return;
-
-    let paused = false;
-    const cardWidth = 200 + 12; // w-[200px] + gap-3
-
-    const interval = setInterval(() => {
-      if (paused || !el) return;
-      const maxScroll = el.scrollWidth - el.clientWidth;
-      if (el.scrollLeft >= maxScroll - 2) {
-        el.scrollTo({ left: 0, behavior: 'smooth' });
-      } else {
-        el.scrollBy({ left: cardWidth, behavior: 'smooth' });
-      }
-    }, 4000);
-
-    const pause = () => { paused = true; };
-    const resume = () => { setTimeout(() => { paused = false; }, 3000); };
-
-    el.addEventListener('pointerdown', pause);
-    el.addEventListener('pointerup', resume);
-    el.addEventListener('pointerenter', pause);
-    el.addEventListener('pointerleave', resume);
-    el.addEventListener('touchstart', pause, { passive: true });
-    el.addEventListener('touchend', resume);
-
-    return () => {
-      clearInterval(interval);
-      el.removeEventListener('pointerdown', pause);
-      el.removeEventListener('pointerup', resume);
-      el.removeEventListener('pointerenter', pause);
-      el.removeEventListener('pointerleave', resume);
-      el.removeEventListener('touchstart', pause);
-      el.removeEventListener('touchend', resume);
-    };
-  }, [articles]);
-
+  const duplicatedArticles = [...articles, ...articles];
   const timeAgo = (iso: string) => {
     const diff = Date.now() - new Date(iso).getTime();
     const mins = Math.floor(diff / 60000);
@@ -121,10 +82,15 @@ const NewsSection = () => {
             <Loader2 size={24} className="animate-spin text-primary" />
           </div>
         ) : (
-          <div ref={scrollRef} className="flex gap-3 overflow-x-auto no-scrollbar -mx-4 px-4 pb-1">
-            {articles.map((article, i) => (
+          <div className="overflow-hidden -mx-4">
+            <motion.div
+              className="flex gap-3 px-4 w-max"
+              animate={{ x: ['0%', '-50%'] }}
+              transition={{ x: { duration: 35, repeat: Infinity, ease: 'linear' } }}
+            >
+            {duplicatedArticles.map((article, i) => (
               <motion.a
-                key={i}
+                key={`news-${i}`}
                 href={article.url}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -156,6 +122,7 @@ const NewsSection = () => {
                 </div>
               </motion.a>
             ))}
+            </motion.div>
           </div>
         )}
       </section>
