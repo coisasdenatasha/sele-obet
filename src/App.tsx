@@ -23,6 +23,9 @@ import SettingsPage from "@/pages/SettingsPage";
 import CasinoPage from "@/pages/CasinoPage";
 import CrashPage from "@/pages/CrashPage";
 import EsportesPage from "@/pages/EsportesPage";
+import BetHistoryPage from "@/pages/BetHistoryPage";
+import PerformancePage from "@/pages/PerformancePage";
+import ResponsibleGamingPage from "@/pages/ResponsibleGamingPage";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -64,6 +67,9 @@ const AppLayout = () => {
           <Route path="/bolao" element={<BolaoPage />} />
           <Route path="/planos" element={<PlansPage />} />
           <Route path="/configuracoes" element={<SettingsPage />} />
+          <Route path="/historico" element={<BetHistoryPage />} />
+          <Route path="/desempenho" element={<PerformancePage />} />
+          <Route path="/jogo-responsavel" element={<ResponsibleGamingPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
