@@ -65,6 +65,84 @@ export type Database = {
         }
         Relationships: []
       }
+      transactions: {
+        Row: {
+          amount: number
+          card_last4: string | null
+          created_at: string
+          description: string | null
+          id: string
+          metadata: Json | null
+          method: string
+          pix_key: string | null
+          pix_qr_code: string | null
+          status: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          card_last4?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          method: string
+          pix_key?: string | null
+          pix_qr_code?: string | null
+          status?: string
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          card_last4?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          method?: string
+          pix_key?: string | null
+          pix_qr_code?: string | null
+          status?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      wallets: {
+        Row: {
+          balance: number
+          bonus_balance: number
+          created_at: string
+          id: string
+          in_bets: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          balance?: number
+          bonus_balance?: number
+          created_at?: string
+          id?: string
+          in_bets?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          balance?: number
+          bonus_balance?: number
+          created_at?: string
+          id?: string
+          in_bets?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
