@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -12,12 +12,27 @@ import LivePage from "@/pages/LivePage";
 import SearchPage from "@/pages/SearchPage";
 import WalletPage from "@/pages/WalletPage";
 import ProfilePage from "@/pages/ProfilePage";
+import AuthPage from "@/pages/AuthPage";
+import EventDetailPage from "@/pages/EventDetailPage";
+import BolaoPage from "@/pages/BolaoPage";
+import PlansPage from "@/pages/PlansPage";
+import SettingsPage from "@/pages/SettingsPage";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
 
 const AppLayout = () => {
   const [betSlipOpen, setBetSlipOpen] = useState(false);
+  const location = useLocation();
+  const isAuthPage = location.pathname === '/auth';
+
+  if (isAuthPage) {
+    return (
+      <Routes>
+        <Route path="/auth" element={<AuthPage />} />
+      </Routes>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -29,6 +44,10 @@ const AppLayout = () => {
           <Route path="/busca" element={<SearchPage />} />
           <Route path="/carteira" element={<WalletPage />} />
           <Route path="/perfil" element={<ProfilePage />} />
+          <Route path="/evento/:id" element={<EventDetailPage />} />
+          <Route path="/bolao" element={<BolaoPage />} />
+          <Route path="/planos" element={<PlansPage />} />
+          <Route path="/configuracoes" element={<SettingsPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>

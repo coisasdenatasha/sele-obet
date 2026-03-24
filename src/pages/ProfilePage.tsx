@@ -1,4 +1,5 @@
-import { User, TrendingUp, History, Shield, Settings, LogOut, ChevronRight, Award } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { User, TrendingUp, History, Shield, Settings, LogOut, ChevronRight, Award, Trophy, CreditCard } from 'lucide-react';
 
 const stats = [
   { label: 'Apostas', value: '142' },
@@ -8,14 +9,18 @@ const stats = [
 ];
 
 const menuItems = [
-  { icon: History, label: 'Histórico de Apostas' },
-  { icon: TrendingUp, label: 'Relatório de Desempenho' },
-  { icon: Award, label: 'Plano Premium' },
-  { icon: Shield, label: 'Jogo Responsável' },
-  { icon: Settings, label: 'Configurações' },
+  { icon: History, label: 'Histórico de Apostas', route: '' },
+  { icon: TrendingUp, label: 'Relatório de Desempenho', route: '' },
+  { icon: Trophy, label: 'Bolão', route: '/bolao' },
+  { icon: Award, label: 'Plano Premium', route: '/planos' },
+  { icon: CreditCard, label: 'Carteira', route: '/carteira' },
+  { icon: Shield, label: 'Jogo Responsável', route: '/configuracoes' },
+  { icon: Settings, label: 'Configurações', route: '/configuracoes' },
 ];
 
 const ProfilePage = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="space-y-6 pb-20 px-4 pt-2">
       {/* Profile Header */}
@@ -49,6 +54,7 @@ const ProfilePage = () => {
         {menuItems.map((item) => (
           <button
             key={item.label}
+            onClick={() => item.route && navigate(item.route)}
             className="w-full flex items-center justify-between bg-surface-card rounded-xl p-4 min-h-[44px] hover:bg-surface-interactive transition-colors"
           >
             <div className="flex items-center gap-3">
@@ -60,7 +66,10 @@ const ProfilePage = () => {
         ))}
       </div>
 
-      <button className="w-full flex items-center justify-center gap-2 bg-destructive/10 text-destructive rounded-xl p-4 min-h-[44px] font-body font-medium text-sm">
+      <button
+        onClick={() => navigate('/auth')}
+        className="w-full flex items-center justify-center gap-2 bg-destructive/10 text-destructive rounded-xl p-4 min-h-[44px] font-body font-medium text-sm"
+      >
         <LogOut size={18} />
         Sair da Conta
       </button>
