@@ -114,7 +114,14 @@ const AuthPage = () => {
   const [loginPassword, setLoginPassword] = useState('');
   const [authError, setAuthError] = useState<string | null>(null);
   const [authLoading, setAuthLoading] = useState(false);
-  const { signUp, signIn } = useAuthStore();
+  const { signUp, signIn, isLoggedIn } = useAuthStore();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigate('/', { replace: true });
+    }
+  }, [isLoggedIn, navigate]);
 
   // Recovery
   const [recoveryEmail, setRecoveryEmail] = useState('');
