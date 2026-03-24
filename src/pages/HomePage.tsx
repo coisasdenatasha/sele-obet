@@ -19,7 +19,6 @@ import PopularTournamentsSection from '@/components/home/PopularTournamentsSecti
 import GoalReplaysSection from '@/components/home/GoalReplaysSection';
 import MultiCreatorBanner from '@/components/home/MultiCreatorBanner';
 import LiveInPlaySection from '@/components/home/LiveInPlaySection';
-import StreamingSection from '@/components/home/StreamingSection';
 import NewsSection from '@/components/home/NewsSection';
 import SuperSocialCTA from '@/components/home/SuperSocialCTA';
 
@@ -233,8 +232,6 @@ const HomePage = () => {
       {/* Quick Access Row */}
       <QuickAccessRow />
 
-      {/* 2. Streaming Esportivo */}
-      <StreamingSection />
 
       <SectionReveal delay={0.1}>
       <section className="px-4 space-y-3">
