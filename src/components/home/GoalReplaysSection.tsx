@@ -74,7 +74,7 @@ const GoalReplaysSection = () => {
 
     const step = () => {
       if (!paused && el) {
-        el.scrollLeft += 0.5;
+        el.scrollLeft += 0.3;
         if (el.scrollLeft >= el.scrollWidth - el.clientWidth - 1) {
           el.scrollLeft = 0;
         }
@@ -87,6 +87,8 @@ const GoalReplaysSection = () => {
 
     el.addEventListener('pointerdown', pause);
     el.addEventListener('pointerup', resume);
+    el.addEventListener('pointerenter', pause);
+    el.addEventListener('pointerleave', resume);
     el.addEventListener('touchstart', pause, { passive: true });
     el.addEventListener('touchend', resume);
     animId = requestAnimationFrame(step);
@@ -95,6 +97,8 @@ const GoalReplaysSection = () => {
       cancelAnimationFrame(animId);
       el.removeEventListener('pointerdown', pause);
       el.removeEventListener('pointerup', resume);
+      el.removeEventListener('pointerenter', pause);
+      el.removeEventListener('pointerleave', resume);
       el.removeEventListener('touchstart', pause);
       el.removeEventListener('touchend', resume);
     };

@@ -43,7 +43,7 @@ const NewsSection = () => {
 
     let animId: number;
     let paused = false;
-    let speed = 0.5;
+    let speed = 0.3;
 
     const step = () => {
       if (!paused && el) {
@@ -56,22 +56,26 @@ const NewsSection = () => {
       animId = requestAnimationFrame(step);
     };
 
-    const handlePointerDown = () => { paused = true; };
-    const handlePointerUp = () => { setTimeout(() => { paused = false; }, 2000); };
+    const pause = () => { paused = true; };
+    const resume = () => { setTimeout(() => { paused = false; }, 2000); };
 
-    el.addEventListener('pointerdown', handlePointerDown);
-    el.addEventListener('pointerup', handlePointerUp);
-    el.addEventListener('touchstart', handlePointerDown, { passive: true });
-    el.addEventListener('touchend', handlePointerUp);
+    el.addEventListener('pointerdown', pause);
+    el.addEventListener('pointerup', resume);
+    el.addEventListener('pointerenter', pause);
+    el.addEventListener('pointerleave', resume);
+    el.addEventListener('touchstart', pause, { passive: true });
+    el.addEventListener('touchend', resume);
 
     animId = requestAnimationFrame(step);
 
     return () => {
       cancelAnimationFrame(animId);
-      el.removeEventListener('pointerdown', handlePointerDown);
-      el.removeEventListener('pointerup', handlePointerUp);
-      el.removeEventListener('touchstart', handlePointerDown);
-      el.removeEventListener('touchend', handlePointerUp);
+      el.removeEventListener('pointerdown', pause);
+      el.removeEventListener('pointerup', resume);
+      el.removeEventListener('pointerenter', pause);
+      el.removeEventListener('pointerleave', resume);
+      el.removeEventListener('touchstart', pause);
+      el.removeEventListener('touchend', resume);
     };
   }, [articles]);
 
