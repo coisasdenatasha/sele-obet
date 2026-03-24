@@ -251,6 +251,10 @@ const ChatPage = () => {
   const PostCard = ({ post }: { post: FeedPost }) => {
     const isLiked = likedPosts.has(post.id);
     const isSaved = savedPosts.has(post.id);
+    const isCommentsOpen = openComments === post.id;
+    const [newComment, setNewComment] = useState('');
+    const [localComments, setLocalComments] = useState(post.comments);
+    const commentInputRef = useRef<HTMLInputElement>(null);
 
     return (
       <motion.div
