@@ -20,7 +20,6 @@ const Header = ({ onMenuToggle }: HeaderProps) => {
           <button onClick={() => navigate('/')} className="flex items-center">
             <span className="font-display text-xl text-primary font-extrabold tracking-tight">Seleção</span><span className="font-display text-xl text-foreground font-extrabold tracking-tight">Bet</span>
           </button>
-          </button>
         </div>
 
         <nav className="hidden lg:flex items-center gap-6">
