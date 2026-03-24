@@ -48,7 +48,7 @@ const AppLayout = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header onMenuToggle={() => setDrawerOpen(true)} />
+      <Header />
       <main className="max-w-7xl mx-auto pt-2">
         <Routes>
           <Route path="/" element={<HomePage />} />
