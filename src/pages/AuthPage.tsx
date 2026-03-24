@@ -253,11 +253,9 @@ const AuthPage = () => {
         {/* SIGNUP */}
         {step === 'signup' && (
           <motion.div key="signup" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} className="flex-1 px-6 pt-4 pb-8 overflow-y-auto">
-            <BackButton to={signupStep === 1 ? 'welcome' : 'signup'} />
-            {signupStep > 1 && (
-              <button onClick={() => setSignupStep(signupStep - 1)} className="absolute top-4 left-6 p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-foreground/70 hover:text-foreground">
-              </button>
-            )}
+            <button onClick={() => { if (signupStep > 1) setSignupStep(signupStep - 1); else setStep('welcome'); }} className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-foreground/70 hover:text-foreground">
+              <ArrowLeft size={22} />
+            </button>
 
             <div className="mt-4 space-y-5">
               <div>
