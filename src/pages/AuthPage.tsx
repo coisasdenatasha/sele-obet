@@ -104,17 +104,73 @@ const AuthPage = () => {
   // OTP
   const [otpCode, setOtpCode] = useState(['', '', '', '', '', '']);
 
+  // Taken usernames (simulated)
+  const takenUsernames = ['admin', 'joaosilva', 'usuario', 'test', 'bot', 'moderador', 'suporte'];
+  const [usernameChecking, setUsernameChecking] = useState(false);
+  const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
+
+  // Username availability check with debounce
+  const checkUsername = useCallback((name: string) => {
+    if (name.length < 3) { setUsernameAvailable(null); return; }
+    setUsernameChecking(true);
+    const timer = setTimeout(() => {
+      setUsernameAvailable(!takenUsernames.includes(name.toLowerCase()));
+      setUsernameChecking(false);
+    }, 600);
+    return () => clearTimeout(timer);
+  }, []);
+
   // Validation helpers
-  const isEmailValid = (e: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+  const isEmailValid = (e: string) => /^[^\s@]+@[^\s@]{2,}\.[^\s@]{2,}$/.test(e);
+  const emailError = email.length > 0 && !isEmailValid(email) ? (
+    !email.includes('@') ? 'Falta o @' :
+    email.endsWith('@') ? 'Falta o domínio' :
+    !email.includes('.') ? 'Domínio inválido' :
+    email.endsWith('.') ? 'Domínio incompleto' : 'E-mail inválido'
+  ) : null;
+
   const cpfClean = cpf.replace(/\D/g, '');
   const cpfValid = cpfClean.length === 11 && isValidCPF(cpf);
+
+  // Date of birth validation (real date check)
   const dobClean = dob.replace(/\D/g, '');
-  const dobValid = dobClean.length === 8;
+  const isValidDate = (dateStr: string): boolean => {
+    const digits = dateStr.replace(/\D/g, '');
+    if (digits.length !== 8) return false;
+    const day = parseInt(digits.slice(0, 2));
+    const month = parseInt(digits.slice(2, 4));
+    const year = parseInt(digits.slice(4, 8));
+    if (month < 1 || month > 12) return false;
+    if (day < 1 || day > 31) return false;
+    if (year < 1900 || year > new Date().getFullYear()) return false;
+    const date = new Date(year, month - 1, day);
+    if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) return false;
+    // Must be at least 18 years old
+    const today = new Date();
+    const age = today.getFullYear() - year - (today.getMonth() < month - 1 || (today.getMonth() === month - 1 && today.getDate() < day) ? 1 : 0);
+    if (age < 18) return false;
+    return true;
+  };
+  const dobValid = isValidDate(dob);
+  const dobError = dobClean.length === 8 && !dobValid ? (
+    (() => {
+      const d = parseInt(dobClean.slice(0, 2)), m = parseInt(dobClean.slice(2, 4)), y = parseInt(dobClean.slice(4, 8));
+      if (m < 1 || m > 12) return 'Mês inválido';
+      if (d < 1 || d > 31) return 'Dia inválido';
+      if (y < 1900 || y > new Date().getFullYear()) return 'Ano inválido';
+      const date = new Date(y, m - 1, d);
+      if (date.getDate() !== d) return 'Data não existe';
+      return 'Você deve ter 18+ anos';
+    })()
+  ) : null;
+
   const pwStrength = getPasswordStrength(password);
   const passwordsMatch = password === confirmPassword && confirmPassword.length > 0;
 
+  const usernameValid = username.trim().length >= 3 && usernameAvailable === true;
+
   // Step validations
-  const step1Valid = fullName.trim().length >= 3 && username.trim().length >= 3 && isEmailValid(email) && cpfValid && dobValid;
+  const step1Valid = fullName.trim().length >= 3 && usernameValid && isEmailValid(email) && cpfValid && dobValid;
   const step2Valid = telefone.replace(/\D/g, '').length >= 10;
   const step3Valid = password.length >= 8 && passwordsMatch;
   const step4Valid = over18 && acceptTerms && notExcluded && acceptRegulation;
