@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import heroBanner from '@/assets/hero-banner.jpg';
 import { useAuthStore } from '@/store/authStore';
+import { supabase } from '@/integrations/supabase/client';
 
 type AuthStep = 'welcome' | 'login' | 'signup' | 'recovery' | 'kyc' | 'otp' | 'success';
 
@@ -110,6 +111,9 @@ const AuthPage = () => {
   const [loginUsername, setLoginUsername] = useState('');
   const [loginCpf, setLoginCpf] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [authLoading, setAuthLoading] = useState(false);
+  const { signUp, signIn } = useAuthStore();
 
   // Recovery
   const [recoveryEmail, setRecoveryEmail] = useState('');
@@ -320,9 +324,24 @@ const AuthPage = () => {
                 Esqueceu a senha?
               </button>
 
-              <motion.button whileTap={{ scale: 0.97 }} onClick={() => { setStep('otp'); }}
-                className="w-full bg-primary text-primary-foreground font-display font-bold text-base py-3.5 rounded-xl min-h-[44px] hover:brightness-110 transition-all">
-                Entrar
+              {authError && (
+                <p className="text-[0.75rem] text-destructive font-body bg-destructive/10 rounded-lg p-3">{authError}</p>
+              )}
+
+              <motion.button whileTap={{ scale: 0.97 }} disabled={authLoading}
+                onClick={async () => {
+                  setAuthError(null);
+                  setAuthLoading(true);
+                  const { error } = await signIn(loginEmail, loginPassword);
+                  setAuthLoading(false);
+                  if (error) {
+                    setAuthError(error === 'Invalid login credentials' ? 'E-mail ou senha incorretos' : error);
+                  } else {
+                    navigate('/');
+                  }
+                }}
+                className="w-full bg-primary text-primary-foreground font-display font-bold text-base py-3.5 rounded-xl min-h-[44px] hover:brightness-110 transition-all disabled:opacity-50">
+                {authLoading ? 'Entrando...' : 'Entrar'}
               </motion.button>
 
               {/* Biometria */}
@@ -643,6 +662,10 @@ const AuthPage = () => {
                 )}
               </AnimatePresence>
 
+              {authError && (
+                <p className="text-[0.75rem] text-destructive font-body bg-destructive/10 rounded-lg p-3">{authError}</p>
+              )}
+
               {/* Navigation Buttons */}
               <div className="flex gap-3 pt-2">
                 {signupStep > 1 && (
@@ -652,17 +675,33 @@ const AuthPage = () => {
                   </motion.button>
                 )}
                 <motion.button whileTap={{ scale: 0.97 }}
-                  onClick={() => {
-                    if (signupStep < totalSignupSteps) setSignupStep(signupStep + 1);
-                    else setStep('kyc');
+                  onClick={async () => {
+                    if (signupStep < totalSignupSteps) {
+                      setSignupStep(signupStep + 1);
+                    } else {
+                      setAuthError(null);
+                      setAuthLoading(true);
+                      const { error } = await signUp(email, password, {
+                        full_name: fullName,
+                        username,
+                        cpf: cpf.replace(/\D/g, ''),
+                        phone: telefone.replace(/\D/g, ''),
+                      });
+                      setAuthLoading(false);
+                      if (error) {
+                        setAuthError(error);
+                      } else {
+                        setStep('success');
+                      }
+                    }
                   }}
-                  disabled={!currentStepValid}
+                  disabled={!currentStepValid || authLoading}
                   className={`flex-1 font-display font-bold text-sm py-3.5 rounded-xl min-h-[44px] transition-all ${
-                    currentStepValid
+                    currentStepValid && !authLoading
                       ? 'bg-primary text-primary-foreground hover:brightness-110'
                       : 'bg-surface-interactive text-muted-foreground cursor-not-allowed'
                   }`}>
-                  {signupStep < totalSignupSteps ? 'Próximo' : 'Cadastrar'}
+                  {authLoading ? 'Cadastrando...' : signupStep < totalSignupSteps ? 'Próximo' : 'Cadastrar'}
                 </motion.button>
               </div>
             </div>
@@ -811,7 +850,7 @@ const AuthPage = () => {
                 ))}
               </div>
 
-              <motion.button whileTap={{ scale: 0.97 }} onClick={() => { useAuthStore.getState().login({ name: 'João Silva', username: 'joaosilva', level: 'Ouro' }); navigate('/'); }}
+              <motion.button whileTap={{ scale: 0.97 }} onClick={() => navigate('/')}
                 className="w-full bg-primary text-primary-foreground font-display font-bold text-base py-3.5 rounded-xl min-h-[44px] hover:brightness-110 transition-all">
                 Confirmar
               </motion.button>
@@ -851,7 +890,12 @@ const AuthPage = () => {
                         className="w-full bg-surface-interactive rounded-xl py-3 pl-11 pr-4 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]" />
                     </div>
                   </div>
-                  <motion.button whileTap={{ scale: 0.97 }} onClick={() => setRecoverySent(true)}
+                  <motion.button whileTap={{ scale: 0.97 }} onClick={async () => {
+                    await supabase.auth.resetPasswordForEmail(recoveryEmail, {
+                      redirectTo: `${window.location.origin}/reset-password`,
+                    });
+                    setRecoverySent(true);
+                  }}
                     disabled={!isEmailValid(recoveryEmail)}
                     className={`w-full font-display font-bold text-base py-3.5 rounded-xl min-h-[44px] transition-all ${
                       isEmailValid(recoveryEmail)
@@ -895,7 +939,7 @@ const AuthPage = () => {
             <p className="text-sm font-body text-muted-foreground mt-2 max-w-[280px]">
               Tudo pronto! Comece a explorar os melhores mercados e odds turbinadas.
             </p>
-            <motion.button whileTap={{ scale: 0.97 }} onClick={() => { useAuthStore.getState().login({ name: fullName || 'João Silva', username: username || 'joaosilva', level: 'Bronze' }); navigate('/'); }}
+            <motion.button whileTap={{ scale: 0.97 }} onClick={() => navigate('/')}
               className="mt-8 w-full bg-primary text-primary-foreground font-display font-bold text-base py-3.5 rounded-xl min-h-[44px] hover:brightness-110 transition-all">
               Começar a Apostar
             </motion.button>

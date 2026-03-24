@@ -22,7 +22,7 @@ const menuItems = [
 
 const ProfilePage = () => {
   const navigate = useNavigate();
-  const { isLoggedIn, user, logout } = useAuthStore();
+  const { isLoggedIn, profile, logout } = useAuthStore();
 
   if (!isLoggedIn) {
     return (
@@ -71,12 +71,12 @@ const ProfilePage = () => {
           <User size={28} className="text-primary" />
         </div>
         <div>
-          <h2 className="font-display text-xl font-bold">{user?.name || 'João Silva'}</h2>
+          <h2 className="font-display text-xl font-bold">{profile?.full_name || 'João Silva'}</h2>
           <div className="flex items-center gap-2 mt-0.5">
             <span className="bg-primary/20 text-primary text-[0.65rem] font-display font-bold px-2 py-0.5 rounded-full">
-              <Star size={12} className="inline mr-0.5" /> Nível {user?.level || 'Ouro'}
+              <Star size={12} className="inline mr-0.5" /> Nível {profile?.level || 'Ouro'}
             </span>
-            <span className="text-xs text-muted-foreground font-body">@{user?.username || 'joaosilva'}</span>
+            <span className="text-xs text-muted-foreground font-body">@{profile?.username || 'joaosilva'}</span>
           </div>
         </div>
       </div>
