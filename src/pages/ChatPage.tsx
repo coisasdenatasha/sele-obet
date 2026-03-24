@@ -2,7 +2,8 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Send, Users, TrendingUp, MessageCircle, Crown, Flame, ThumbsUp,
-  Plus, Clock, Target, Zap, UserCircle, Trophy, Star, Hash
+  Plus, Clock, Target, Zap, UserCircle, Trophy, Star, Hash,
+  Flag, Radio, BarChart3, CreditCard, Swords, Award, CircleDot
 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useNavigate } from 'react-router-dom';
@@ -12,7 +13,6 @@ interface ChatMessage {
   user: string;
   username: string;
   level: string;
-  avatar?: string;
   text: string;
   time: string;
   likes: number;
@@ -23,7 +23,7 @@ interface ChatMessage {
 interface ChatRoom {
   id: string;
   name: string;
-  emoji: string;
+  icon: typeof Trophy;
   members: number;
   lastMessage: string;
   category: string;
@@ -31,7 +31,7 @@ interface ChatRoom {
 
 type Tab = 'popular' | 'apostas' | 'criar' | 'recentes' | 'odds100' | 'gols' | 'jogadores';
 
-const tabs: { id: Tab; label: string; icon: typeof Flame }[] = [
+const tabsList: { id: Tab; label: string; icon: typeof Flame }[] = [
   { id: 'popular', label: 'Popular', icon: Flame },
   { id: 'apostas', label: 'Apostas', icon: TrendingUp },
   { id: 'recentes', label: 'Recentes', icon: Clock },
@@ -42,36 +42,36 @@ const tabs: { id: Tab; label: string; icon: typeof Flame }[] = [
 ];
 
 const rooms: ChatRoom[] = [
-  { id: '1', name: 'Brasileirão Geral', emoji: '🇧🇷', members: 4821, lastMessage: 'Flamengo hoje vai meter!', category: 'popular' },
-  { id: '2', name: 'Libertadores', emoji: '🏆', members: 3210, lastMessage: 'Quem pega essa odd do Boca?', category: 'popular' },
-  { id: '3', name: 'Premier League BR', emoji: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', members: 2190, lastMessage: 'Arsenal tá voando demais', category: 'popular' },
-  { id: '4', name: 'Tips do Dia', emoji: '💎', members: 5670, lastMessage: 'Green de R$ 500 agora!!!', category: 'popular' },
-  { id: '5', name: 'Múltiplas & Combos', emoji: '🔥', members: 3450, lastMessage: 'Múltipla de 8.50 pagou!', category: 'apostas' },
-  { id: '6', name: 'Ao Vivo - Reações', emoji: '🔴', members: 7820, lastMessage: 'GOOOOOOL DO MENGÃO!!!', category: 'apostas' },
-  { id: '7', name: 'Over/Under Club', emoji: '📊', members: 1890, lastMessage: 'Over 2.5 sempre paga no Espanhol', category: 'apostas' },
-  { id: '8', name: 'Cantos & Cartões', emoji: '🟨', members: 980, lastMessage: 'Over 9.5 cantos pagou bonito', category: 'apostas' },
-  { id: '9', name: 'Odds Absurdas', emoji: '🚀', members: 6540, lastMessage: 'Peguei odd 250.00 e deu GREEN', category: 'odds100' },
-  { id: '10', name: 'Loucuras > 100x', emoji: '💰', members: 4320, lastMessage: 'Múltipla de 12 jogos, odd 340', category: 'odds100' },
-  { id: '11', name: 'Gols a Qualquer Momento', emoji: '⚽', members: 3200, lastMessage: 'Haaland marca primeiro, confia', category: 'gols' },
-  { id: '12', name: 'Placar Exato', emoji: '🎯', members: 1450, lastMessage: '2x1 no clássico, tá pago', category: 'gols' },
-  { id: '13', name: 'Ambos Marcam', emoji: '🤝', members: 2100, lastMessage: 'BTTS no Liverpool x City easy', category: 'gols' },
-  { id: '14', name: 'Neymar Watch', emoji: '🇧🇷', members: 8900, lastMessage: 'Será que joga hoje?', category: 'jogadores' },
-  { id: '15', name: 'Vini Jr. Fan Club', emoji: '⭐', members: 7650, lastMessage: 'Melhor do mundo, sem dúvidas', category: 'jogadores' },
-  { id: '16', name: 'Haaland Machine', emoji: '🤖', members: 5430, lastMessage: 'Mais um hat-trick vindo aí', category: 'jogadores' },
-  { id: '17', name: 'Mbappé Zone', emoji: '⚡', members: 6780, lastMessage: 'Odd de gol dele tá barata', category: 'jogadores' },
-  { id: '18', name: 'Messi GOAT', emoji: '🐐', members: 9100, lastMessage: 'Último jogo da carreira?', category: 'jogadores' },
+  { id: '1', name: 'Brasileirao Geral', icon: Flag, members: 4821, lastMessage: 'Flamengo hoje vai meter!', category: 'popular' },
+  { id: '2', name: 'Libertadores', icon: Trophy, members: 3210, lastMessage: 'Quem pega essa odd do Boca?', category: 'popular' },
+  { id: '3', name: 'Premier League BR', icon: Award, members: 2190, lastMessage: 'Arsenal ta voando demais', category: 'popular' },
+  { id: '4', name: 'Tips do Dia', icon: Star, members: 5670, lastMessage: 'Green de R$ 500 agora!', category: 'popular' },
+  { id: '5', name: 'Multiplas & Combos', icon: BarChart3, members: 3450, lastMessage: 'Multipla de 8.50 pagou!', category: 'apostas' },
+  { id: '6', name: 'Ao Vivo - Reacoes', icon: Radio, members: 7820, lastMessage: 'GOOOOL DO MENGAO!', category: 'apostas' },
+  { id: '7', name: 'Over/Under Club', icon: TrendingUp, members: 1890, lastMessage: 'Over 2.5 sempre paga no Espanhol', category: 'apostas' },
+  { id: '8', name: 'Cantos & Cartoes', icon: CreditCard, members: 980, lastMessage: 'Over 9.5 cantos pagou bonito', category: 'apostas' },
+  { id: '9', name: 'Odds Absurdas', icon: Zap, members: 6540, lastMessage: 'Peguei odd 250.00 e deu GREEN', category: 'odds100' },
+  { id: '10', name: 'Loucuras > 100x', icon: Flame, members: 4320, lastMessage: 'Multipla de 12 jogos, odd 340', category: 'odds100' },
+  { id: '11', name: 'Gols a Qualquer Momento', icon: CircleDot, members: 3200, lastMessage: 'Haaland marca primeiro, confia', category: 'gols' },
+  { id: '12', name: 'Placar Exato', icon: Target, members: 1450, lastMessage: '2x1 no classico, ta pago', category: 'gols' },
+  { id: '13', name: 'Ambos Marcam', icon: Swords, members: 2100, lastMessage: 'BTTS no Liverpool x City easy', category: 'gols' },
+  { id: '14', name: 'Neymar Watch', icon: Star, members: 8900, lastMessage: 'Sera que joga hoje?', category: 'jogadores' },
+  { id: '15', name: 'Vini Jr. Fan Club', icon: Award, members: 7650, lastMessage: 'Melhor do mundo, sem duvidas', category: 'jogadores' },
+  { id: '16', name: 'Haaland Machine', icon: Zap, members: 5430, lastMessage: 'Mais um hat-trick vindo ai', category: 'jogadores' },
+  { id: '17', name: 'Mbappe Zone', icon: Flame, members: 6780, lastMessage: 'Odd de gol dele ta barata', category: 'jogadores' },
+  { id: '18', name: 'Messi GOAT', icon: Crown, members: 9100, lastMessage: 'Ultimo jogo da carreira?', category: 'jogadores' },
 ];
 
 const mockMessages: ChatMessage[] = [
-  { id: '1', user: 'Carlos M.', username: '@carlosm', level: 'VIP', text: 'Flamengo vai meter 3 hoje, confia! 🔥', time: '14:32', likes: 24, betInfo: { match: 'Flamengo x Palmeiras', market: 'Over 2.5', odd: 1.85 } },
-  { id: '2', user: 'Ana Paula', username: '@anapbet', level: 'Ouro', text: 'Alguém viu a odd do Palmeiras? Tá valendo demais', time: '14:33', likes: 12 },
-  { id: '3', user: 'Lucas R.', username: '@lucasr10', level: 'Prata', text: 'Peguei a múltipla de 15.00 ontem e deu green!! 💚', time: '14:35', likes: 45, isTip: true, betInfo: { match: 'Múltipla 4 jogos', market: 'Combo', odd: 15.00, result: 'green' } },
-  { id: '4', user: 'Thiago F.', username: '@thifern', level: 'VIP', text: 'Over 2.5 no jogo do Real Madrid tá pagando 1.85, bora', time: '14:36', likes: 18, betInfo: { match: 'Real Madrid x Barcelona', market: 'Over 2.5', odd: 1.85 } },
-  { id: '5', user: 'Mariana S.', username: '@marisantos', level: 'Ouro', text: 'Essa odd turbinada do Corinthians tá um roubo, peguem!', time: '14:38', likes: 31 },
-  { id: '6', user: 'Pedro H.', username: '@pedroh99', level: 'Bronze', text: 'Primeira vez aqui, qual aposta vocês recomendam pro iniciante?', time: '14:39', likes: 8 },
-  { id: '7', user: 'Rafael K.', username: '@rafaelk', level: 'VIP', text: 'Tip do dia: Ambos Marcam no Liverpool x Arsenal @ 1.72. Confiem no pai. 👑', time: '14:41', likes: 67, isTip: true, betInfo: { match: 'Liverpool x Arsenal', market: 'Ambos Marcam', odd: 1.72 } },
-  { id: '8', user: 'Juliana C.', username: '@julibet', level: 'Ouro', text: 'Green de R$ 380 agora! Obrigada pela dica @rafaelk 💰', time: '14:42', likes: 22, betInfo: { match: 'Liverpool x Arsenal', market: 'Ambos Marcam', odd: 1.72, result: 'green' } },
-  { id: '9', user: 'Diego S.', username: '@diegosil', level: 'VIP', text: 'Quem tiver coragem: múltipla de odd 145.00, 6 jogos, all in 🚀', time: '14:44', likes: 89, isTip: true, betInfo: { match: '6 jogos', market: 'Múltipla', odd: 145.00 } },
+  { id: '1', user: 'Carlos M.', username: '@carlosm', level: 'VIP', text: 'Flamengo vai meter 3 hoje, confia!', time: '14:32', likes: 24, betInfo: { match: 'Flamengo x Palmeiras', market: 'Over 2.5', odd: 1.85 } },
+  { id: '2', user: 'Ana Paula', username: '@anapbet', level: 'Ouro', text: 'Alguem viu a odd do Palmeiras? Ta valendo demais', time: '14:33', likes: 12 },
+  { id: '3', user: 'Lucas R.', username: '@lucasr10', level: 'Prata', text: 'Peguei a multipla de 15.00 ontem e deu green!!', time: '14:35', likes: 45, isTip: true, betInfo: { match: 'Multipla 4 jogos', market: 'Combo', odd: 15.00, result: 'green' } },
+  { id: '4', user: 'Thiago F.', username: '@thifern', level: 'VIP', text: 'Over 2.5 no jogo do Real Madrid ta pagando 1.85, bora', time: '14:36', likes: 18, betInfo: { match: 'Real Madrid x Barcelona', market: 'Over 2.5', odd: 1.85 } },
+  { id: '5', user: 'Mariana S.', username: '@marisantos', level: 'Ouro', text: 'Essa odd turbinada do Corinthians ta um roubo, peguem!', time: '14:38', likes: 31 },
+  { id: '6', user: 'Pedro H.', username: '@pedroh99', level: 'Bronze', text: 'Primeira vez aqui, qual aposta voces recomendam pro iniciante?', time: '14:39', likes: 8 },
+  { id: '7', user: 'Rafael K.', username: '@rafaelk', level: 'VIP', text: 'Tip do dia: Ambos Marcam no Liverpool x Arsenal @ 1.72. Confiem no pai.', time: '14:41', likes: 67, isTip: true, betInfo: { match: 'Liverpool x Arsenal', market: 'Ambos Marcam', odd: 1.72 } },
+  { id: '8', user: 'Juliana C.', username: '@julibet', level: 'Ouro', text: 'Green de R$ 380 agora! Obrigada pela dica @rafaelk', time: '14:42', likes: 22, betInfo: { match: 'Liverpool x Arsenal', market: 'Ambos Marcam', odd: 1.72, result: 'green' } },
+  { id: '9', user: 'Diego S.', username: '@diegosil', level: 'VIP', text: 'Quem tiver coragem: multipla de odd 145.00, 6 jogos, all in', time: '14:44', likes: 89, isTip: true, betInfo: { match: '6 jogos', market: 'Multipla', odd: 145.00 } },
   { id: '10', user: 'Fernanda L.', username: '@ferbet', level: 'Ouro', text: 'Vini Jr marca a qualquer momento @ 2.10, easy money', time: '14:45', likes: 34, betInfo: { match: 'Real Madrid x Barcelona', market: 'Vini Jr - Gol', odd: 2.10 } },
 ];
 
@@ -96,7 +96,6 @@ const ChatPage = () => {
   const [activeRoom, setActiveRoom] = useState<string | null>(null);
   const [createName, setCreateName] = useState('');
   const bottomRef = useRef<HTMLDivElement>(null);
-  const tabsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (activeRoom) bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -107,7 +106,7 @@ const ChatPage = () => {
     if (!isLoggedIn) { navigate('/auth'); return; }
     const newMsg: ChatMessage = {
       id: Date.now().toString(),
-      user: 'Você',
+      user: 'Voce',
       username: '@voce',
       level: 'Bronze',
       text: message,
@@ -136,14 +135,16 @@ const ChatPage = () => {
 
   // Room chat view
   if (activeRoom && selectedRoom) {
+    const RoomIcon = selectedRoom.icon;
     return (
       <div className="flex flex-col h-[calc(100vh-8rem)] pb-16 pt-16">
-        {/* Room header */}
         <div className="px-4 py-3 bg-surface-section flex items-center gap-3">
           <button onClick={() => setActiveRoom(null)} className="text-muted-foreground hover:text-foreground min-w-[44px] min-h-[44px] flex items-center justify-center">
-            ←
+            <span className="text-lg">&larr;</span>
           </button>
-          <span className="text-xl">{selectedRoom.emoji}</span>
+          <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+            <RoomIcon size={16} className="text-primary" />
+          </div>
           <div className="flex-1">
             <p className="text-sm font-display font-bold">{selectedRoom.name}</p>
             <div className="flex items-center gap-1.5">
@@ -154,8 +155,7 @@ const ChatPage = () => {
           <Users size={18} className="text-muted-foreground" />
         </div>
 
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2 no-scrollbar">
+        <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2">
           {messages.map((msg) => (
             <motion.div
               key={msg.id}
@@ -193,8 +193,8 @@ const ChatPage = () => {
                   </div>
                   <div className="flex items-center gap-1 mt-0.5">
                     <span className="text-foreground/70">{msg.betInfo.market}</span>
-                    {msg.betInfo.result === 'green' && <span className="text-secondary font-bold ml-auto">GREEN ✅</span>}
-                    {msg.betInfo.result === 'red' && <span className="text-destructive font-bold ml-auto">RED ❌</span>}
+                    {msg.betInfo.result === 'green' && <span className="text-secondary font-bold ml-auto">GREEN</span>}
+                    {msg.betInfo.result === 'red' && <span className="text-destructive font-bold ml-auto">RED</span>}
                   </div>
                 </div>
               )}
@@ -215,12 +215,11 @@ const ChatPage = () => {
           <div ref={bottomRef} />
         </div>
 
-        {/* Input */}
         <div className="px-4 py-3">
           {!isLoggedIn ? (
             <button onClick={() => navigate('/auth')}
               className="w-full bg-surface-card rounded-xl py-3.5 text-sm font-body text-muted-foreground text-center min-h-[44px]">
-              Faça login para participar
+              Faca login para participar
             </button>
           ) : (
             <div className="flex gap-2">
@@ -228,7 +227,7 @@ const ChatPage = () => {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
-                placeholder="Manda a visão..."
+                placeholder="Manda a visao..."
                 className="flex-1 bg-surface-card rounded-xl py-3 px-4 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]"
               />
               <motion.button
@@ -245,10 +244,9 @@ const ChatPage = () => {
     );
   }
 
-  // Main view — rooms list
+  // Main view
   return (
-    <div className="min-h-screen bg-background pb-24 pt-16">
-      {/* Header */}
+    <div className="min-h-screen bg-background pb-24 pt-16 overflow-y-auto">
       <div className="px-4 pt-3 pb-2 space-y-3">
         <div className="flex items-center justify-between">
           <h1 className="font-display text-xl font-extrabold flex items-center gap-2">
@@ -262,9 +260,9 @@ const ChatPage = () => {
           </div>
         </div>
 
-        {/* Tabs scroll */}
-        <div ref={tabsRef} className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide -mx-4 px-4">
-          {tabs.map((t) => {
+        {/* Tabs - horizontal scroll */}
+        <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-4 px-4" style={{ WebkitOverflowScrolling: 'touch' }}>
+          {tabsList.map((t) => {
             const Icon = t.icon;
             return (
               <button
@@ -286,7 +284,6 @@ const ChatPage = () => {
 
       <div className="px-4 mt-2">
         <AnimatePresence mode="wait">
-          {/* CRIAR TAB */}
           {activeTab === 'criar' && (
             <motion.div key="criar" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
               <div className="bg-surface-card rounded-xl p-4 space-y-3">
@@ -303,7 +300,7 @@ const ChatPage = () => {
                 <div className="space-y-2">
                   <p className="text-xs font-body text-muted-foreground">Categoria</p>
                   <div className="flex flex-wrap gap-1.5">
-                    {['Futebol', 'Basquete', 'Tênis', 'E-Sports', 'Múltiplas', 'Jogadores', 'Outros'].map(cat => (
+                    {['Futebol', 'Basquete', 'Tenis', 'E-Sports', 'Multiplas', 'Jogadores', 'Outros'].map(cat => (
                       <button key={cat} className="px-3 py-1.5 bg-surface-interactive rounded-full text-xs font-body text-foreground/70 hover:bg-primary hover:text-primary-foreground transition-colors min-h-[32px]">
                         {cat}
                       </button>
@@ -321,31 +318,34 @@ const ChatPage = () => {
 
               <div className="space-y-2">
                 <p className="text-xs font-body text-muted-foreground font-semibold uppercase tracking-wider">Salas criadas recentemente</p>
-                {rooms.slice(0, 3).map(room => (
-                  <button key={room.id} onClick={() => setActiveRoom(room.id)}
-                    className="w-full flex items-center gap-3 bg-surface-card rounded-xl p-3 min-h-[44px]">
-                    <span className="text-xl">{room.emoji}</span>
-                    <div className="flex-1 text-left">
-                      <p className="text-sm font-display font-bold">{room.name}</p>
-                      <p className="text-[0.6rem] font-body text-muted-foreground">{room.members} membros</p>
-                    </div>
-                  </button>
-                ))}
+                {rooms.slice(0, 3).map(room => {
+                  const RIcon = room.icon;
+                  return (
+                    <button key={room.id} onClick={() => setActiveRoom(room.id)}
+                      className="w-full flex items-center gap-3 bg-surface-card rounded-xl p-3 min-h-[44px]">
+                      <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+                        <RIcon size={16} className="text-primary" />
+                      </div>
+                      <div className="flex-1 text-left">
+                        <p className="text-sm font-display font-bold">{room.name}</p>
+                        <p className="text-[0.6rem] font-body text-muted-foreground">{room.members} membros</p>
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </motion.div>
           )}
 
-          {/* ROOMS LIST */}
           {activeTab !== 'criar' && (
             <motion.div key={activeTab} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-2">
-              {/* Featured banner for odds100 */}
               {activeTab === 'odds100' && (
                 <div className="bg-gradient-to-r from-primary/20 to-primary/5 rounded-xl p-4 mb-3">
                   <div className="flex items-center gap-2 mb-1">
                     <Zap size={18} className="text-primary" />
                     <span className="font-display font-extrabold text-sm text-primary">ODDS INSANAS</span>
                   </div>
-                  <p className="text-xs font-body text-foreground/70">Apostas com odds acima de 100x. Alto risco, alta recompensa! 🚀</p>
+                  <p className="text-xs font-body text-foreground/70">Apostas com odds acima de 100x. Alto risco, alta recompensa!</p>
                 </div>
               )}
 
@@ -355,7 +355,7 @@ const ChatPage = () => {
                     <Target size={18} className="text-secondary" />
                     <span className="font-display font-extrabold text-sm text-secondary">MERCADO DE GOLS</span>
                   </div>
-                  <p className="text-xs font-body text-foreground/70">Gols, placares, artilheiros e tudo sobre bola na rede ⚽</p>
+                  <p className="text-xs font-body text-foreground/70">Gols, placares, artilheiros e tudo sobre bola na rede</p>
                 </div>
               )}
 
@@ -365,33 +365,36 @@ const ChatPage = () => {
                     <Star size={18} className="text-primary" />
                     <span className="font-display font-extrabold text-sm text-primary">CRAQUES</span>
                   </div>
-                  <p className="text-xs font-body text-foreground/70">Discussões e apostas focadas nos maiores jogadores do mundo ⭐</p>
+                  <p className="text-xs font-body text-foreground/70">Discussoes e apostas focadas nos maiores jogadores do mundo</p>
                 </div>
               )}
 
-              {filteredRooms.map((room) => (
-                <motion.button
-                  key={room.id}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => setActiveRoom(room.id)}
-                  className="w-full flex items-center gap-3 bg-surface-card rounded-xl p-3.5 min-h-[44px] hover:bg-surface-interactive transition-colors"
-                >
-                  <span className="text-2xl">{room.emoji}</span>
-                  <div className="flex-1 text-left">
-                    <div className="flex items-center gap-1.5">
-                      <p className="text-sm font-display font-bold text-foreground">{room.name}</p>
+              {filteredRooms.map((room) => {
+                const RIcon = room.icon;
+                return (
+                  <motion.button
+                    key={room.id}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setActiveRoom(room.id)}
+                    className="w-full flex items-center gap-3 bg-surface-card rounded-xl p-3.5 min-h-[44px] hover:bg-surface-interactive transition-colors"
+                  >
+                    <div className="w-9 h-9 rounded-full bg-primary/15 flex items-center justify-center flex-shrink-0">
+                      <RIcon size={18} className="text-primary" />
                     </div>
-                    <p className="text-[0.6rem] font-body text-muted-foreground mt-0.5 line-clamp-1">{room.lastMessage}</p>
-                  </div>
-                  <div className="text-right flex-shrink-0">
-                    <div className="flex items-center gap-1 text-muted-foreground">
-                      <Users size={12} />
-                      <span className="text-[0.6rem] font-body">{room.members.toLocaleString('pt-BR')}</span>
+                    <div className="flex-1 text-left min-w-0">
+                      <p className="text-sm font-display font-bold text-foreground truncate">{room.name}</p>
+                      <p className="text-[0.6rem] font-body text-muted-foreground mt-0.5 line-clamp-1">{room.lastMessage}</p>
                     </div>
-                    <span className="w-2 h-2 rounded-full bg-secondary inline-block mt-1" />
-                  </div>
-                </motion.button>
-              ))}
+                    <div className="text-right flex-shrink-0">
+                      <div className="flex items-center gap-1 text-muted-foreground">
+                        <Users size={12} />
+                        <span className="text-[0.6rem] font-body">{room.members.toLocaleString('pt-BR')}</span>
+                      </div>
+                      <span className="w-2 h-2 rounded-full bg-secondary inline-block mt-1" />
+                    </div>
+                  </motion.button>
+                );
+              })}
             </motion.div>
           )}
         </AnimatePresence>
