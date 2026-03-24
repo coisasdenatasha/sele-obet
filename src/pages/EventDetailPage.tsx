@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Video, Clock, ChevronDown, ChevronUp, Shield } from 'lucide-react';
+import { ArrowLeft, Video, Clock, ChevronDown, ChevronUp, Shield, Radio } from 'lucide-react';
 import OddsChip from '@/components/OddsChip';
 import LiveBadge from '@/components/LiveBadge';
+import { liveMatches, boostedMatches, upcomingMatches } from '@/data/mockData';
 
-// Team flag mappings (ISO 3166-1 alpha-2 or custom for clubs)
 const teamFlags: Record<string, string> = {
   'Flamengo': 'https://flagcdn.com/w80/br.png',
   'Palmeiras': 'https://flagcdn.com/w80/br.png',
@@ -32,6 +32,14 @@ const teamFlags: Record<string, string> = {
   'Brasil': 'https://flagcdn.com/w80/br.png',
   'Argentina': 'https://flagcdn.com/w80/ar.png',
   'França': 'https://flagcdn.com/w80/fr.png',
+  'Arsenal': 'https://flagcdn.com/w80/gb-eng.png',
+  'Chelsea': 'https://flagcdn.com/w80/gb-eng.png',
+  'Imperatriz': 'https://flagcdn.com/w80/br.png',
+  'Retrô': 'https://flagcdn.com/w80/br.png',
+  'Rio Branco-ES': 'https://flagcdn.com/w80/br.png',
+  'Vila Nova': 'https://flagcdn.com/w80/br.png',
+  'Lakers': 'https://flagcdn.com/w80/us.png',
+  'Warriors': 'https://flagcdn.com/w80/us.png',
 };
 
 const TeamBadge = ({ team }: { team: string }) => {
@@ -47,20 +55,20 @@ const TeamBadge = ({ team }: { team: string }) => {
   );
 };
 
-const markets = [
+const buildMarkets = (home: string, away: string, oddsHome: number, oddsDraw: number, oddsAway: number) => [
   {
     name: 'Resultado Final (1X2)',
     options: [
-      { label: 'Flamengo', odds: 1.55, id: 'ev-1x2-1' },
-      { label: 'Empate', odds: 4.20, id: 'ev-1x2-x' },
-      { label: 'Palmeiras', odds: 5.10, id: 'ev-1x2-2' },
+      { label: home, odds: oddsHome, id: 'ev-1x2-1' },
+      { label: 'Empate', odds: oddsDraw, id: 'ev-1x2-x' },
+      { label: away, odds: oddsAway, id: 'ev-1x2-2' },
     ],
   },
   {
     name: 'Ambos Marcam',
     options: [
-      { label: 'Sim', odds: 1.72, id: 'ev-btts-y' },
-      { label: 'Não', odds: 2.05, id: 'ev-btts-n' },
+      { label: 'Sim', odds: +(1 + Math.random()).toFixed(2), id: 'ev-btts-y' },
+      { label: 'Não', odds: +(1.5 + Math.random()).toFixed(2), id: 'ev-btts-n' },
     ],
   },
   {
@@ -77,18 +85,18 @@ const markets = [
   {
     name: 'Handicap Asiático',
     options: [
-      { label: 'Flamengo -0.5', odds: 1.80, id: 'ev-ah-h1' },
-      { label: 'Palmeiras +0.5', odds: 2.00, id: 'ev-ah-h2' },
-      { label: 'Flamengo -1.5', odds: 3.10, id: 'ev-ah-h3' },
-      { label: 'Palmeiras +1.5', odds: 1.35, id: 'ev-ah-h4' },
+      { label: `${home} -0.5`, odds: 1.80, id: 'ev-ah-h1' },
+      { label: `${away} +0.5`, odds: 2.00, id: 'ev-ah-h2' },
+      { label: `${home} -1.5`, odds: 3.10, id: 'ev-ah-h3' },
+      { label: `${away} +1.5`, odds: 1.35, id: 'ev-ah-h4' },
     ],
   },
   {
     name: 'Próximo Gol',
     options: [
-      { label: 'Flamengo', odds: 1.65, id: 'ev-ng-1' },
+      { label: home, odds: 1.65, id: 'ev-ng-1' },
       { label: 'Nenhum', odds: 5.50, id: 'ev-ng-n' },
-      { label: 'Palmeiras', odds: 3.40, id: 'ev-ng-2' },
+      { label: away, odds: 3.40, id: 'ev-ng-2' },
     ],
   },
   {
@@ -107,8 +115,60 @@ const markets = [
   },
 ];
 
+// Streaming matches from the StreamingSection component
+const streamingMatches = [
+  {
+    id: 'str-1', homeTeam: 'Arsenal', awayTeam: 'Chelsea',
+    homeScore: 1, awayScore: 1, time: "72'", league: 'Champions Feminina',
+    isLive: true, oddsHome: 2.10, oddsDraw: 3.20, oddsAway: 3.50,
+    channel: 'Disney+',
+  },
+  {
+    id: 'str-2', homeTeam: 'Imperatriz', awayTeam: 'Retrô',
+    homeScore: 0, awayScore: 0, time: "20'", league: 'Copa do Nordeste',
+    isLive: true, oddsHome: 1.90, oddsDraw: 3.40, oddsAway: 4.20,
+    channel: 'YouTube (CazéTV)',
+  },
+  {
+    id: 'str-3', homeTeam: 'Rio Branco-ES', awayTeam: 'Vila Nova',
+    homeScore: 1, awayScore: 0, time: "10'", league: 'Copa Verde',
+    isLive: true, oddsHome: 1.75, oddsDraw: 3.60, oddsAway: 4.80,
+    channel: 'YouTube (GOAT)',
+  },
+];
+
+const extraLiveMatches = [
+  {
+    id: 'live-4', homeTeam: 'Athletico-PR', awayTeam: 'Coritiba',
+    homeScore: 1, awayScore: 0, time: "45'+2", league: 'Brasileirão Série A',
+    isLive: true, oddsHome: 1.70, oddsDraw: 3.80, oddsAway: 4.60,
+  },
+  {
+    id: 'live-5', homeTeam: 'Juventus', awayTeam: 'Inter Milan',
+    homeScore: 2, awayScore: 2, time: "71'", league: 'Serie A',
+    isLive: true, oddsHome: 3.20, oddsDraw: 2.90, oddsAway: 2.50,
+  },
+  {
+    id: 'live-6', homeTeam: 'Lakers', awayTeam: 'Warriors',
+    homeScore: 89, awayScore: 94, time: "Q3 4:22", league: 'NBA',
+    isLive: true, oddsHome: 2.10, oddsDraw: 0, oddsAway: 1.75,
+  },
+];
+
 const EventDetailPage = () => {
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+
+  const allMatches = useMemo(() => [
+    ...liveMatches,
+    ...boostedMatches,
+    ...upcomingMatches,
+    ...streamingMatches,
+    ...extraLiveMatches,
+  ], []);
+
+  const match = allMatches.find((m) => m.id === id);
+
   const [openMarkets, setOpenMarkets] = useState<Record<string, boolean>>({
     'Resultado Final (1X2)': true,
     'Ambos Marcam': true,
@@ -119,7 +179,29 @@ const EventDetailPage = () => {
     setOpenMarkets((prev) => ({ ...prev, [name]: !prev[name] }));
   };
 
-  const matchName = 'Flamengo vs Palmeiras';
+  if (!match) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[60vh] px-4 text-center">
+        <Shield size={48} className="text-muted-foreground/30 mb-4" />
+        <p className="font-display text-lg font-bold">Evento nao encontrado</p>
+        <p className="text-sm text-muted-foreground font-body mt-1">Este evento pode ter sido encerrado.</p>
+        <button onClick={() => navigate('/')} className="mt-4 bg-primary text-primary-foreground font-display font-bold text-sm px-5 py-2.5 rounded-lg min-h-[44px]">
+          Voltar ao Inicio
+        </button>
+      </div>
+    );
+  }
+
+  const home = match.homeTeam;
+  const away = match.awayTeam;
+  const isLive = 'isLive' in match && match.isLive;
+  const homeScore = 'homeScore' in match ? (match as any).homeScore : undefined;
+  const awayScore = 'awayScore' in match ? (match as any).awayScore : undefined;
+  const time = 'time' in match ? match.time : undefined;
+  const league = match.league;
+  const channel = 'channel' in match ? (match as any).channel : null;
+  const matchName = `${home} vs ${away}`;
+  const markets = buildMarkets(home, away, match.oddsHome, match.oddsDraw, match.oddsAway);
 
   return (
     <div className="pb-20">
@@ -129,43 +211,55 @@ const EventDetailPage = () => {
           <button onClick={() => navigate(-1)} className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-foreground/70 hover:text-foreground">
             <ArrowLeft size={22} />
           </button>
-          <span className="text-xs font-body text-muted-foreground uppercase tracking-wider">Brasileirão Série A</span>
+          <span className="text-xs font-body text-muted-foreground uppercase tracking-wider">{league}</span>
         </div>
 
         <div className="flex items-center justify-between px-4">
           <div className="text-center flex-1">
-            <TeamBadge team="Flamengo" />
-            <p className="font-body font-semibold text-sm mt-2">Flamengo</p>
+            <TeamBadge team={home} />
+            <p className="font-body font-semibold text-sm mt-2">{home}</p>
           </div>
           <div className="text-center px-4">
-            <div className="flex items-center gap-3">
-              <span className="font-display text-4xl font-extrabold text-primary">2</span>
-              <span className="font-display text-2xl text-muted-foreground">:</span>
-              <span className="font-display text-4xl font-extrabold text-primary">1</span>
-            </div>
-            <div className="flex items-center justify-center gap-2 mt-1">
-              <LiveBadge />
-              <span className="text-xs font-body text-muted-foreground flex items-center gap-1">
-                <Clock size={12} /> 67'
-              </span>
-            </div>
+            {isLive && homeScore !== undefined ? (
+              <>
+                <div className="flex items-center gap-3">
+                  <span className="font-display text-4xl font-extrabold text-primary">{homeScore}</span>
+                  <span className="font-display text-2xl text-muted-foreground">:</span>
+                  <span className="font-display text-4xl font-extrabold text-primary">{awayScore}</span>
+                </div>
+                <div className="flex items-center justify-center gap-2 mt-1">
+                  <LiveBadge />
+                  <span className="text-xs font-body text-muted-foreground flex items-center gap-1">
+                    <Clock size={12} /> {time}
+                  </span>
+                </div>
+              </>
+            ) : (
+              <div className="space-y-1">
+                <p className="font-display text-lg font-bold text-primary">{time}</p>
+                <p className="text-[0.6rem] font-body text-muted-foreground">Pre-jogo</p>
+              </div>
+            )}
           </div>
           <div className="text-center flex-1">
-            <TeamBadge team="Palmeiras" />
-            <p className="font-body font-semibold text-sm mt-2">Palmeiras</p>
+            <TeamBadge team={away} />
+            <p className="font-body font-semibold text-sm mt-2">{away}</p>
           </div>
         </div>
 
         {/* Streaming button */}
-        <button className="w-full bg-surface-interactive rounded-xl py-3 flex items-center justify-center gap-2 text-sm font-body text-muted-foreground hover:text-foreground transition-colors min-h-[44px]">
-          <Video size={18} className="text-primary" />
-          Assistir Transmissão ao Vivo
-        </button>
+        {isLive && (
+          <button className="w-full bg-surface-interactive rounded-xl py-3 flex items-center justify-center gap-2 text-sm font-body text-muted-foreground hover:text-foreground transition-colors min-h-[44px]">
+            <Video size={18} className="text-destructive" />
+            {channel ? `Assistir ao Vivo - ${channel}` : 'Assistir Transmissao ao Vivo'}
+          </button>
+        )}
       </div>
 
       {/* Markets accordion */}
       <div className="px-4 pt-4 space-y-2">
         {markets.map((market) => {
+          if (market.options.some((o) => o.odds === 0)) return null;
           const isOpen = openMarkets[market.name] ?? false;
           return (
             <div key={market.name} className="bg-surface-card rounded-xl overflow-hidden">
