@@ -186,6 +186,7 @@ const PlayerPropsCarousel = () => {
 
 /* ───────── Main Home ───────── */
 const HomePage = () => {
+  const navigate = useNavigate();
   const addBet = useBetSlipStore((s) => s.addBet);
   const { isLoggedIn } = useAuthStore();
 
@@ -218,14 +219,91 @@ const HomePage = () => {
       </SectionReveal>
 
       <SectionReveal delay={0.1}>
-      <section className="px-4">
-        <SectionTitle icon={<Flame size={20} className="text-primary" />} action="Ver Todas">
-          Odds Turbinadas
-        </SectionTitle>
+      <section className="px-4 space-y-3">
+        {/* Super Odds Banner */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="rounded-2xl p-5 relative overflow-hidden"
+          style={{ background: 'linear-gradient(135deg, hsl(43 80% 45%), hsl(35 90% 35%))' }}
+        >
+          <div className="relative z-10">
+            <h2 className="font-display text-2xl font-extrabold italic text-primary-foreground tracking-tight">SUPER ODDS</h2>
+            <p className="text-sm font-body text-primary-foreground/80 mt-1">Maximize Ganhos Hoje!</p>
+          </div>
+          <button
+            onClick={() => navigate('/esportes')}
+            className="relative z-10 mt-3 bg-primary-foreground/20 text-primary-foreground text-xs font-body font-semibold px-4 py-2 rounded-full min-h-[36px] flex items-center gap-1 backdrop-blur-sm"
+          >
+            Ver tudo <ChevronRight size={14} />
+          </button>
+          {/* Lightning decoration */}
+          <div className="absolute top-2 right-4 text-4xl opacity-80">⚡</div>
+        </motion.div>
+
+        {/* Boosted match cards - Superbet style */}
         <motion.div className="space-y-3" variants={staggerContainer} initial="hidden" whileInView="show" viewport={{ once: true }}>
           {boostedMatches.map((match) => (
-            <motion.div key={match.id} variants={staggerItem}>
-              <MatchCard {...match} />
+            <motion.div
+              key={match.id}
+              variants={staggerItem}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => navigate(`/evento/${match.id}`)}
+              className="bg-surface-card rounded-2xl overflow-hidden cursor-pointer"
+            >
+              {/* Match header */}
+              <div className="px-4 pt-4 pb-2 text-center space-y-1">
+                <p className="text-[0.65rem] font-body text-muted-foreground">{match.league}</p>
+                <p className="font-display text-base font-bold">{match.homeTeam} — {match.awayTeam}</p>
+                <p className="text-xs font-body text-muted-foreground">{match.time}</p>
+              </div>
+
+              {/* Super Boost badge */}
+              <div className="px-4 pt-2 pb-3">
+                <span
+                  className="inline-block font-display text-sm font-extrabold italic px-3 py-1 rounded-md"
+                  style={{ background: 'linear-gradient(135deg, hsl(43 80% 45%), hsl(35 90% 35%))', color: 'hsl(0 0% 7%)' }}
+                >
+                  SUPER BOOST
+                </span>
+
+                <div className="mt-3 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary/60" />
+                    <span className="text-sm font-body text-foreground/80">Ambas as equipes marcam</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary/60" />
+                    <span className="text-sm font-body text-foreground/80">Mais de 2.5 gols na partida</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Odds bar */}
+              <div className="px-4 pb-4">
+                <motion.button
+                  whileTap={{ scale: 0.97 }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    addBet({
+                      id: `${match.id}-boost`,
+                      match: `${match.homeTeam} vs ${match.awayTeam}`,
+                      market: 'Super Boost',
+                      selection: 'Ambas marcam + Over 2.5',
+                      odds: match.oddsHome,
+                    });
+                  }}
+                  className="w-full py-3.5 rounded-xl text-center border border-primary/30 bg-primary/5 min-h-[48px] transition-colors hover:bg-primary/10"
+                >
+                  <span className="text-muted-foreground font-display text-sm line-through mr-2">
+                    {match.originalOddsHome?.toFixed(2)}
+                  </span>
+                  <span className="text-primary font-display text-lg font-extrabold">
+                    ⚡ {match.oddsHome.toFixed(2)}
+                  </span>
+                </motion.button>
+              </div>
             </motion.div>
           ))}
         </motion.div>
