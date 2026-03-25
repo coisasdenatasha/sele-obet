@@ -512,7 +512,13 @@ const AuthPage = () => {
                           className="w-full bg-surface-interactive rounded-xl py-3 pl-11 pr-10 text-sm font-body text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground min-h-[44px]" />
                         {cpfClean.length === 11 && <div className="absolute right-3 top-1/2 -translate-y-1/2"><ValidationIcon valid={cpfValid} /></div>}
                       </div>
-                      {cpfClean.length === 11 && !cpfValid && <p className="text-[0.65rem] text-destructive font-body">CPF inválido</p>}
+              {cpfClean.length === 11 && !cpfValid && <p className="text-[0.65rem] text-destructive font-body">CPF inválido</p>}
+                      {cpfValid && (
+                        <div className="flex items-center gap-1.5 bg-secondary/10 rounded-lg px-3 py-1.5">
+                          <ShieldCheck size={13} className="text-secondary" />
+                          <span className="text-[0.65rem] text-secondary font-body font-semibold">Consulta Receita Federal — CPF regular ✓</span>
+                        </div>
+                      )}
                     </div>
 
                     <div className="space-y-1.5">
@@ -779,6 +785,41 @@ const AuthPage = () => {
                   <p className="text-sm font-body text-muted-foreground mt-1">
                     Precisamos verificar sua identidade para sua segurança.
                   </p>
+                </div>
+              </div>
+
+              {/* Security Verification Layers */}
+              <div className="space-y-2">
+                <p className="text-[0.65rem] font-body font-semibold text-muted-foreground uppercase tracking-wider">Camadas de Segurança</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="bg-surface-card rounded-xl p-3 flex flex-col gap-1.5">
+                    <div className="w-8 h-8 rounded-full bg-primary/15 flex items-center justify-center">
+                      <CreditCard size={15} className="text-primary" />
+                    </div>
+                    <span className="text-[0.7rem] font-body font-bold text-foreground">Consulta CPF</span>
+                    <span className="text-[0.6rem] font-body text-muted-foreground leading-tight">Cruzamento com a Receita Federal. CPF irregular ou de menor bloqueia o cadastro.</span>
+                  </div>
+                  <div className="bg-surface-card rounded-xl p-3 flex flex-col gap-1.5">
+                    <div className="w-8 h-8 rounded-full bg-primary/15 flex items-center justify-center">
+                      <FileText size={15} className="text-primary" />
+                    </div>
+                    <span className="text-[0.7rem] font-body font-bold text-foreground">Identidade OCR</span>
+                    <span className="text-[0.6rem] font-body text-muted-foreground leading-tight">Extração de dados via OCR do RG/CNH e verificação anti-montagem digital.</span>
+                  </div>
+                  <div className="bg-surface-card rounded-xl p-3 flex flex-col gap-1.5">
+                    <div className="w-8 h-8 rounded-full bg-secondary/15 flex items-center justify-center">
+                      <Camera size={15} className="text-secondary" />
+                    </div>
+                    <span className="text-[0.7rem] font-body font-bold text-foreground">Facial Liveness</span>
+                    <span className="text-[0.6rem] font-body text-muted-foreground leading-tight">Prova de vida: mova o rosto e pisque. Bloqueia fotos e Deepfakes.</span>
+                  </div>
+                  <div className="bg-surface-card rounded-xl p-3 flex flex-col gap-1.5">
+                    <div className="w-8 h-8 rounded-full bg-secondary/15 flex items-center justify-center">
+                      <ShieldCheck size={15} className="text-secondary" />
+                    </div>
+                    <span className="text-[0.7rem] font-body font-bold text-foreground">PLD Anti-Lavagem</span>
+                    <span className="text-[0.6rem] font-body text-muted-foreground leading-tight">Monitoramento de origem de depósitos. Apenas contas do mesmo CPF.</span>
+                  </div>
                 </div>
               </div>
 
