@@ -137,7 +137,6 @@ const AuthPage = () => {
   const [livenessStep, setLivenessStep] = useState(0);
   const [livenessProgress, setLivenessProgress] = useState(0);
   const [validationStep, setValidationStep] = useState(0);
-  const [selfie, setSelfie] = useState<string | null>(null);
 
   // OTP
   const [otpCode, setOtpCode] = useState(['', '', '', '', '', '']);
