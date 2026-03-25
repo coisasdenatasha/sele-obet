@@ -5,7 +5,7 @@ import {
   ArrowLeft, Eye, EyeOff, Upload, Gift, Check, X,
   ShieldCheck, Camera, FileText, Mail, Lock, User, UserCircle,
   AtSign, Calendar, CreditCard, Fingerprint, CheckCircle2,
-  Smartphone, MapPin
+  Smartphone, MapPin, Scan, Brain, AlertTriangle, RefreshCw
 } from 'lucide-react';
 import heroBanner from '@/assets/hero-banner.jpg';
 import { useAuthStore } from '@/store/authStore';
