@@ -129,9 +129,14 @@ const AuthPage = () => {
   const [recoverySent, setRecoverySent] = useState(false);
 
   // KYC
+  const [kycSubStep, setKycSubStep] = useState<KycSubStep>('intro');
   const [kycStatus, setKycStatus] = useState<'pending' | 'analyzing' | 'approved' | 'rejected'>('pending');
   const [docFront, setDocFront] = useState<string | null>(null);
   const [docBack, setDocBack] = useState<string | null>(null);
+  const [selfie, setSelfie] = useState<string | null>(null);
+  const [livenessStep, setLivenessStep] = useState(0);
+  const [livenessProgress, setLivenessProgress] = useState(0);
+  const [validationStep, setValidationStep] = useState(0);
   const [selfie, setSelfie] = useState<string | null>(null);
 
   // OTP
