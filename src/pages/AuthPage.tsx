@@ -13,6 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable';
 
 type AuthStep = 'welcome' | 'login' | 'signup' | 'recovery' | 'kyc' | 'otp' | 'success';
+type KycSubStep = 'intro' | 'doc-front' | 'doc-back' | 'liveness' | 'validating' | 'done';
 
 // CPF validation
 const isValidCPF = (cpf: string): boolean => {
