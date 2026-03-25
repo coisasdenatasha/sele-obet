@@ -1116,26 +1116,6 @@ const AuthPage = () => {
                         </motion.div>
                       ))}
                     </div>
-
-                    {/* Auto-advance simulation */}
-                    {(() => {
-                      // eslint-disable-next-line react-hooks/rules-of-hooks
-                      useEffect(() => {
-                        if (kycSubStep !== 'validating') return;
-                        setValidationStep(0);
-                        const timers = [
-                          setTimeout(() => setValidationStep(1), 1200),
-                          setTimeout(() => setValidationStep(2), 2400),
-                          setTimeout(() => setValidationStep(3), 3400),
-                          setTimeout(() => setValidationStep(4), 4400),
-                          setTimeout(() => setValidationStep(5), 5200),
-                          setTimeout(() => setValidationStep(6), 6000),
-                          setTimeout(() => setKycSubStep('done'), 6800),
-                        ];
-                        return () => timers.forEach(clearTimeout);
-                      }, [kycSubStep]);
-                      return null;
-                    })()}
                   </div>
                 </motion.div>
               )}
