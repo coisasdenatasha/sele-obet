@@ -778,136 +778,400 @@ const AuthPage = () => {
           </motion.div>
         )}
 
-        {/* KYC */}
+        {/* KYC — Immersive Pipeline */}
         {step === 'kyc' && (
-          <motion.div key="kyc" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} className="flex-1 px-6 pt-4 pb-8 overflow-y-auto">
-            <BackButton to="signup" />
-            <div className="mt-4 space-y-6">
-              <div className="flex items-start gap-3">
-                <ShieldCheck size={28} className="text-primary flex-shrink-0 mt-0.5" />
-                <div>
-                  <h2 className="font-display text-2xl font-extrabold">Verificação de Identidade</h2>
-                  <p className="text-sm font-body text-muted-foreground mt-1">
-                    Precisamos verificar sua identidade para sua segurança.
-                  </p>
-                </div>
-              </div>
+          <motion.div key="kyc" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} className="flex-1 flex flex-col pb-8 overflow-y-auto">
+            <AnimatePresence mode="wait">
 
-              {/* Security Verification Layers */}
-              <div className="space-y-2">
-                <p className="text-[0.65rem] font-body font-semibold text-muted-foreground uppercase tracking-wider">Camadas de Segurança</p>
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="bg-surface-card rounded-xl p-3 flex flex-col gap-1.5">
-                    <div className="w-8 h-8 rounded-full bg-primary/15 flex items-center justify-center">
-                      <CreditCard size={15} className="text-primary" />
+              {/* KYC INTRO */}
+              {kycSubStep === 'intro' && (
+                <motion.div key="kyc-intro" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, x: -30 }} className="flex-1 px-6 pt-4">
+                  <BackButton to="signup" />
+                  <div className="mt-4 space-y-5">
+                    <div className="flex items-start gap-3">
+                      <motion.div animate={{ rotate: [0, 10, -10, 0] }} transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}>
+                        <ShieldCheck size={32} className="text-primary" />
+                      </motion.div>
+                      <div>
+                        <h2 className="font-display text-xl font-extrabold">Verificação de Segurança</h2>
+                        <p className="text-xs font-body text-muted-foreground mt-1">
+                          Protegemos seu dinheiro com 5 camadas de segurança. É rápido e seguro!
+                        </p>
+                      </div>
                     </div>
-                    <span className="text-[0.7rem] font-body font-bold text-foreground">Consulta CPF</span>
-                    <span className="text-[0.6rem] font-body text-muted-foreground leading-tight">Cruzamento com a Receita Federal. CPF irregular ou de menor bloqueia o cadastro.</span>
-                  </div>
-                  <div className="bg-surface-card rounded-xl p-3 flex flex-col gap-1.5">
-                    <div className="w-8 h-8 rounded-full bg-primary/15 flex items-center justify-center">
-                      <FileText size={15} className="text-primary" />
-                    </div>
-                    <span className="text-[0.7rem] font-body font-bold text-foreground">Identidade OCR</span>
-                    <span className="text-[0.6rem] font-body text-muted-foreground leading-tight">Extração de dados via OCR do RG/CNH e verificação anti-montagem digital.</span>
-                  </div>
-                  <div className="bg-surface-card rounded-xl p-3 flex flex-col gap-1.5">
-                    <div className="w-8 h-8 rounded-full bg-secondary/15 flex items-center justify-center">
-                      <Camera size={15} className="text-secondary" />
-                    </div>
-                    <span className="text-[0.7rem] font-body font-bold text-foreground">Facial Liveness</span>
-                    <span className="text-[0.6rem] font-body text-muted-foreground leading-tight">Prova de vida: mova o rosto e pisque. Bloqueia fotos e Deepfakes.</span>
-                  </div>
-                  <div className="bg-surface-card rounded-xl p-3 flex flex-col gap-1.5">
-                    <div className="w-8 h-8 rounded-full bg-secondary/15 flex items-center justify-center">
-                      <ShieldCheck size={15} className="text-secondary" />
-                    </div>
-                    <span className="text-[0.7rem] font-body font-bold text-foreground">PLD Anti-Lavagem</span>
-                    <span className="text-[0.6rem] font-body text-muted-foreground leading-tight">Monitoramento de origem de depósitos. Apenas contas do mesmo CPF.</span>
-                  </div>
-                </div>
-              </div>
 
-              {/* Status badges */}
-              {kycStatus !== 'pending' && (
-                <div className={`rounded-xl p-4 flex items-center gap-3 ${
-                  kycStatus === 'analyzing' ? 'bg-primary/10' :
-                  kycStatus === 'approved' ? 'bg-secondary/10' :
-                  'bg-destructive/10'
-                }`}>
-                  {kycStatus === 'analyzing' && <ShieldCheck size={20} className="text-primary" />}
-                  {kycStatus === 'approved' && <CheckCircle2 size={20} className="text-secondary" />}
-                  {kycStatus === 'rejected' && <X size={20} className="text-destructive" />}
-                  <span className={`text-sm font-body font-semibold ${
-                    kycStatus === 'analyzing' ? 'text-primary' :
-                    kycStatus === 'approved' ? 'text-secondary' :
-                    'text-destructive'
-                  }`}>
-                    {kycStatus === 'analyzing' && 'Em análise'}
-                    {kycStatus === 'approved' && 'Aprovado'}
-                    {kycStatus === 'rejected' && 'Rejeitado — Envie novamente'}
-                  </span>
-                </div>
+                    {/* Pipeline steps preview */}
+                    <div className="space-y-2.5">
+                      {[
+                        { icon: CreditCard, title: 'Consulta CPF', desc: 'Cruzamento com a Receita Federal em tempo real', color: 'text-primary', bg: 'bg-primary/15', done: true },
+                        { icon: FileText, title: 'Captura de Documento', desc: 'RG ou CNH com bordas inteligentes e OCR automático', color: 'text-primary', bg: 'bg-primary/15', done: false },
+                        { icon: Camera, title: 'Liveness Check', desc: 'Prova de vida: mova o rosto para confirmar identidade', color: 'text-secondary', bg: 'bg-secondary/15', done: false },
+                        { icon: Scan, title: 'Face Match & Anti-Deepfake', desc: 'Comparação biométrica e análise de manipulação por IA', color: 'text-secondary', bg: 'bg-secondary/15', done: false },
+                        { icon: ShieldCheck, title: 'PLD Anti-Lavagem', desc: 'Só aceitamos depósitos de contas em seu nome', color: 'text-primary', bg: 'bg-primary/15', done: false },
+                      ].map((item, i) => (
+                        <motion.div key={i} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.1 }}
+                          className="bg-surface-card rounded-xl p-3 flex items-center gap-3">
+                          <div className={`w-9 h-9 rounded-full ${item.bg} flex items-center justify-center flex-shrink-0`}>
+                            {item.done ? <Check size={16} className="text-secondary" /> : <item.icon size={16} className={item.color} />}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="text-[0.72rem] font-body font-bold text-foreground">{item.title}</span>
+                              {item.done && <span className="text-[0.55rem] font-body font-semibold text-secondary bg-secondary/10 px-1.5 py-0.5 rounded-full">✓ Verificado</span>}
+                            </div>
+                            <p className="text-[0.6rem] font-body text-muted-foreground leading-tight mt-0.5">{item.desc}</p>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+
+                    <div className="bg-secondary/10 rounded-xl p-3 flex items-start gap-2.5">
+                      <ShieldCheck size={16} className="text-secondary flex-shrink-0 mt-0.5" />
+                      <p className="text-[0.65rem] font-body text-secondary leading-snug">
+                        <strong>Por sua segurança:</strong> esse rigor técnico garante que seu dinheiro e seus prêmios estejam sempre protegidos.
+                      </p>
+                    </div>
+
+                    <motion.button whileTap={{ scale: 0.97 }} onClick={() => setKycSubStep('doc-front')}
+                      className="w-full bg-primary text-primary-foreground font-display font-bold text-base py-3.5 rounded-xl min-h-[44px] hover:brightness-110 transition-all">
+                      Iniciar Verificação
+                    </motion.button>
+
+                    <button onClick={() => setStep('success')} className="w-full text-center text-xs text-muted-foreground font-body min-h-[44px]">
+                      Pular por agora
+                    </button>
+                  </div>
+                </motion.div>
               )}
 
-              <div className="space-y-4">
-                {/* Doc front */}
-                <div className={`bg-surface-card rounded-xl p-5 flex flex-col items-center justify-center gap-3 min-h-[140px] transition-all ${docFront ? 'ring-1 ring-secondary' : ''}`}>
-                  <div className="w-12 h-12 rounded-full bg-surface-interactive flex items-center justify-center">
-                    {docFront ? <Check size={22} className="text-secondary" /> : <FileText size={22} className="text-primary" />}
-                  </div>
-                  <p className="text-sm font-body font-medium">{docFront ? 'Documento (frente) enviado' : 'Frente do documento'}</p>
-                  <p className="text-[0.65rem] text-muted-foreground font-body">RG, CNH ou Passaporte</p>
-                  <button onClick={() => setDocFront('doc-front.jpg')}
-                    className="bg-surface-interactive text-foreground font-body font-semibold text-xs px-4 py-2 rounded-lg min-h-[44px] flex items-center gap-2">
-                    <Upload size={14} />
-                    {docFront ? 'Trocar Arquivo' : 'Escolher Arquivo'}
+              {/* DOC FRONT — Smart Borders */}
+              {kycSubStep === 'doc-front' && (
+                <motion.div key="kyc-doc-front" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} className="flex-1 px-6 pt-4">
+                  <button onClick={() => setKycSubStep('intro')} className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-foreground/70 hover:text-foreground">
+                    <ArrowLeft size={22} />
                   </button>
-                </div>
+                  <div className="mt-2 space-y-5">
+                    <div className="text-center">
+                      <h2 className="font-display text-lg font-extrabold">Frente do Documento</h2>
+                      <p className="text-xs font-body text-muted-foreground mt-1">Posicione seu RG ou CNH dentro da área</p>
+                    </div>
 
-                {/* Doc back */}
-                <div className={`bg-surface-card rounded-xl p-5 flex flex-col items-center justify-center gap-3 min-h-[140px] transition-all ${docBack ? 'ring-1 ring-secondary' : ''}`}>
-                  <div className="w-12 h-12 rounded-full bg-surface-interactive flex items-center justify-center">
-                    {docBack ? <Check size={22} className="text-secondary" /> : <FileText size={22} className="text-primary" />}
+                    {/* Document capture area with smart borders */}
+                    <div className="relative mx-auto w-full max-w-[320px] aspect-[1.6/1] bg-surface-card rounded-2xl overflow-hidden flex items-center justify-center">
+                      {/* Animated corner borders */}
+                      <motion.div className="absolute inset-3 pointer-events-none" animate={{ opacity: [0.5, 1, 0.5] }} transition={{ duration: 2, repeat: Infinity }}>
+                        <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-primary rounded-tl-lg" />
+                        <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-primary rounded-tr-lg" />
+                        <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-primary rounded-bl-lg" />
+                        <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-primary rounded-br-lg" />
+                      </motion.div>
+
+                      {docFront ? (
+                        <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="flex flex-col items-center gap-2">
+                          <div className="w-14 h-14 rounded-full bg-secondary/20 flex items-center justify-center">
+                            <Check size={28} className="text-secondary" />
+                          </div>
+                          <span className="text-xs font-body font-semibold text-secondary">Documento capturado!</span>
+                        </motion.div>
+                      ) : (
+                        <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                          <FileText size={32} className="text-primary/40" />
+                          <span className="text-[0.65rem] font-body">Posicione aqui</span>
+                        </div>
+                      )}
+
+                      {/* Scanning line animation */}
+                      {!docFront && (
+                        <motion.div className="absolute left-3 right-3 h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent"
+                          animate={{ top: ['15%', '85%', '15%'] }}
+                          transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                        />
+                      )}
+                    </div>
+
+                    <div className="flex gap-2">
+                      <motion.button whileTap={{ scale: 0.97 }} onClick={() => setDocFront('doc-front.jpg')}
+                        className="flex-1 bg-primary text-primary-foreground font-display font-bold text-sm py-3 rounded-xl min-h-[44px] flex items-center justify-center gap-2">
+                        <Camera size={16} /> Tirar Foto
+                      </motion.button>
+                      <motion.button whileTap={{ scale: 0.97 }} onClick={() => setDocFront('doc-front-upload.jpg')}
+                        className="flex-1 bg-surface-interactive text-foreground font-display font-bold text-sm py-3 rounded-xl min-h-[44px] flex items-center justify-center gap-2">
+                        <Upload size={16} /> Galeria
+                      </motion.button>
+                    </div>
+
+                    {docFront && (
+                      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-secondary/10 rounded-xl p-3 flex items-center gap-2">
+                        <Scan size={14} className="text-secondary" />
+                        <span className="text-[0.65rem] font-body text-secondary font-semibold">OCR detectou dados automaticamente ✓</span>
+                      </motion.div>
+                    )}
+
+                    <motion.button whileTap={{ scale: 0.97 }} onClick={() => setKycSubStep('doc-back')} disabled={!docFront}
+                      className={`w-full font-display font-bold text-sm py-3.5 rounded-xl min-h-[44px] transition-all ${
+                        docFront ? 'bg-primary text-primary-foreground hover:brightness-110' : 'bg-surface-interactive text-muted-foreground cursor-not-allowed'
+                      }`}>
+                      Próximo — Verso do documento
+                    </motion.button>
                   </div>
-                  <p className="text-sm font-body font-medium">{docBack ? 'Documento (verso) enviado' : 'Verso do documento'}</p>
-                  <button onClick={() => setDocBack('doc-back.jpg')}
-                    className="bg-surface-interactive text-foreground font-body font-semibold text-xs px-4 py-2 rounded-lg min-h-[44px] flex items-center gap-2">
-                    <Upload size={14} />
-                    {docBack ? 'Trocar Arquivo' : 'Escolher Arquivo'}
-                  </button>
-                </div>
+                </motion.div>
+              )}
 
-                {/* Selfie */}
-                <div className={`bg-surface-card rounded-xl p-5 flex flex-col items-center justify-center gap-3 min-h-[140px] transition-all ${selfie ? 'ring-1 ring-secondary' : ''}`}>
-                  <div className="w-12 h-12 rounded-full bg-surface-interactive flex items-center justify-center">
-                    {selfie ? <Check size={22} className="text-secondary" /> : <Camera size={22} className="text-primary" />}
+              {/* DOC BACK */}
+              {kycSubStep === 'doc-back' && (
+                <motion.div key="kyc-doc-back" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} className="flex-1 px-6 pt-4">
+                  <button onClick={() => setKycSubStep('doc-front')} className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-foreground/70 hover:text-foreground">
+                    <ArrowLeft size={22} />
+                  </button>
+                  <div className="mt-2 space-y-5">
+                    <div className="text-center">
+                      <h2 className="font-display text-lg font-extrabold">Verso do Documento</h2>
+                      <p className="text-xs font-body text-muted-foreground mt-1">Agora vire o documento e capture o verso</p>
+                    </div>
+
+                    <div className="relative mx-auto w-full max-w-[320px] aspect-[1.6/1] bg-surface-card rounded-2xl overflow-hidden flex items-center justify-center">
+                      <motion.div className="absolute inset-3 pointer-events-none" animate={{ opacity: [0.5, 1, 0.5] }} transition={{ duration: 2, repeat: Infinity }}>
+                        <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-primary rounded-tl-lg" />
+                        <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-primary rounded-tr-lg" />
+                        <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-primary rounded-bl-lg" />
+                        <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-primary rounded-br-lg" />
+                      </motion.div>
+
+                      {docBack ? (
+                        <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="flex flex-col items-center gap-2">
+                          <div className="w-14 h-14 rounded-full bg-secondary/20 flex items-center justify-center">
+                            <Check size={28} className="text-secondary" />
+                          </div>
+                          <span className="text-xs font-body font-semibold text-secondary">Verso capturado!</span>
+                        </motion.div>
+                      ) : (
+                        <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                          <FileText size={32} className="text-primary/40" />
+                          <span className="text-[0.65rem] font-body">Posicione aqui</span>
+                        </div>
+                      )}
+
+                      {!docBack && (
+                        <motion.div className="absolute left-3 right-3 h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent"
+                          animate={{ top: ['15%', '85%', '15%'] }}
+                          transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                        />
+                      )}
+                    </div>
+
+                    <div className="flex gap-2">
+                      <motion.button whileTap={{ scale: 0.97 }} onClick={() => setDocBack('doc-back.jpg')}
+                        className="flex-1 bg-primary text-primary-foreground font-display font-bold text-sm py-3 rounded-xl min-h-[44px] flex items-center justify-center gap-2">
+                        <Camera size={16} /> Tirar Foto
+                      </motion.button>
+                      <motion.button whileTap={{ scale: 0.97 }} onClick={() => setDocBack('doc-back-upload.jpg')}
+                        className="flex-1 bg-surface-interactive text-foreground font-display font-bold text-sm py-3 rounded-xl min-h-[44px] flex items-center justify-center gap-2">
+                        <Upload size={16} /> Galeria
+                      </motion.button>
+                    </div>
+
+                    <motion.button whileTap={{ scale: 0.97 }} onClick={() => setKycSubStep('liveness')} disabled={!docBack}
+                      className={`w-full font-display font-bold text-sm py-3.5 rounded-xl min-h-[44px] transition-all ${
+                        docBack ? 'bg-primary text-primary-foreground hover:brightness-110' : 'bg-surface-interactive text-muted-foreground cursor-not-allowed'
+                      }`}>
+                      Próximo — Prova de Vida
+                    </motion.button>
                   </div>
-                  <p className="text-sm font-body font-medium">{selfie ? 'Selfie enviada' : 'Selfie com documento'}</p>
-                  <p className="text-[0.65rem] text-muted-foreground font-body">Opcional, mas acelera a aprovação</p>
-                  <button onClick={() => setSelfie('selfie.jpg')}
-                    className="bg-surface-interactive text-foreground font-body font-semibold text-xs px-4 py-2 rounded-lg min-h-[44px] flex items-center gap-2">
-                    <Camera size={14} />
-                    {selfie ? 'Tirar Novamente' : 'Tirar Selfie'}
+                </motion.div>
+              )}
+
+              {/* LIVENESS CHECK — Circular Guide */}
+              {kycSubStep === 'liveness' && (
+                <motion.div key="kyc-liveness" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} className="flex-1 px-6 pt-4">
+                  <button onClick={() => setKycSubStep('doc-back')} className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-foreground/70 hover:text-foreground">
+                    <ArrowLeft size={22} />
                   </button>
-                </div>
-              </div>
+                  <div className="mt-2 space-y-5">
+                    <div className="text-center">
+                      <h2 className="font-display text-lg font-extrabold">Prova de Vida</h2>
+                      <p className="text-xs font-body text-muted-foreground mt-1">Siga as instruções na tela para confirmar que é você</p>
+                    </div>
 
-              <motion.button whileTap={{ scale: 0.97 }}
-                onClick={() => { setKycStatus('analyzing'); setTimeout(() => { setKycStatus('approved'); setTimeout(() => setStep('success'), 800); }, 2000); }}
-                disabled={!docFront || !docBack}
-                className={`w-full font-display font-bold text-base py-3.5 rounded-xl min-h-[44px] transition-all ${
-                  docFront && docBack
-                    ? 'bg-primary text-primary-foreground hover:brightness-110'
-                    : 'bg-surface-interactive text-muted-foreground cursor-not-allowed'
-                }`}>
-                Enviar Documentos
-              </motion.button>
+                    {/* Circular face guide */}
+                    <div className="relative mx-auto w-56 h-56">
+                      {/* Outer ring animated */}
+                      <motion.div className="absolute inset-0 rounded-full border-[3px] border-dashed border-primary/30"
+                        animate={{ rotate: 360 }} transition={{ duration: 8, repeat: Infinity, ease: 'linear' }} />
+                      {/* Progress ring */}
+                      <svg className="absolute inset-0 w-full h-full -rotate-90">
+                        <circle cx="112" cy="112" r="106" fill="none" stroke="hsl(var(--surface-interactive))" strokeWidth="4" />
+                        <motion.circle cx="112" cy="112" r="106" fill="none" stroke="hsl(var(--secondary))" strokeWidth="4"
+                          strokeDasharray={666} strokeDashoffset={666 - (666 * livenessProgress / 100)} strokeLinecap="round"
+                          transition={{ duration: 0.3 }}
+                        />
+                      </svg>
+                      {/* Inner area */}
+                      <div className="absolute inset-4 rounded-full bg-surface-card flex items-center justify-center overflow-hidden">
+                        <motion.div animate={
+                          livenessStep === 0 ? {} :
+                          livenessStep === 1 ? { rotate: [0, 15, -15, 0] } :
+                          livenessStep === 2 ? { scale: [1, 1.05, 1] } :
+                          { y: [0, -3, 0] }
+                        } transition={{ duration: 1.5, repeat: Infinity }}>
+                          <UserCircle size={64} className="text-muted-foreground/30" />
+                        </motion.div>
+                      </div>
+                    </div>
 
-              <button onClick={() => setStep('success')} className="w-full text-center text-xs text-muted-foreground font-body min-h-[44px]">
-                Pular por agora
-              </button>
-            </div>
+                    {/* Liveness instructions */}
+                    {(() => {
+                      const instructions = [
+                        { text: 'Posicione seu rosto no centro', emoji: '👤' },
+                        { text: 'Agora vire levemente a cabeça', emoji: '↔️' },
+                        { text: 'Dê um leve sorriso', emoji: '😊' },
+                        { text: 'Pisque os olhos', emoji: '😉' },
+                      ];
+                      const current = instructions[livenessStep] || instructions[0];
+                      return (
+                        <motion.div key={livenessStep} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                          className="text-center space-y-1">
+                          <span className="text-2xl">{current.emoji}</span>
+                          <p className="text-sm font-body font-semibold text-foreground">{current.text}</p>
+                        </motion.div>
+                      );
+                    })()}
+
+                    <motion.button whileTap={{ scale: 0.97 }}
+                      onClick={() => {
+                        if (livenessStep < 3) {
+                          setLivenessStep(livenessStep + 1);
+                          setLivenessProgress((livenessStep + 1) * 33);
+                        } else {
+                          setLivenessProgress(100);
+                          setSelfie('liveness-selfie.jpg');
+                          setTimeout(() => setKycSubStep('validating'), 600);
+                        }
+                      }}
+                      className="w-full bg-primary text-primary-foreground font-display font-bold text-sm py-3.5 rounded-xl min-h-[44px] hover:brightness-110 transition-all">
+                      {livenessStep < 3 ? 'Confirmar' : 'Finalizar Captura'}
+                    </motion.button>
+
+                    <p className="text-[0.6rem] font-body text-muted-foreground text-center leading-snug">
+                      A câmera verifica que você é uma pessoa real, não uma foto ou deepfake. Seus dados biométricos não são armazenados.
+                    </p>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* VALIDATING — Loading Pipeline */}
+              {kycSubStep === 'validating' && (
+                <motion.div key="kyc-validating" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                  className="flex-1 px-6 pt-4 flex flex-col items-center justify-center min-h-[70vh]">
+                  <div className="w-full max-w-xs space-y-8">
+                    <div className="text-center space-y-2">
+                      <motion.div animate={{ rotate: 360 }} transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+                        className="w-16 h-16 mx-auto rounded-full bg-primary/15 flex items-center justify-center">
+                        <ShieldCheck size={32} className="text-primary" />
+                      </motion.div>
+                      <h2 className="font-display text-lg font-extrabold">Estamos validando seus dados</h2>
+                      <p className="text-xs font-body text-muted-foreground">Para sua proteção, cada camada é verificada individualmente</p>
+                    </div>
+
+                    {/* Validation steps */}
+                    <div className="space-y-3">
+                      {[
+                        { icon: CreditCard, label: 'Consulta CPF — Receita Federal', status: validationStep >= 0 ? (validationStep > 0 ? 'done' : 'loading') : 'pending' },
+                        { icon: Scan, label: 'OCR — Extração de dados do documento', status: validationStep >= 1 ? (validationStep > 1 ? 'done' : 'loading') : 'pending' },
+                        { icon: Camera, label: 'Liveness — Prova de vida confirmada', status: validationStep >= 2 ? (validationStep > 2 ? 'done' : 'loading') : 'pending' },
+                        { icon: Brain, label: 'Face Match — Comparação biométrica', status: validationStep >= 3 ? (validationStep > 3 ? 'done' : 'loading') : 'pending' },
+                        { icon: AlertTriangle, label: 'Anti-Deepfake — Análise de manipulação', status: validationStep >= 4 ? (validationStep > 4 ? 'done' : 'loading') : 'pending' },
+                        { icon: ShieldCheck, label: 'PLD — Prevenção à Lavagem de Dinheiro', status: validationStep >= 5 ? (validationStep > 5 ? 'done' : 'loading') : 'pending' },
+                      ].map((item, i) => (
+                        <motion.div key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.15 }}
+                          className="flex items-center gap-3">
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                            item.status === 'done' ? 'bg-secondary/20' : item.status === 'loading' ? 'bg-primary/15' : 'bg-surface-interactive'
+                          }`}>
+                            {item.status === 'done' ? <Check size={14} className="text-secondary" /> :
+                             item.status === 'loading' ? (
+                              <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}>
+                                <RefreshCw size={14} className="text-primary" />
+                              </motion.div>
+                             ) : <item.icon size={14} className="text-muted-foreground/40" />}
+                          </div>
+                          <span className={`text-[0.7rem] font-body font-medium ${
+                            item.status === 'done' ? 'text-secondary' : item.status === 'loading' ? 'text-foreground' : 'text-muted-foreground/50'
+                          }`}>{item.label}</span>
+                        </motion.div>
+                      ))}
+                    </div>
+
+                    {/* Auto-advance simulation */}
+                    {(() => {
+                      // eslint-disable-next-line react-hooks/rules-of-hooks
+                      useEffect(() => {
+                        if (kycSubStep !== 'validating') return;
+                        setValidationStep(0);
+                        const timers = [
+                          setTimeout(() => setValidationStep(1), 1200),
+                          setTimeout(() => setValidationStep(2), 2400),
+                          setTimeout(() => setValidationStep(3), 3400),
+                          setTimeout(() => setValidationStep(4), 4400),
+                          setTimeout(() => setValidationStep(5), 5200),
+                          setTimeout(() => setValidationStep(6), 6000),
+                          setTimeout(() => setKycSubStep('done'), 6800),
+                        ];
+                        return () => timers.forEach(clearTimeout);
+                      }, [kycSubStep]);
+                      return null;
+                    })()}
+                  </div>
+                </motion.div>
+              )}
+
+              {/* KYC DONE */}
+              {kycSubStep === 'done' && (
+                <motion.div key="kyc-done" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
+                  className="flex-1 px-6 pt-4 flex flex-col items-center justify-center min-h-[70vh]">
+                  <div className="w-full max-w-xs space-y-6 text-center">
+                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+                      className="w-20 h-20 mx-auto rounded-full bg-secondary/20 flex items-center justify-center">
+                      <CheckCircle2 size={44} className="text-secondary" />
+                    </motion.div>
+                    <div>
+                      <h2 className="font-display text-xl font-extrabold">Identidade Verificada!</h2>
+                      <p className="text-xs font-body text-muted-foreground mt-2">
+                        Todas as 5 camadas de segurança foram aprovadas. Seu dinheiro e prêmios estão protegidos.
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-2">
+                      {[
+                        { icon: CreditCard, label: 'CPF' },
+                        { icon: FileText, label: 'OCR' },
+                        { icon: Camera, label: 'Liveness' },
+                        { icon: Brain, label: 'Face Match' },
+                        { icon: AlertTriangle, label: 'Anti-Deepfake' },
+                        { icon: ShieldCheck, label: 'PLD' },
+                      ].map((item, i) => (
+                        <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}
+                          className="bg-secondary/10 rounded-lg p-2 flex flex-col items-center gap-1">
+                          <item.icon size={14} className="text-secondary" />
+                          <span className="text-[0.55rem] font-body font-semibold text-secondary">{item.label}</span>
+                        </motion.div>
+                      ))}
+                    </div>
+
+                    <div className="bg-primary/10 rounded-xl p-3">
+                      <p className="text-[0.65rem] font-body text-primary leading-snug">
+                        💰 <strong>Por sua segurança:</strong> só aceitamos depósitos de contas em seu nome. Isso garante que seu prêmio vá direto para você!
+                      </p>
+                    </div>
+
+                    <motion.button whileTap={{ scale: 0.97 }} onClick={() => setStep('success')}
+                      className="w-full bg-primary text-primary-foreground font-display font-bold text-base py-3.5 rounded-xl min-h-[44px] hover:brightness-110 transition-all">
+                      Começar a Apostar 🎉
+                    </motion.button>
+                  </div>
+                </motion.div>
+              )}
+
+            </AnimatePresence>
           </motion.div>
         )}
 
