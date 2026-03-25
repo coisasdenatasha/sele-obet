@@ -756,7 +756,7 @@ const AuthPage = () => {
                         };
                         setAuthError(errMap[error] || error);
                       } else {
-                        setStep('success');
+                        setStep('kyc');
                       }
                     }
                   }}
