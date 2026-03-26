@@ -30,7 +30,7 @@ const OddsChip = ({ odds, label, betId, match, market, selection, boosted, origi
       className={cn(
         "flex flex-col items-center justify-center min-w-[72px] min-h-[44px] px-3 py-2 rounded-lg transition-colors font-display",
         isSelected
-          ? "bg-primary text-primary-foreground"
+          ? "bg-secondary text-secondary-foreground glow-neon"
           : "bg-surface-interactive text-foreground hover:bg-muted"
       )}
     >
