@@ -15,7 +15,7 @@ export default {
     extend: {
       fontFamily: {
         display: ["Lexend", "sans-serif"],
-        body: ["Manrope", "sans-serif"],
+        body: ["Inter", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
