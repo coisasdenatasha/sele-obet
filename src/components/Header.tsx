@@ -9,7 +9,7 @@ const Header = () => {
 
   return (
     <>
-      <header className="sticky top-0 z-30 bg-accent px-4 py-3 relative">
+      <header className="sticky top-0 z-30 bg-surface-section px-4 py-3 relative">
         
         <div className="flex items-center justify-between max-w-7xl mx-auto">
           {/* Perfil à esquerda */}
